@@ -1,0 +1,25 @@
+.btn.module-button{
+    position: relative;
+    width: 379px;
+    height: 195px;
+    margin: 50px;
+
+    background: #C4C4C4;
+
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 36px;
+    line-height: 42px;
+    text-align: center;
+
+    color: #000000;
+}
+
+h1.username-display{
+    background-color: #C4C4C4;;
+    width: 222px;
+    height: 48px;
+    left: 82px;
+    top: 131px;
+}
