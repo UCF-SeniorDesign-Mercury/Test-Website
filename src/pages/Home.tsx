@@ -37,10 +37,10 @@ function HomePage(): JSX.Element
                         PDF's
                     </Button>
                     <Button variant="primary" className="module-button" type="submit">
-                        Notification
+                        Test
                     </Button>
                     <Button variant="primary" className="module-button" type="submit">
-                        Calendar
+                        Test
                     </Button>
                     <Button variant="primary" className="module-button" type="submit">
                         Module
