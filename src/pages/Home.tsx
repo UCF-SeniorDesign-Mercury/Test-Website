@@ -37,22 +37,22 @@ function HomePage(): JSX.Element
                         PDF's
                     </Button>
                     <Button variant="primary" className="module-button" type="submit">
+                        Notification
+                    </Button>
+                    <Button variant="primary" className="module-button" type="submit">
+                        Calendar
+                    </Button>
+                    <Button variant="primary" className="module-button" type="submit">
+                        Module
+                    </Button>
+                    <Button variant="primary" className="module-button" type="submit">
+                        Module
+                    </Button>
+                    <Button variant="primary" className="module-button" type="submit">
                         Test
                     </Button>
                     <Button variant="primary" className="module-button" type="submit">
                         Test
-                    </Button>
-                    <Button variant="primary" className="module-button" type="submit">
-                        Module
-                    </Button>
-                    <Button variant="primary" className="module-button" type="submit">
-                        Module
-                    </Button>
-                    <Button variant="primary" className="module-button" type="submit">
-                        Module
-                    </Button>
-                    <Button variant="primary" className="module-button" type="submit">
-                        Module
                     </Button>
                     
                 </Form>
