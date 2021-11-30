@@ -26,7 +26,7 @@ const LoginPage = function (): JSX.Element {
   return (
     <div className="div-background">
       <div className="header">
-        <h1>Electric Eagles</h1>
+        <h1>Electric Eagles CAWWWWW</h1>
       </div>
       <Form className="login-form" onSubmit={SubmitHandler}>
         <Form.Group className="mb-3" controlId="login">
