@@ -1,0 +1,82 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "jest": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 12,
+        "sourceType": "module",
+        "project": "./tsconfig.json"
+    },
+    "plugins": [
+        "react",
+        "@typescript-eslint"
+    ],
+    "rules": {
+        "react/jsx-uses-react": "off",
+        "react/react-in-jsx-scope": "off",
+        "arrow-parens": "off",
+        "semi": "off",
+        // should be changed to error (2)
+        "@typescript-eslint/no-empty-function": 1,
+        // should be changed to error (2)
+        "react/no-unescaped-entities": 1,
+        // should be changed to error (2)
+        "@typescript-eslint/ban-ts-comment": 1,
+        "@typescript-eslint/semi": [
+            "error"
+        ],
+        "@typescript-eslint/member-delimiter-style": [
+            "error",
+            {
+                "multiline": {
+                    "delimiter": "semi",
+                    "requireLast": true
+                },
+                "singleline": {
+                    "delimiter": "semi",
+                    "requireLast": false
+                },
+                "multilineDetection": "brackets"
+            }
+        ],
+        "indent": "off",
+        "@typescript-eslint/indent": [
+            "error",
+            2,
+            {
+                "ignoredNodes": [
+                    "TSTypeParameterInstantiation"
+                ]
+            }
+        ],
+        "@typescript-eslint/array-type": [
+            "error",
+            {
+                "default": "array"
+            }
+        ],
+        // should be changed to error (2)
+        "@typescript-eslint/no-floating-promises": 1,
+        // should be changed to error (2)
+        "@typescript-eslint/explicit-module-boundary-types": 1,
+        "quotes": "off",
+        "@typescript-eslint/quotes": [
+            "error",
+            "single",
+            {
+                "avoidEscape": true
+            }
+        ]
+    }
+}
