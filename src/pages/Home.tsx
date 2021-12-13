@@ -3,6 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Home.css';
+import { NavLink } from 'react-router-dom';
 
 import { useContext } from 'react';
 
@@ -30,9 +31,11 @@ const HomePage = function (): JSX.Element {
           <Button variant="primary" className="module-button" type="submit">
             Chat
           </Button>
-          <Button variant="primary" className="module-button" type="submit">
-            PDF's
-          </Button>
+          <NavLink to="/pdf">
+            <Button variant="primary" className="module-button" type="submit">
+              PDF's
+            </Button>
+          </NavLink>
           <Button variant="primary" className="module-button" type="submit">
             Notification
           </Button>

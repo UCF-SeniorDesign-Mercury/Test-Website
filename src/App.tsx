@@ -7,6 +7,7 @@ import {
 import Context from './context/MainContext';
 import LoginPage from './pages/Login';
 import HomePage from './pages/Home';
+import PDFPage from './pages/PDF';
 
 const App = function (): JSX.Element {
   // keeps track of id and token in the website
@@ -41,6 +42,7 @@ const App = function (): JSX.Element {
               {!var1 && <Redirect from="/home" to="/login" exact />}
               {!var1 && <Route path="/login" component={LoginPage} />}
               {var1 && <Route path="/home" component={HomePage} />}
+              {var1 && <Route path="/pdf" component={PDFPage} />}
             </Switch>
           </main>
         </Context.Provider>
