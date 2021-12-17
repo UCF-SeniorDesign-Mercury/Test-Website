@@ -7,7 +7,11 @@ const useFullPageLoader = () => {
   return [
     loading ? <FullPageLoader /> : null, 
     () => setLoading(true), // shows the loader
-    () => setLoading(false) // hide the loader
+    async () => {
+      setLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setLoading(false);
+    }
   ] as const;
 };
 

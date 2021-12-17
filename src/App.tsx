@@ -31,14 +31,14 @@ const App = function (): JSX.Element {
           value={{
             var1,
             var2,
-            login: login as any,
+            login,
             logout,
           }}
         >
           <main className="main-content">
             <Switch>
               {!var1 && <Redirect from="/" to="/login" exact />}
-              {var1 && <Redirect from="/login" to="/home" exact />}
+              {var1 && <Redirect from="/login" to="/home" exact />} 
               {!var1 && <Redirect from="/home" to="/login" exact />}
               {!var1 && <Route path="/login" component={LoginPage} />}
               {var1 && <Route path="/home" component={HomePage} />}
