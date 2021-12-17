@@ -7,12 +7,13 @@ import { NavLink } from 'react-router-dom';
 
 import { useContext } from 'react';
 
-function SubmitHandler(event: any): void {
+function SubmitHandler(event: React.FormEvent<HTMLFormElement>): void {
   const context = useContext(mainContext);
 
   // prevents submit button to reload page
   event.preventDefault();
-  context.logout();
+  if (context && context.logout)
+    context.logout();
 }
 
 const HomePage = function (): JSX.Element {
@@ -33,7 +34,7 @@ const HomePage = function (): JSX.Element {
           </Button>
           <NavLink to="/pdf">
             <Button variant="primary" className="module-button" type="submit">
-              PDF's
+              PDF&apos;s
             </Button>
           </NavLink>
           <Button variant="primary" className="module-button" type="submit">

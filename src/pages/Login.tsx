@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, } from 'react';
 
 import './Login.css';
 
@@ -19,8 +19,8 @@ const LoginPage = function (): JSX.Element {
     event.preventDefault();
     if (loginEl && loginEl.current) {
       const login: string = loginEl.current.value;
-      // @ts-ignore
-      context.login(login);
+      if (context && context.login)
+        context.login(login);
     }
   }
 
@@ -36,7 +36,6 @@ const LoginPage = function (): JSX.Element {
             className="login-form-control"
             type="text"
             placeholder="Email"
-            id="login"
             ref={loginEl}
             required
           />
@@ -46,7 +45,6 @@ const LoginPage = function (): JSX.Element {
             className="login-form-control"
             type="password"
             placeholder="Password"
-            id="password"
             ref={passwordEl}
             required
           />

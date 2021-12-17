@@ -1,5 +1,5 @@
 import './App.css';
-import React, {SetStateAction, useState } from 'react';
+import React, { useState } from 'react';
 import {
   BrowserRouter, Route, Redirect, Switch,
 } from 'react-router-dom';
@@ -11,10 +11,10 @@ import PDFPage from './pages/PDF';
 
 const App = function (): JSX.Element {
   // keeps track of id and token in the website
-  const [var1, setVar1] = useState(null);
+  const [var1, setVar1] = useState<string | null>(null);
   const [var2, setVar2] = useState('this is var 2');
 
-  const login = (value: SetStateAction<null>) => {
+  const login = (value: string) => {
     setVar1(value);
     setVar2('this is var 2');
   };
