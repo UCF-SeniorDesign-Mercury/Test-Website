@@ -8,6 +8,7 @@ import Context from './context/MainContext';
 import LoginPage from './pages/Login';
 import HomePage from './pages/Home';
 import PDFPage from './pages/PDF';
+import Menu from './components/Navigation/Menu';
 
 const App = function (): JSX.Element {
   // keeps track of id and token in the website
@@ -36,8 +37,10 @@ const App = function (): JSX.Element {
           }}
         >
           <main className="main-content">
+            {var1 && <Menu/>} 
             <Switch>
               {!var1 && <Redirect from="/" to="/login" exact />}
+              {!var1 && <Redirect from="/logout" to="/login" exact />}
               {var1 && <Redirect from="/login" to="/home" exact />} 
               {!var1 && <Redirect from="/home" to="/login" exact />}
               {!var1 && <Route path="/login" component={LoginPage} />}

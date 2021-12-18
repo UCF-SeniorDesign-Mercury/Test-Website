@@ -1,12 +1,32 @@
+.home-page {
+    background: rgba(198, 212, 252, 0.452);
+}
+
+.home-page .username-display {
+    display: inline-block;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 60px;
+    width: 222px;
+    height: 48px;
+    left: 82px;
+    top: 131px;
+    text-align: center;
+    background-color: #FFC947;
+    color: #000000;
+}
+
 .btn.module-button{
     position: relative;
-    width: 379px;
-    height: 195px;
-    margin: 50px;
+    width: 25%;
+    height: 180px;
+    margin-left: 100px;
+    margin-bottom: 50px;
+    display: inline-block;
 
     background: #C4C4C4;
 
-    font-family: Roboto;
+    font-family: 'Roboto';
     font-style: normal;
     font-weight: normal;
     font-size: 36px;
@@ -14,12 +34,5 @@
     text-align: center;
 
     color: #000000;
-}
-
-h1.username-display{
-    background-color: #C4C4C4;;
-    width: 222px;
-    height: 48px;
-    left: 82px;
-    top: 131px;
+    background-color: #FFC947;
 }

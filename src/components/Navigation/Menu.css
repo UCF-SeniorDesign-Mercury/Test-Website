@@ -1,0 +1,69 @@
+.Menu {
+    background-color: #FFC947;
+}
+
+.Menu .menu-icon {
+    display: inline-block;
+    cursor: pointer;
+    margin: auto;
+}
+
+.regular-menu {
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.regular-menu nav ul {
+    width: calc(100vw - 70px);
+    overflow-x: hidden;
+}
+
+.regular-menu nav ul li{
+    display: none;
+}
+
+.regular-menu nav ul li.regular{
+    display: inline-block;
+    font-family: 'Roboto';
+    font-size: 36px;
+    margin-left: 180px;
+}
+
+.regular-menu nav ul li:hover {
+    border-bottom: 5px solid black;
+}
+
+.regular-menu nav ul li a{
+    text-decoration: none;
+    color:black;
+}
+
+.hamburger-menu {
+    position: absolute;
+    z-index: 1000;
+}
+
+.hamburger-menu nav ul {
+    width: 100vw;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: #615700;
+    opacity: 0.95;
+}
+
+.hamburger-menu nav ul li{
+    display: block;
+    font-family: 'Roboto';
+    font-size: 36px;
+    text-align: center;
+}
+
+.hamburger-menu nav ul li:hover {
+    border-bottom: 5px solid black;
+}
+
+.hamburger-menu nav ul li a{
+    text-decoration: none;
+    color:black;
+}
