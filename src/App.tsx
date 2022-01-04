@@ -8,6 +8,7 @@ import Context from './context/MainContext';
 import LoginPage from './pages/Login';
 import HomePage from './pages/Home';
 import PDFPage from './pages/PDF';
+import PDF_TestPage from './pages/PDF_Test';
 import Menu from './components/Navigation/Menu';
 
 const App = function (): JSX.Element {
@@ -46,6 +47,7 @@ const App = function (): JSX.Element {
               {!var1 && <Route path="/login" component={LoginPage} />}
               {var1 && <Route path="/home" component={HomePage} />}
               {var1 && <Route path="/pdf" component={PDFPage} />}
+              {var1 && <Route path="/pdf_test" component={PDF_TestPage} />}
             </Switch>
           </main>
         </Context.Provider>

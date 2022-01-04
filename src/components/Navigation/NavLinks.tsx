@@ -15,11 +15,11 @@ const NavLinks = (props:NavLinksProps):JSX.Element => {
       <nav className="links">
         <ul>
           {context.var1 && <li className='regular' onClick={() => {
-            if (context && context.logout) {
-              context.logout();
-              props.closeMenu();
-            }
-          }}> <NavLink to="/logout">Home</NavLink></li>} 
+            // if (context && context.logout) {
+            //   context.logout();
+            //   props.closeMenu();
+            // }
+          }}> <NavLink to="/home">Home</NavLink></li>} 
 
           {context.var1 && <li className='regular' onClick={() => {
             if (context && context.logout) {
@@ -40,7 +40,19 @@ const NavLinks = (props:NavLinksProps):JSX.Element => {
               context.logout();
               props.closeMenu();
             }
-          }}> <NavLink to="/logout">PDF&apos;s</NavLink></li>}  
+          }}> <NavLink to="/logout">PDF&apos;s</NavLink></li>}
+
+          {/* pdf test nav link    */}
+          
+          {context.var1 && <li className='regular' onClick={() => {
+            // if (context && context.logout) {
+            //   context.logout();
+            //   props.closeMenu();
+            // }
+          }}> <NavLink to="/pdf_test">PDF Test&apos;s</NavLink></li>}
+
+          {/* pdf test nav link end */}
+          
           {context.var1 && <li className='regular' onClick={() => {
             if (context && context.logout) {
               context.logout();
@@ -60,7 +72,7 @@ const NavLinks = (props:NavLinksProps):JSX.Element => {
               context.logout();
               props.closeMenu();
             }
-          }}> <NavLink to="/logout">Calendar</NavLink></li>}  
+          }}> <NavLink to="/logout">Calendar</NavLink></li>}
           
           {context.var1 && <li onClick={() => {
             if (context && context.logout) {

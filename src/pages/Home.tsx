@@ -49,9 +49,11 @@ const HomePage = function (): JSX.Element {
           <Button variant="primary" className="module-button" type="submit">
             Module
           </Button>
-          <Button variant="primary" className="module-button" type="submit">
-            Test
-          </Button>
+          <NavLink to="/pdf_test">
+            <Button variant="primary" className="module-button" type="submit">
+              PDF_test&apos;s
+            </Button>
+          </NavLink>
           <Button variant="primary" className="module-button" type="submit">
             Test
           </Button>
