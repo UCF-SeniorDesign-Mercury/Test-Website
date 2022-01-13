@@ -7,6 +7,9 @@ import Button from 'react-bootstrap/Button';
 import mainContext from '../context/MainContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { loginWithEmail } from '../firebase/firebase';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+import Alert from '@mui/material/Alert';
 
 import armyLogo from '../assets/1200px-Seal_of_the_United_States_Army_Reserve.svg.png';
 
@@ -14,11 +17,14 @@ const LoginPage = function (): JSX.Element {
   const context = useContext(mainContext);
   const loginEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const passwordEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-  const [headerMessage, setHeaderMessage] = useState('Welcome Back!');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [spinner, setSpinner] = useState(false);
+  const [alert, setAlert] = useState(false);
 
   async function SubmitHandler(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     // prevents submit button to reload page
     event.preventDefault();
+    setSpinner(true);
     if (loginEl && loginEl.current && passwordEl.current && passwordEl.current) {
       const login: string = loginEl.current.value;
       const password: string = passwordEl.current.value;
@@ -31,17 +37,26 @@ const LoginPage = function (): JSX.Element {
   async function handleOnLogin(email: string, password: string): Promise<boolean | undefined> {
     const result = await loginWithEmail(email, password);
     if (!result){
-      setHeaderMessage('Error Cannot Login. Try making an account on firebase.');
+      setAlertMessage('Error Cannot Login. Try making an account on firebase.');
+      setAlert(true);
+      setSpinner(false);
     }
     return result;
   }
 
   return (
     <div className="div-background">
+      {alert && <Alert severity="error">{alertMessage}</Alert>}
       <div className="login-header">
-        <h1 className="headerText">{headerMessage}</h1>
+        <h1 className="headerText">Welcome Back!</h1>
         <img className="login-img" src={armyLogo}/>
       </div>
+      {spinner && <Box sx={{ 
+        display: 'flex',
+        width: '100%',
+      }}>
+        <CircularProgress />
+      </Box>}
       <Form className="login-form" onSubmit={SubmitHandler}>
         <Form.Group className="mb-3" controlId="login">
           <Form.Control
