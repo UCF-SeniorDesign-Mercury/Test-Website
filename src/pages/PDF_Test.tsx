@@ -3,6 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 import './PDF.css';
 import { downloadPDF } from '../firebase/firebase';
+import { arrayBuffer } from 'stream/consumers';
+// import { downloadPDF } from '../firebase/firebase';
 
 
 const iframeStyle = {
@@ -11,7 +13,18 @@ const iframeStyle = {
 };
 
 const PDF_TestPage = function (): JSX.Element {
-  const [iframeSrc, setiframeSrc] = useState<string | undefined>('about:blank');
+  const [iframeSrc, setiframeSrc] = useState<string | undefined >('about:blank');
+
+  // async function handleOnLogin(email: string, password: string): Promise<boolean | undefined> {
+
+  async function byteDownload(){
+    const bytes = await downloadPDF('RST_base64.txt');
+    // const bytesString = bytes.toString();
+    console.log(bytes);
+    return bytes;
+    
+  }
+  
 
   useEffect(() => {
     async function modifyPdf() {
@@ -43,7 +56,8 @@ const PDF_TestPage = function (): JSX.Element {
           console.log('success');
           return res;
         });
-      setiframeSrc(pdfDataUri);
+      // console.log(pdfDataUri);
+      setiframeSrc(await byteDownload());
     
       // eslint-disable-next-line
       const pdfBytes = await pdfDoc.save();
