@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { loginWithEmail } from '../firebase/firebase';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
+import AlertBox from '../components/AlertBox';
 
 import armyLogo from '../assets/1200px-Seal_of_the_United_States_Army_Reserve.svg.png';
 
@@ -24,6 +24,7 @@ const LoginPage = function (): JSX.Element {
   async function SubmitHandler(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     // prevents submit button to reload page
     event.preventDefault();
+    setAlert(false);
     setSpinner(true);
     if (loginEl && loginEl.current && passwordEl.current && passwordEl.current) {
       const login: string = loginEl.current.value;
@@ -44,9 +45,10 @@ const LoginPage = function (): JSX.Element {
     return result;
   }
 
+
   return (
     <div className="div-background">
-      {alert && <Alert severity="error">{alertMessage}</Alert>}
+      {AlertBox(alert, setAlert, alertMessage)}
       <div className="login-header">
         <h1 className="headerText">Welcome Back!</h1>
         <img className="login-img" src={armyLogo}/>
