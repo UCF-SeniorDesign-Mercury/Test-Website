@@ -56,6 +56,9 @@ const LoginPage = function (): JSX.Element {
       {spinner && <Box sx={{ 
         display: 'flex',
         width: '100%',
+        zIndex:1, 
+        position: 'absolute', 
+        opacity: '80%',
       }}>
         <CircularProgress />
       </Box>}

@@ -17,6 +17,7 @@ export default function AlertBox(externalOpen: boolean, externalSetOpen: React.D
       opacity: '80%',
     }} 
 
+    variant='filled'
     severity="error"
 
     action={
@@ -35,7 +36,6 @@ export default function AlertBox(externalOpen: boolean, externalSetOpen: React.D
     // overrriding default css
     sx={{ 
       mb: 2,
-      'background-color': '#FFCCCC',
     }}
     
   >{message}</Alert>
