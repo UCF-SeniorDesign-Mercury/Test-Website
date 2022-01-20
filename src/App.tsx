@@ -10,6 +10,7 @@ import HomePage from './pages/Home';
 import PDFPage from './pages/PDF';
 import PDF_TestPage from './pages/PDF_Test';
 import Menu from './components/Navigation/Menu';
+import RegisterNewUserPage from './pages/RegisterNewUser';
 
 const App = function (): JSX.Element {
   // keeps track of id and token in the website
@@ -45,6 +46,7 @@ const App = function (): JSX.Element {
               {var1 && <Redirect from="/login" to="/home" exact />} 
               {!var1 && <Redirect from="/home" to="/login" exact />}
               {!var1 && <Route path="/login" component={LoginPage} />}
+              {!var1 && <Route path="/registerNewUser" component={RegisterNewUserPage} />}
               {var1 && <Route path="/home" component={HomePage} />}
               {var1 && <Route path="/pdf" component={PDFPage} />}
               {var1 && <Route path="/pdf_test" component={PDF_TestPage} />}

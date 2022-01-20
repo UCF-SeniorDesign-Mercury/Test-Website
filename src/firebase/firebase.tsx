@@ -1,10 +1,11 @@
-import * as firebase from 'firebase/app';
 // import firebase from 'firebase/app'
-import { Auth, getAuth, signInWithEmailAndPassword} from 'firebase/auth';
+import { Auth, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification} from 'firebase/auth';
 '@firebase/auth-types';
 
 import { initializeApp } from 'firebase/app';
-import { getStorage, ref,getBlob, listAll,getMetadata, getBytes, FirebaseStorage } from 'firebase/storage';
+
+// import { getStorage, ref,getBlob, listAll,getMetadata, getBytes, FirebaseStorage } from 'firebase/storage';
+import { getStorage, ref,getBlob,} from 'firebase/storage';
 
 import firebaseConfig from './firebaseConfig';
 
@@ -12,15 +13,35 @@ import firebaseConfig from './firebaseConfig';
 
 // Initialize Firebase App
 
-if (!firebase.getApps().length) {
-  firebase.initializeApp(firebaseConfig);
-}
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth();
+
+export const registerWithEmail = async (email: string, password: string): Promise<boolean | undefined> =>
+{
+  try
+  {
+    await createUserWithEmailAndPassword(auth, email, password);
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
+export const verifyEmail = async (): Promise<void> => {
+  try
+  {
+    if (auth.currentUser)
+    {
+      await sendEmailVerification(auth.currentUser);
+    }
+  } catch (err) {
+  }
+};
 
 export const loginWithEmail = async (email: string, password: string): Promise<boolean | undefined> =>
 {
   try
   {
-    const auth = getAuth();
     await signInWithEmailAndPassword(auth, email, password);
     return true;
   } catch (err) {
@@ -41,14 +62,6 @@ export const getToken = async(auth: Auth): Promise<string | undefined> => {
     throw (err);
   }
 };
-
-// export const auth = getAuth();
-// export const registerWithEmail = async (email: string, password: string): Promise<boolean | undefined> =>
-//   auth.createUserWithEmailAndPassword(email, password);
-
-
-
-const firebaseApp = initializeApp(firebaseConfig);
 
 export const downloadPDF = async (filename: string): Promise<string> =>{
   const storage = getStorage(firebaseApp);

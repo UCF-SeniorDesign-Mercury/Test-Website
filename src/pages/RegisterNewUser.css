@@ -1,0 +1,45 @@
+html {background-color: rgba(198, 212, 252, 0.452)}
+
+.div-background {
+    background: rgba(198, 212, 252, 0.452);
+}
+
+.register-header {
+    max-width: 100%;
+    margin-top: 2rem;
+    padding: 1px;
+    text-align: center;
+}
+
+.register-header > .headerText {
+    font-size: calc(42px + 2vmin);
+    font-family: 'Roboto';
+    font-weight: 700;
+}
+
+.register-form {
+    max-width: 85%;
+    margin: 2rem auto;
+}
+
+.form-control.email-form-control {
+    margin-bottom: 3rem;
+}
+
+input[type="text"].email-form-control{
+    background-color: #FFC947;
+    text-align: center;
+    height: 60px;
+}
+
+input[placeholder]{
+    font-weight: 800;
+    color: black; 
+    font-size: 30px;
+}
+
+input[type="password"].password-form-control{
+    background-color: #FFC947;
+    text-align: center;
+    height: 60px;
+}
