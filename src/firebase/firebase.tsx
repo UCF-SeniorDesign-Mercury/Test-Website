@@ -1,5 +1,5 @@
 // import firebase from 'firebase/app'
-import { Auth, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification} from 'firebase/auth';
+import { Auth, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail} from 'firebase/auth';
 '@firebase/auth-types';
 
 import { initializeApp } from 'firebase/app';
@@ -8,6 +8,7 @@ import { initializeApp } from 'firebase/app';
 import { getStorage, ref,getBlob,} from 'firebase/storage';
 
 import firebaseConfig from './firebaseConfig';
+// import { Email, Password } from '@mui/icons-material';
 
 // const axios = require('axios');
 
@@ -38,12 +39,28 @@ export const verifyEmail = async (): Promise<void> => {
   }
 };
 
+export const changePassword = async (email: string): Promise< boolean | void> =>{
+  try
+  {
+    if (auth.currentUser)
+    {
+      await sendPasswordResetEmail(auth, email);
+      return true;
+    }
+  } catch (err) {
+    return false;
+  }
+};
+
 export const loginWithEmail = async (email: string, password: string): Promise<boolean | undefined> =>
 {
   try
   {
-    await signInWithEmailAndPassword(auth, email, password);
-    return true;
+    if(auth.currentUser?.emailVerified == true){
+      await signInWithEmailAndPassword(auth, email, password);
+      return true;
+    }
+    
   } catch (err) {
     return false;
   }

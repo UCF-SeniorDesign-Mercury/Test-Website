@@ -37,7 +37,7 @@ const LoginPage = function (): JSX.Element {
   }
  
   async function handleOnLogin(email: string, password: string): Promise<boolean | undefined> {
-    const result = await loginWithEmail(email, password);
+    const result = await loginWithEmail(email, password); 
     if (!result){
       setAlertMessage('Error Cannot Login. Try making an account.');
       setAlert(true);
@@ -89,6 +89,9 @@ const LoginPage = function (): JSX.Element {
 
       <div className="register-link">
         <NavLink className="register-link" to="/registerNewUser">Haven&apos;t made an Account? Click Here!</NavLink>
+      </div>
+      <div className="register-link">
+        <NavLink className="register-link" to="/changePassword">Forgot Password?</NavLink>
       </div>
     </div>
   );
