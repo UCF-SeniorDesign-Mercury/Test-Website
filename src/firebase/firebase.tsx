@@ -56,10 +56,14 @@ export const loginWithEmail = async (email: string, password: string): Promise<b
 {
   try
   {
+    await signInWithEmailAndPassword(auth, email, password);
+
     if(auth.currentUser?.emailVerified == true){
-      await signInWithEmailAndPassword(auth, email, password);
       return true;
     }
+
+    else
+      return false;
     
   } catch (err) {
     return false;
