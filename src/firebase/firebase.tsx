@@ -42,11 +42,9 @@ export const verifyEmail = async (): Promise<void> => {
 export const changePassword = async (email: string): Promise< boolean | void> =>{
   try
   {
-    if (auth.currentUser)
-    {
-      await sendPasswordResetEmail(auth, email);
-      return true;
-    }
+    await sendPasswordResetEmail(auth, email);
+    return true;
+
   } catch (err) {
     return false;
   }
