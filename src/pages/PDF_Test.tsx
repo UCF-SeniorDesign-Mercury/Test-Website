@@ -4,8 +4,12 @@ import { useEffect, useState } from 'react';
 import './PDF.css';
 import { downloadPDF } from '../firebase/firebase';
 import { arrayBuffer } from 'stream/consumers';
-// import { downloadPDF } from '../firebase/firebase';
+import Button from 'react-bootstrap/Button';
+import React from 'react';
 
+import { postFile } from '../api/files';
+// import { downloadPDF } from '../firebase/firebase';
+// https://stackoverflow.com/questions/31270145/save-pdf-file-loaded-in-iframe
 
 const iframeStyle = {
   width: '100%', 
@@ -14,17 +18,57 @@ const iframeStyle = {
 
 const PDF_TestPage = function (): JSX.Element {
   const [iframeSrc, setiframeSrc] = useState<string | undefined >('about:blank');
+  const inputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
 
   // async function handleOnLogin(email: string, password: string): Promise<boolean | undefined> {
 
   async function byteDownload(){
     const bytes = await downloadPDF('RST_base64.txt');
     // const bytesString = bytes.toString();
-    console.log(bytes);
+    //console.log(bytes);
     return bytes;
     
+  } 
+
+  async function uploadPDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
+    //Read File
+    if (inputEl && inputEl.current){
+      const selectedFile = inputEl.current.files;
+      //Check File is not Empty
+      if (selectedFile && selectedFile.length > 0) {
+        // Select the very first file from list
+        const fileToLoad = selectedFile[0];
+        // FileReader function for read the file.
+        const fileReader = new FileReader();
+        let base64;
+        // Onload of file read the file content
+        fileReader.onload = function(fileLoadedEvent) {
+          if (fileLoadedEvent && fileLoadedEvent.target)
+          {
+            base64 = fileLoadedEvent.target.result;
+            // Print data in console
+            //console.log(base64);
+
+            const requestBody = {
+              file: base64,
+              filename: 'testfilename',
+              reviewer: 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2',
+
+            };
+
+            postFile(requestBody);
+          }
+        };
+        // Convert data to base64
+        fileReader.readAsDataURL(fileToLoad);
+      }
+    }
   }
-  
+
+  function iframeFunction(){
+    console.log('function');
+    
+  }
 
   useEffect(() => {
     async function modifyPdf() {
@@ -36,6 +80,7 @@ const PDF_TestPage = function (): JSX.Element {
     
       const pages = pdfDoc.getPages();
       const firstPage = pages[0];
+      //console.log(pdfDoc.getForm().getFields());
       // eslint-disable-next-line
       const { width, height } = firstPage.getSize();
       // firstPage.drawText('Testing writing on a form :)', {
@@ -56,22 +101,28 @@ const PDF_TestPage = function (): JSX.Element {
           console.log('success');
           return res;
         });
-      // console.log(pdfDataUri);
-      setiframeSrc(pdfDataUri);
+      //console.log(pdfDataUri);
+      // setiframeSrc(pdfDataUri);
+      setiframeSrc(await byteDownload());
     
       // eslint-disable-next-line
       const pdfBytes = await pdfDoc.save();
-      console.log(pdfBytes);
     }
     modifyPdf()
       .catch(err => console.log(err))
       .then( () => console.log('success'))
       .catch(() => 'obligatory catch');
+
   });
 
   return (
     <div>
-      <iframe src={iframeSrc} style={iframeStyle}></iframe>
+      <iframe id="pdfiframe" src={iframeSrc} style={iframeStyle}></iframe>
+      <input id="inputFile" type="file" ref = {inputEl}/>
+      <Button variant="primary" type="submit" onClick={uploadPDF}>
+          Save
+      </Button>
+      {iframeFunction()}
     </div>
   );
 };

@@ -15,7 +15,7 @@ import firebaseConfig from './firebaseConfig';
 // Initialize Firebase App
 
 const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth();
+export const auth = getAuth();
 
 export const registerWithEmail = async (email: string, password: string): Promise<boolean | undefined> =>
 {
@@ -69,7 +69,7 @@ export const loginWithEmail = async (email: string, password: string): Promise<b
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
-export const getToken = async(auth: Auth): Promise<string | undefined> => {
+export const getToken = async(): Promise<string | undefined> => {
   try
   {
     if (auth && auth.currentUser)
