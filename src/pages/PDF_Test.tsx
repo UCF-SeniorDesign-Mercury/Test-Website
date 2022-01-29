@@ -6,8 +6,12 @@ import { downloadPDF } from '../firebase/firebase';
 import { arrayBuffer } from 'stream/consumers';
 import Button from 'react-bootstrap/Button';
 import React from 'react';
+import { getToken } from '../firebase/firebase';
+import Input from '@mui/material/Input';
 
-import { postFile } from '../api/files';
+
+import { postFile, getFile } from '../api/files';
+import { ConstructionOutlined } from '@mui/icons-material';
 // import { downloadPDF } from '../firebase/firebase';
 // https://stackoverflow.com/questions/31270145/save-pdf-file-loaded-in-iframe
 
@@ -19,7 +23,9 @@ const iframeStyle = {
 const PDF_TestPage = function (): JSX.Element {
   const [iframeSrc, setiframeSrc] = useState<string | undefined >('about:blank');
   const inputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-
+  const getFileInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
+  const [getFileActivate, setgetFileActivate] = useState<boolean>(false);
+  
   // async function handleOnLogin(email: string, password: string): Promise<boolean | undefined> {
 
   async function byteDownload(){
@@ -47,16 +53,9 @@ const PDF_TestPage = function (): JSX.Element {
           {
             base64 = fileLoadedEvent.target.result;
             // Print data in console
-            //console.log(base64);
+            console.log(base64);
 
-            const requestBody = {
-              file: base64,
-              filename: 'testfilename',
-              reviewer: 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2',
-
-            };
-
-            postFile(requestBody);
+            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2');
           }
         };
         // Convert data to base64
@@ -65,8 +64,18 @@ const PDF_TestPage = function (): JSX.Element {
     }
   }
 
+  async function getPDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
+    if (getFileInputEl && getFileInputEl.current)
+    {
+      const fileString = await getFile(getFileInputEl.current.value);
+      console.log(fileString);
+      setgetFileActivate(true);
+      setiframeSrc(fileString);
+    }
+  }
+
   function iframeFunction(){
-    console.log('function');
+    console.log(  getToken());
     
   }
 
@@ -108,11 +117,14 @@ const PDF_TestPage = function (): JSX.Element {
       // eslint-disable-next-line
       const pdfBytes = await pdfDoc.save();
     }
-    modifyPdf()
-      .catch(err => console.log(err))
-      .then( () => console.log('success'))
-      .catch(() => 'obligatory catch');
 
+    if (!getFileActivate)
+    {
+      modifyPdf()
+        .catch(err => console.log(err))
+        .then( () => console.log('success'))
+        .catch(() => 'obligatory catch');
+    }
   });
 
   return (
@@ -123,6 +135,11 @@ const PDF_TestPage = function (): JSX.Element {
           Save
       </Button>
       {iframeFunction()}
+
+      <Input placeholder="input file id to get it"  inputRef = {getFileInputEl}/>
+      <Button variant="primary" type="submit" onClick={getPDF}>
+          Get PDF
+      </Button>
     </div>
   );
 };
