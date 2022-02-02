@@ -1,27 +1,5 @@
 import { url, getHeaders } from './api_settings';
 
-/*export const getFile = async (endpoint, token) => {
-  const url_endpoint = url + endpoint;
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: token
-    };
-
-  return axios
-    .get(url_endpoint, { headers: headers })
-    .then((response) => response.data)
-    .catch((error) => console.error(error.message));
-};*/
-
-/*export const postFile = async (data: postData) => {
-  const url_endpoint = url + '/files/upload_file';
-
-  await axios
-    .post(url_endpoint, data, { headers: headers})
-    .then((response: any) => response.data)
-    .catch((error: any) => console.error(error.message));
-};*/
-
 export const getFile = async (fileID: string): Promise<string> => {
   const header = await getHeaders();
 
@@ -43,13 +21,14 @@ export const getFile = async (fileID: string): Promise<string> => {
   });
 };
 
-export const postFile = async (file: string, filename: string, reviewer: string) => {
+export const postFile = async (file: string, filename: string, reviewer: string, signature: string) => {
   const data = {
     file: file,
     filename: filename,
     reviewer: reviewer,
-
   };
+  console.log(JSON.stringify(data));
+
   const header = await getHeaders();
 
   fetch(url + '/files/upload_file', {
@@ -67,23 +46,47 @@ export const postFile = async (file: string, filename: string, reviewer: string)
     });
 };
 
+export const updateFile = async (file: string, file_id: string, filename:string) => {
+  const data = {
+    file: file,
+    file_id: file_id,
+    filename: filename,
+  };
+  console.log(JSON.stringify(data));
 
-/*export const putFile = async (data, endpoint) => {
-  const token = await getToken();
-  const url_endpoint = url + endpoint;
+  const header = await getHeaders();
 
-  return axios
-    .put(url_endpoint, data, { headers: headers })
-    .then((response) => response.data)
-    .catch((error) => console.error(error.message));
+  fetch(url + '/files/update_file', {
+    method: 'PUT',
+    mode: 'cors',
+    headers: header,
+    body: JSON.stringify(data)
+  })
+    .then(response => response)
+    .then(data => {
+      console.log(data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
 
-export const deleteFile = async (data, endpoint) => {
-  const token = await getToken();
-  const url_endpoint = url + endpoint;
+export const deleteFile = async (fileID: string): Promise<void> => {
+  const header = await getHeaders();
 
-  return axios
-    .delete(url_endpoint, data, { headers: headers })
-    .then((response) => response.data)
-    .catch((error) => console.error(error.message));
-};*/
+  return new Promise(function(resolve,reject){
+    fetch(url + '/files/delete_file/' + fileID, {
+      method: 'DELETE',
+      mode: 'cors',
+      headers: header,
+    })
+      .then(response => response)
+      .then(data => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
+};
+

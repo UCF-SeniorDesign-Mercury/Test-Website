@@ -10,7 +10,7 @@ import { getToken } from '../firebase/firebase';
 import Input from '@mui/material/Input';
 
 
-import { postFile, getFile } from '../api/files';
+import { postFile, getFile, updateFile, deleteFile } from '../api/files';
 import { ConstructionOutlined } from '@mui/icons-material';
 // import { downloadPDF } from '../firebase/firebase';
 // https://stackoverflow.com/questions/31270145/save-pdf-file-loaded-in-iframe
@@ -24,6 +24,9 @@ const PDF_TestPage = function (): JSX.Element {
   const [iframeSrc, setiframeSrc] = useState<string | undefined >('about:blank');
   const inputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const getFileInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
+  const getFileDeleteInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
+  const getFileUpdateInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
+  const getFileUpdateStringInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const [getFileActivate, setgetFileActivate] = useState<boolean>(false);
   
   // async function handleOnLogin(email: string, password: string): Promise<boolean | undefined> {
@@ -55,7 +58,36 @@ const PDF_TestPage = function (): JSX.Element {
             // Print data in console
             console.log(base64);
 
-            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2');
+            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2', 'this is signatire');
+          }
+        };
+        // Convert data to base64
+        fileReader.readAsDataURL(fileToLoad);
+      }
+    }
+  }
+
+  async function updatePDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
+    //Read File
+    if (getFileUpdateInputEl && getFileUpdateInputEl.current && getFileUpdateStringInputEl && getFileUpdateStringInputEl.current){
+      const selectedFile = getFileUpdateInputEl.current.files;
+      const selectedFileID = getFileUpdateStringInputEl.current.value;
+      //Check File is not Empty
+      if (selectedFile && selectedFile.length > 0) {
+        // Select the very first file from list
+        const fileToLoad = selectedFile[0];
+        // FileReader function for read the file.
+        const fileReader = new FileReader();
+        let base64;
+        // Onload of file read the file content
+        fileReader.onload = function(fileLoadedEvent) {
+          if (fileLoadedEvent && fileLoadedEvent.target)
+          {
+            base64 = fileLoadedEvent.target.result;
+            // Print data in console
+            console.log(base64);
+
+            updateFile(base64 as string, selectedFileID, 'testfilename.pdf');
           }
         };
         // Convert data to base64
@@ -70,9 +102,18 @@ const PDF_TestPage = function (): JSX.Element {
       const fileString = await getFile(getFileInputEl.current.value);
       console.log(fileString);
       setgetFileActivate(true);
+      setiframeSrc(undefined);
       setiframeSrc(fileString);
     }
   }
+
+  async function deletePDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
+    if (getFileDeleteInputEl && getFileDeleteInputEl.current)
+    {
+      const fileString = await deleteFile(getFileDeleteInputEl.current.value);
+    }
+  }
+
 
   function iframeFunction(){
     console.log(  getToken());
@@ -139,6 +180,17 @@ const PDF_TestPage = function (): JSX.Element {
       <Input placeholder="input file id to get it"  inputRef = {getFileInputEl}/>
       <Button variant="primary" type="submit" onClick={getPDF}>
           Get PDF
+      </Button>
+
+      <Input placeholder="input file id to update it"  type="file" inputRef = {getFileUpdateInputEl}/>
+      <Input placeholder="input file id string to update it" inputRef = {getFileUpdateStringInputEl}/>
+      <Button variant="primary" type="submit" onClick={updatePDF}>
+          Update PDF
+      </Button>
+
+      <Input placeholder="input file id to delete it"  inputRef = {getFileDeleteInputEl}/>
+      <Button variant="primary" type="submit" onClick={deletePDF}>
+          Delete PDF
       </Button>
     </div>
   );
