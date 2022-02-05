@@ -1,10 +1,13 @@
-import { PDFDocument, StandardFonts } from 'pdf-lib';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
+import React from 'react';
 import './PDF.css';
-import { downloadPDF } from '../firebase/firebase';
-// import { downloadPDF } from '../firebase/firebase';
 
+import { postFile, getFile, updateFile, deleteFile } from '../api/files';
+import Input from '@mui/material/Input';
+import Button from '@mui/material/Button';
+import Select from '@mui/material/Select';
+import { SelectChangeEvent } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
 
 const iframeStyle = {
   width: '100%', 
@@ -12,113 +15,134 @@ const iframeStyle = {
 };
 
 const PDFPage = function (): JSX.Element {
-  const [iframeSrc, setiframeSrc] = useState<string | undefined >('about:blank');
+  const [showPDFview, setShowPDFview] = useState<boolean>(true);
+  const [showPDFviewActionInput, setShowPDFviewActionInput] = useState<boolean>(false);
+  const [showPDFviewActionSubmit, setShowPDFviewActionSubmit] = useState<boolean>(false);
+  const [PDFviewActionSelectValue, setPDFviewActionSelectValue] = useState<number>(0);
+  const [PDFviewiframeSrc, setPDFviewiframeSrc] = useState<string | undefined >('about:blank');
 
-  // async function handleOnLogin(email: string, password: string): Promise<boolean | undefined> {
+  const PDFActionInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
+  const PDFActionSubmitRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
+  /*async function uploadPDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
+    //Read File
+    if (inputEl && inputEl.current){
+      const selectedFile = inputEl.current.files;
+      //Check File is not Empty
+      if (selectedFile && selectedFile.length > 0) {
+        // Select the very first file from list
+        const fileToLoad = selectedFile[0];
+        // FileReader function for read the file.
+        const fileReader = new FileReader();
+        let base64;
+        // Onload of file read the file content
+        fileReader.onload = function(fileLoadedEvent) {
+          if (fileLoadedEvent && fileLoadedEvent.target)
+          {
+            base64 = fileLoadedEvent.target.result;
+            // Print data in console
+            console.log(base64);
 
-  async function byteDownload(){
-    const bytes = await downloadPDF('RST_base64.txt');
-    // const bytesString = bytes.toString();
-    // console.log(bytes);
-    return bytes;
-    
+            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2', 'this is signatire');
+          }
+        };
+        // Convert data to base64
+        fileReader.readAsDataURL(fileToLoad);
+      }
+    }
+  }*/
+
+  async function getPDF(): Promise<void> {
+    if (PDFActionInputRef && PDFActionInputRef.current)
+    {
+      const fileString = await getFile(PDFActionInputRef.current.value);
+      console.log(fileString);
+      setPDFviewiframeSrc(fileString);
+    }
   }
-  
+
+  /*async function updatePDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
+    //Read File
+    if (getFileUpdateInputEl && getFileUpdateInputEl.current && getFileUpdateStringInputEl && getFileUpdateStringInputEl.current){
+      const selectedFile = getFileUpdateInputEl.current.files;
+      const selectedFileID = getFileUpdateStringInputEl.current.value;
+      //Check File is not Empty
+      if (selectedFile && selectedFile.length > 0) {
+        // Select the very first file from list
+        const fileToLoad = selectedFile[0];
+        // FileReader function for read the file.
+        const fileReader = new FileReader();
+        let base64;
+        // Onload of file read the file content
+        fileReader.onload = function(fileLoadedEvent) {
+          if (fileLoadedEvent && fileLoadedEvent.target)
+          {
+            base64 = fileLoadedEvent.target.result;
+            // Print data in console
+            console.log(base64);
+
+            updateFile(base64 as string, selectedFileID, 'testfilename.pdf');
+          }
+        };
+        // Convert data to base64
+        fileReader.readAsDataURL(fileToLoad);
+      }
+    }
+  }*/
+
+  /*async function deletePDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
+    if (getFileDeleteInputEl && getFileDeleteInputEl.current)
+    {
+      const fileString = await deleteFile(getFileDeleteInputEl.current.value);
+    }
+  }*/
+
+  function handlePDFviewActionSelect(event: SelectChangeEvent<unknown>)
+  {
+    setShowPDFviewActionInput(true);
+    setShowPDFviewActionSubmit(true);
+
+    if (event && event.target)
+    {
+      console.log(event.target.value);
+      setPDFviewActionSelectValue(event.target.value as number);
+    }
+  }
+
+  async function handlePDFviewActionSubmit()
+  {
+    if (PDFviewActionSelectValue == 2)
+    {
+      console.log('succsdfasdf');
+      await getPDF();
+    }
+  }
 
   useEffect(() => {
-    async function modifyPdf() {
-      const url = 'https://firebasestorage.googleapis.com/v0/b/electric-eagles.appspot.com/o/RST_Request_Form_Blank.pdf?alt=media&token=2fbae07a-1496-49ba-ab74-6cf5dd87f9b2';
-      const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
-    
-      const pdfDoc = await PDFDocument.load(existingPdfBytes);
-      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    
-      // const pages = pdfDoc.getPages();
-      // const firstPage = pages[0];
-      // eslint-disable-next-line
-      // const { width, height } = firstPage.getSize();
-      // firstPage.drawText('Testing writing on a form :)', {
-      //   x: 5,
-      //   y: height / 2 + 300,
-      //   size: 50,
-      //   font: helveticaFont,
-      //   color: rgb(0.95, 0.1, 0.1),
-      //   rotate: degrees(-45),
-      // });
 
-      const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true })
-        .catch(err => {
-          console.log(err);
-          return undefined;
-        })
-        .then( (res) => {
-          console.log('success');
-          return res;
-        });
-      // console.log(pdfDataUri);
-      setiframeSrc(await byteDownload());
-    
-      // the saved pdf
-      // const pdfBytes = await pdfDoc.save();
-      // console.log(pdfBytes);
-    }
-    modifyPdf()
-      .catch(err => console.log(err))
-      .then( () => console.log('success'))
-      .catch(() => 'obligatory catch');
   });
 
   return (
     <div>
-      <iframe src={iframeSrc} style={iframeStyle}></iframe>
+      {showPDFview && <div className='PDFview'>
+        <Select
+          labelId="PDFviewSelectLabel"
+          id="PDFviewSelect"
+          label="Actions"
+          value={0}
+          onChange={handlePDFviewActionSelect}
+        >
+          <MenuItem disabled value={0}>Please Select an Action</MenuItem>
+          <MenuItem value={1}>Upload PDF</MenuItem>
+          <MenuItem value={2}>Get PDF</MenuItem>
+          <MenuItem value={3}>Update PDF</MenuItem>
+          <MenuItem value={4}>Delete PDF</MenuItem>
+        </Select>
+        {showPDFviewActionInput && <Input inputRef = {PDFActionInputRef}/>}
+        {showPDFviewActionSubmit && <Button onClick={handlePDFviewActionSubmit}>Submit</Button>}
+        <iframe src={PDFviewiframeSrc} style={iframeStyle}></iframe>
+      </div>}
     </div>
   );
 };
 
 export default PDFPage;
-
-
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import { useEffect, useState } from 'react';
-// import { PDFDocument } from 'pdf-lib';
-// import './PDF.css';
-
-// const iframeStyle = {
-//   width: '100%', 
-//   height: '900px', 
-// };
-
-// const PDFPage = function (): JSX.Element {
-//   const [iframeSrc, setiframeSrc] = useState<string | undefined>('about:blank');
-
-//   useEffect(() => {
-//     async function createPdf():Promise<void> {
-//       const pdfDoc = await PDFDocument.create();
-//       const page = pdfDoc.addPage([350, 400]);
-//       page.moveTo(110, 200);
-//       page.drawText('Hello World!');
-//       const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true })
-//         .catch(err => {
-//           console.log(err);
-//           return undefined;
-//         })
-//         .then( (res) => {
-//           console.log('success');
-//           return res;
-//         });
-//       setiframeSrc(pdfDataUri);
-//       // console.log('iframeSrc' + iframeSrc);
-//       // console.log('pdfDataUri' + pdfDataUri);
-//     }
-//     createPdf()
-//       .catch(err => console.log(err))
-//       .then( () => console.log('success'))
-//       .catch(() => 'obligatory catch');
-//   });
-
-//   return (
-//     <div>
-//       <iframe src={iframeSrc} style={iframeStyle}></iframe>
-//     </div>
-//   );
-// };
