@@ -21,6 +21,27 @@ export const getFile = async (fileID: string): Promise<string> => {
   });
 };
 
+export const getUserFiles = async (): Promise<any> => {
+  const header = await getHeaders();
+  console.log(header);
+  return new Promise(function(resolve,reject){
+    fetch(url + '/files/get_user_files', {
+      method: 'GET',
+      mode: 'cors',
+      headers: header,
+    })
+      .then(response => response.json())
+      .then(data => {
+        //console.log(data);
+        resolve(data);
+      })
+      .catch((error) => {
+        console.log(error);
+        reject(error);
+      });
+  });
+};
+
 export const postFile = async (file: string, filename: string, reviewer: string, signature: string) => {
   const data = {
     file: file,
