@@ -3,12 +3,14 @@ import React from 'react';
 import './PDF.css';
 
 import { postFile, getFile, updateFile, deleteFile, getUserFiles } from '../api/files';
+import { RenderExpandCellGrid } from '../components/RenderExpandCellGrid';
+
 import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
 import Select from '@mui/material/Select';
 import { SelectChangeEvent } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
-import { DataGrid, GridColDef, GridSelectionModel } from '@mui/x-data-grid';
+import { GridColDef, GridSelectionModel } from '@mui/x-data-grid';
 
 import { FileUpload } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
@@ -61,15 +63,14 @@ const PDFPage = function (): JSX.Element {
   const [showBlankFormsView, setShowBlankFormsView] = useState<boolean>(false);
   const [showFormListView, setShowFormListView] = useState<boolean>(false);
   const [showPDFview, setShowPDFview] = useState<boolean>(false);
-  const [BlankFormListDataGridRows, setBlankFormListDataGridRows] = useState<BlankFormListDataGridRowsType[]>([]);
-  const [FormListDataGridRows, setFormListDataGridRows] = useState<FormListDataGridRowsType[]>([]);
+  const [DataGridRows, setDataGridRows] = useState<FormListDataGridRowsType[] | BlankFormListDataGridRowsType[]>([]);
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [PDFviewActionSelectValue, setPDFviewActionSelectValue] = useState<number>(0);
   const [PDFviewiframeSrc, setPDFviewiframeSrc] = useState<string | undefined >('about:blank');
 
   const UploadViewInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const PDFActionInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-  async function uploadPDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
+  async function uploadPDF(/*event: React.MouseEvent<HTMLButtonElement>*/): Promise<void> {
     //Read File
     if (UploadViewInputRef && UploadViewInputRef.current){
       const selectedFile = UploadViewInputRef.current.files;
@@ -88,7 +89,8 @@ const PDFPage = function (): JSX.Element {
             // Print data in console
             console.log(base64);
 
-            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2', 'this is signatire');
+            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2')
+              .catch(err => console.log(err));
           }
         };
         // Convert data to base64
@@ -170,7 +172,7 @@ const PDFPage = function (): JSX.Element {
   {
     setShowMainMenu(false);
     setShowBlankFormsView(true);
-    setBlankFormListDataGridRows([{id: '1', filename: 'RST'}]);
+    setDataGridRows([{id: '1', filename: 'RST'}]);
   }
 
 
@@ -178,7 +180,7 @@ const PDFPage = function (): JSX.Element {
   {
     setShowMainMenu(false);
     setShowFormListView(true);
-    setFormListDataGridRows(await getUserFiles() as FormListDataGridRowsType[]);
+    setDataGridRows(await getUserFiles() as FormListDataGridRowsType[]);
   }
 
   async function handleFormsListButton()
@@ -207,29 +209,6 @@ const PDFPage = function (): JSX.Element {
       console.log('succsdfasdf');
     }
   }
-  
-  const FormDataGrid: React.FC<{columns: GridColDef[]; rows:{[key:string]: any}[]}> = ({columns, rows}) => {
-    return (
-      <div style={{ height: 400, width: '100%' }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
-          checkboxSelection
-          disableSelectionOnClick
-          onSelectionModelChange={(newSelection => {
-            setSelectionModel(newSelection);
-          })}
-          selectionModel={selectionModel}
-        />
-      </div>
-    );
-  };
-
-  useEffect(() => {
-
-  });
 
   return (
     <div>
@@ -254,12 +233,34 @@ const PDFPage = function (): JSX.Element {
       </div>}
 
       {showBlankFormsView && <div className='BlankFormsView'>
-        <FormDataGrid columns = {BlankFormListDataGridCols} rows = {BlankFormListDataGridRows}/>
+        <RenderExpandCellGrid 
+          columns = {BlankFormListDataGridCols} 
+          rows = {DataGridRows}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          checkboxSelection
+          disableSelectionOnClick
+          onSelectionModelChange={(newSelection => {
+            setSelectionModel(newSelection);
+          })}
+          selectionModel={selectionModel}
+        />
         <Button onClick={getBlankPDFs}>Submit</Button>
       </div>}
 
       {showFormListView && <div className='FormListView'>
-        <FormDataGrid columns = {FormListDataGridCols} rows = {FormListDataGridRows}/>
+        <RenderExpandCellGrid 
+          columns = {FormListDataGridCols} 
+          rows = {DataGridRows}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          checkboxSelection
+          disableSelectionOnClick
+          onSelectionModelChange={(newSelection => {
+            setSelectionModel(newSelection);
+          })}
+          selectionModel={selectionModel}
+        />
         <Button onClick={handleFormsListButton}>Submit</Button>
       </div>}
 

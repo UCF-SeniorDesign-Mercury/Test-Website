@@ -6,7 +6,7 @@ import './RegisterNewUser.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { registerWithEmail, verifyEmail, changePassword } from '../firebase/firebase';
+import { changePassword } from '../firebase/firebase';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import AlertBox from '../components/AlertBox';
@@ -15,7 +15,6 @@ import AlertBox from '../components/AlertBox';
 
 const ChangePassword = function (): JSX.Element {
   const emailEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-  const passwordEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const [alertMessage, setAlertMessage] = useState('');
   const [spinner, setSpinner] = useState(false);
   const [alert, setAlert] = useState(false);

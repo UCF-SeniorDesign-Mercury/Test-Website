@@ -58,7 +58,7 @@ const PDF_TestPage = function (): JSX.Element {
             // Print data in console
             console.log(base64);
 
-            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2', 'this is signatire');
+            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2');
           }
         };
         // Convert data to base64

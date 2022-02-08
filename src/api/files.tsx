@@ -21,7 +21,7 @@ export const getFile = async (fileID: string): Promise<string> => {
   });
 };
 
-export const getUserFiles = async (): Promise<any> => {
+export const getUserFiles = async (): Promise<unknown> => {
   const header = await getHeaders();
   console.log(header);
   return new Promise(function(resolve,reject){
@@ -42,7 +42,7 @@ export const getUserFiles = async (): Promise<any> => {
   });
 };
 
-export const postFile = async (file: string, filename: string, reviewer: string, signature: string) => {
+export const postFile = async (file: string, filename: string, reviewer: string): Promise<void> => {
   const data = {
     file: file,
     filename: filename,
@@ -67,7 +67,7 @@ export const postFile = async (file: string, filename: string, reviewer: string,
     });
 };
 
-export const updateFile = async (file: string, file_id: string, filename:string) => {
+export const updateFile = async (file: string, file_id: string, filename:string): Promise<void> => {
   const data = {
     file: file,
     file_id: file_id,
@@ -95,7 +95,7 @@ export const updateFile = async (file: string, file_id: string, filename:string)
 export const deleteFile = async (fileID: string): Promise<void> => {
   const header = await getHeaders();
 
-  return new Promise(function(resolve,reject){
+  return new Promise(function(){
     fetch(url + '/files/delete_file/' + fileID, {
       method: 'DELETE',
       mode: 'cors',
