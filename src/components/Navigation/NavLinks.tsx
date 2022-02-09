@@ -26,14 +26,14 @@ const NavLinks = (props:NavLinksProps):JSX.Element => {
               context.logout();
               props.closeMenu();
             }
-          }}> <NavLink to="/logout">Calendar</NavLink></li>}      
+          }}> <NavLink to="/calendar">Calendar</NavLink></li>}      
 
           {context.var1 && <li className='regular' onClick={() => {
             // if (context && context.logout) {
             //   context.logout();
             //   props.closeMenu();
             // }
-          }}> <NavLink to="/calendar">Chat</NavLink></li>}  
+          }}> <NavLink to="/logout">Chat</NavLink></li>}  
 
           {context.var1 && <li className='regular' onClick={() => {
             // if (context && context.logout) {

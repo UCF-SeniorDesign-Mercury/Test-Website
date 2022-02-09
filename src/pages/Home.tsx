@@ -40,7 +40,7 @@ const HomePage = function (): JSX.Element {
           <Button variant="primary" className="module-button" type="submit">
             Notification
           </Button>
-          <NavLink to="/profile">
+          <NavLink to="/calendar">
             <Button variant="primary" className="module-button" type="submit">
               Calendar
             </Button>
