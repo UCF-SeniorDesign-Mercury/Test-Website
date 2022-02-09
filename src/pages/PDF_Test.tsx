@@ -58,7 +58,7 @@ const PDF_TestPage = function (): JSX.Element {
             // Print data in console
             console.log(base64);
 
-            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2', 'this is signatire');
+            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2');
           }
         };
         // Convert data to base64
@@ -122,7 +122,7 @@ const PDF_TestPage = function (): JSX.Element {
 
   useEffect(() => {
     async function modifyPdf() {
-      const url = 'https://firebasestorage.googleapis.com/v0/b/electric-eagles.appspot.com/o/uploads%2Frst.pdf?alt=media&token=37e78899-529a-4489-9f2e-58b096e4eef8';
+      const url = 'https://firebasestorage.googleapis.com/v0/b/electric-eagles.appspot.com/o/1380_Blank.pdf?alt=media&token=d21b82a0-2e80-4746-970c-65dd145b93f5';
       const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
     
       const pdfDoc = await PDFDocument.load(existingPdfBytes);
