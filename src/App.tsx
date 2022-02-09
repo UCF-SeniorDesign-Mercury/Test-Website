@@ -12,6 +12,8 @@ import PDF_TestPage from './pages/PDF_Test';
 import Menu from './components/Navigation/Menu';
 import RegisterNewUserPage from './pages/RegisterNewUser';
 import ChangePassword from './pages/ChangePassword';
+import ProfilePage from './pages/Profile';
+import Calendarpage from './pages/Calendar';
 
 const App = function (): JSX.Element {
   // keeps track of id and token in the website
@@ -50,6 +52,8 @@ const App = function (): JSX.Element {
               {!var1 && <Route path="/registerNewUser" component={RegisterNewUserPage} />}
               {!var1 && <Route path="/changePassword" component={ChangePassword} />}
               {var1 && <Route path="/home" component={HomePage} />}
+              {var1 && <Route path="/profile" component={ProfilePage} />}
+              {var1 && <Route path="/calendar" component={Calendarpage} />}
               {var1 && <Route path="/pdf" component={PDFPage} />}
               {var1 && <Route path="/pdf_test" component={PDF_TestPage} />}
             </Switch>

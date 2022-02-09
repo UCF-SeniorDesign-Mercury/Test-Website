@@ -1,0 +1,38 @@
+.profile-page {
+    background: rgba(198, 212, 252, 0.452);
+}
+
+.profile-page .username-display {
+    display: inline-block;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 60px;
+    width: auto;
+    height: 48px;
+    left: 82px;
+    top: 131px;
+    text-align: center;
+    background-color: #FFC947;
+    color: #000000;
+}
+
+.btn.module-button{
+    position: relative;
+    width: 25%;
+    height: 180px;
+    margin-left: 100px;
+    margin-bottom: 50px;
+    display: inline-block;
+
+    background: #C4C4C4;
+
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: normal;
+    font-size: 36px;
+    line-height: 42px;
+    text-align: center;
+
+    color: #000000;
+    background-color: #FFC947;
+}

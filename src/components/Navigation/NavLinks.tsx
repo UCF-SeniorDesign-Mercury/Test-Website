@@ -29,11 +29,11 @@ const NavLinks = (props:NavLinksProps):JSX.Element => {
           }}> <NavLink to="/logout">Calendar</NavLink></li>}      
 
           {context.var1 && <li className='regular' onClick={() => {
-            if (context && context.logout) {
-              context.logout();
-              props.closeMenu();
-            }
-          }}> <NavLink to="/logout">Chat</NavLink></li>}  
+            // if (context && context.logout) {
+            //   context.logout();
+            //   props.closeMenu();
+            // }
+          }}> <NavLink to="/calendar">Chat</NavLink></li>}  
 
           {context.var1 && <li className='regular' onClick={() => {
             // if (context && context.logout) {
@@ -45,11 +45,11 @@ const NavLinks = (props:NavLinksProps):JSX.Element => {
           {/* pdf test nav link    */}
           
           {context.var1 && <li className='regular' onClick={() => {
-            if (context && context.logout) {
-              context.logout();
-              props.closeMenu();
-            }
-          }}> <NavLink to="/logout">Profile</NavLink></li>}
+            // if (context && context.logout) {
+            //   context.logout();
+            //   props.closeMenu();
+            // }
+          }}> <NavLink to="/profile">Profile</NavLink></li>}
 
           {/* pdf test nav link end */}
           
