@@ -22,10 +22,10 @@ const NavLinks = (props:NavLinksProps):JSX.Element => {
           }}> <NavLink to="/home">Home</NavLink></li>} 
 
           {context.var1 && <li className='regular' onClick={() => {
-            if (context && context.logout) {
-              context.logout();
-              props.closeMenu();
-            }
+            // if (context && context.logout) {
+            //   context.logout();
+            //   props.closeMenu();
+            // }
           }}> <NavLink to="/calendar">Calendar</NavLink></li>}      
 
           {context.var1 && <li className='regular' onClick={() => {
