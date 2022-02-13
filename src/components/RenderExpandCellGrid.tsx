@@ -124,6 +124,7 @@ export const RenderExpandCellGrid: React.FC<DataGridProps> = (DataGridProps) =>{
 
   for (let i = 0; i < DataGridProps.columns.length; i++) {
     DataGridProps.columns[i].renderCell = renderCellExpand;
+    DataGridProps.columns[i].headerAlign = 'center';
   }
 
   return (

@@ -11,10 +11,9 @@ export default function AlertBox(externalOpen: boolean, externalSetOpen: React.D
   const icon = (<Alert 
     style={{
       zIndex:1, 
-      position: 'absolute', 
+      position: 'fixed', 
       width: '100%', 
       top: 0, 
-      opacity: '80%',
     }} 
 
     variant='filled'

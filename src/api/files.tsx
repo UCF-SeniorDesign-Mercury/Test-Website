@@ -9,15 +9,28 @@ export const getFile = async (fileID: string): Promise<string> => {
       mode: 'cors',
       headers: header,
     })
-      .then(response => response.json())
-      .then(data => {
-        // console.log(data);
-        resolve(data.file);
+      .then(async response => {
+        console.log(response);
+        if (response.status == 200) {          
+          const data = await response.json();
+          //console.log(data);
+          resolve(data.file);
+        }
+        else {
+          if (response.status == 400)
+            reject('Status 400: Bad Request');
+          else if (response.status == 401)
+            reject('Status 401: Unauthorized - the provided token is not valid.');
+          else if (response.status == 404)
+            reject('Status 404: File not found.');
+          else if (response.status == 415)
+            reject('Status 415: Unsupported media type.');
+          else if (response.status == 500)
+            reject('Status 500: Internal API Error.');
+          reject('Error. Please try again later.');
+        }
       })
-      .catch((error) => {
-        console.log(error);
-        reject(error);
-      });
+      .catch(err => console.log(err));
   });
 };
 
@@ -30,15 +43,28 @@ export const getUserFiles = async (): Promise<unknown> => {
       mode: 'cors',
       headers: header,
     })
-      .then(response => response.json())
-      .then(data => {
-        //console.log(data);
-        resolve(data);
+      .then(async response => {
+        console.log(response);
+        if (response.status == 200) {          
+          const data = await response.json();
+          //console.log(data);
+          resolve(data);
+        }
+        else {
+          if (response.status == 400)
+            reject('Status 400: Bad Request');
+          else if (response.status == 401)
+            reject('Status 401: Unauthorized - the provided token is not valid.');
+          else if (response.status == 404)
+            reject('Status 404: File not found.');
+          else if (response.status == 415)
+            reject('Status 415: Unsupported media type.');
+          else if (response.status == 500)
+            reject('Status 500: Internal API Error.');
+          reject('Error. Please try again later.');
+        }
       })
-      .catch((error) => {
-        console.log(error);
-        reject(error);
-      });
+      .catch(err => console.log(err));
   });
 };
 

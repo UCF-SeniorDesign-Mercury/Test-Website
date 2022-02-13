@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import React from 'react';
 import './PDF.css';
 
 import { postFile, getFile, updateFile, deleteFile, getUserFiles } from '../api/files';
 import { RenderExpandCellGrid } from '../components/RenderExpandCellGrid';
+import FullPageLoader from '../components/FullPageLoader';
+import AlertBox from '../components/AlertBox';
+import { CustomModal } from '../components/Modal';
 
 import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
@@ -24,13 +27,13 @@ const iframeStyle = {
 };
 
 const FormListDataGridCols: GridColDef[] = [
-  { field: 'id', headerName: 'ID'},
-  { field: 'filename', headerName: 'File Name'},
+  { field: 'id', headerName: 'ID', flex: 1},
+  { field: 'filename', headerName: 'File Name', flex: 1},
   { field: 'status', headerName: 'Status'},
-  { field: 'timestamp', headerName: 'Timestamp'},
-  { field: 'author', headerName: 'Author'},
-  { field: 'reviewer', headerName: 'Reviewer'},
-  { field: 'comment', headerName: 'Comment'},
+  { field: 'timestamp', headerName: 'Timestamp', flex: 1},
+  { field: 'author', headerName: 'Author', flex: 0.5},
+  { field: 'reviewer', headerName: 'Reviewer', flex: 0.5},
+  { field: 'comment', headerName: 'Comment', flex: 1},
 ];
 
 interface FormListDataGridRowsType
@@ -67,6 +70,10 @@ const PDFPage = function (): JSX.Element {
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [PDFviewActionSelectValue, setPDFviewActionSelectValue] = useState<number>(0);
   const [PDFviewiframeSrc, setPDFviewiframeSrc] = useState<string | undefined >('about:blank');
+  const [spinner, setSpinner] = useState(false);
+  const [alert, setAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [helpModal, setHelpModal] = useState(false);
 
   const UploadViewInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const PDFActionInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
@@ -180,15 +187,45 @@ const PDFPage = function (): JSX.Element {
   {
     setShowMainMenu(false);
     setShowFormListView(true);
-    setDataGridRows(await getUserFiles() as FormListDataGridRowsType[]);
+    setSpinner(true);
+    await getUserFiles()
+      .then((data) => {
+        setDataGridRows(data as FormListDataGridRowsType[]);
+      })
+      .catch((error) => {
+        setAlertMessage(error);
+        setAlert(true);
+      });
+    setSpinner(false);
+  }
+
+  function handleHelpModalButton()
+  {
+    setHelpModal(true);
   }
 
   async function handleFormsListButton()
   {
-    setPDFviewiframeSrc(await getFile(selectionModel[0] as string));
-    setShowFormListView(false);
-    setShowPDFview(true);
-
+    if (selectionModel.length == 0)
+    {
+      setAlertMessage('Please select a file to view.');
+      setAlert(true);
+      return;
+    }
+    setSpinner(true);
+    await getFile(selectionModel[0] as string)
+      .then((string) => {
+        setPDFviewiframeSrc(string);
+        setSpinner(false);
+        setShowFormListView(false);
+        setShowPDFview(true);
+      })
+      .catch((error) => {
+        setAlertMessage(error);
+        setAlert(true);
+        setSpinner(false);
+        return;
+      });
   }
 
 
@@ -211,18 +248,57 @@ const PDFPage = function (): JSX.Element {
   }
 
   return (
-    <div>
+    <div className='PDFPage'>
+      {AlertBox(alert, setAlert, alertMessage)}
+
+      {spinner && <FullPageLoader/>}
 
       {showMainMenu && <div className='MainMenu'>
-        <Button variant='outlined' startIcon={<FileUpload />} onClick={handleUploadFileButton}>
+        <Button variant='outlined' startIcon={<FileUpload />} onClick={handleUploadFileButton}
+          sx={{
+            position: 'absolute',
+            top: '30%',
+            left: '8%',
+            marginTop: '-50px',
+            marginLeft: '-50px',
+            width: '23%',
+            height: '23%',
+            fontSize: '100%',
+            backgroundColor: '#FFC947'
+          }}
+        >
           Upload a File
         </Button>
 
-        <Button variant='outlined' startIcon={<AddIcon/>} onClick={handleBlankFilesButton}>
+        <Button variant='outlined' startIcon={<AddIcon/>} onClick={handleBlankFilesButton}
+          sx={{
+            position: 'absolute',
+            top: '30%',
+            left: '42%',
+            marginTop: '-50px',
+            marginLeft: '-50px',
+            width: '23%',
+            height: '23%',
+            fontSize: '100%',
+            backgroundColor: '#FFC947'
+          }}
+        >
           Create a Blank File
         </Button>
 
-        <Button variant='outlined' startIcon={<ViewAgendaIcon/>} onClick={handleViewYourFilesButton}>
+        <Button variant='outlined' startIcon={<ViewAgendaIcon/>} onClick={handleViewYourFilesButton}
+          sx={{
+            position: 'absolute',
+            top: '30%',
+            left: '75%',
+            marginTop: '-50px',
+            marginLeft: '-50px',
+            width: '23%',
+            height: '23%',
+            fontSize: '100%',
+            backgroundColor: '#FFC947'
+          }}
+        >
           View Your Files 
         </Button>
       </div>}
@@ -249,19 +325,32 @@ const PDFPage = function (): JSX.Element {
       </div>}
 
       {showFormListView && <div className='FormListView'>
+        <Button onClick={handleHelpModalButton}>Open Help Menu</Button>
+        <CustomModal open={helpModal} onClose={() => setHelpModal(false)}>
+          <p>This is help button screen</p>
+        </CustomModal>
         <RenderExpandCellGrid 
           columns = {FormListDataGridCols} 
           rows = {DataGridRows}
           pageSize={5}
           rowsPerPageOptions={[5]}
-          checkboxSelection
-          disableSelectionOnClick
           onSelectionModelChange={(newSelection => {
             setSelectionModel(newSelection);
           })}
           selectionModel={selectionModel}
+          columnVisibilityModel={{
+            id: false,
+          }}
         />
-        <Button onClick={handleFormsListButton}>Submit</Button>
+        <Button onClick={handleFormsListButton}
+          sx={{
+            height: 70,
+            width: '100%',
+            backgroundColor: '#FFC947',
+            fontSize: '100%',
+          }}
+        >
+          Submit</Button>
       </div>}
 
       {showPDFview && <div className='PDFview'>
