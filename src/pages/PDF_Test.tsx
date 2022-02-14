@@ -7,18 +7,10 @@ import { arrayBuffer } from 'stream/consumers';
 import Button from 'react-bootstrap/Button';
 import React from 'react';
 import { getToken } from '../firebase/firebase';
-import Input from '@mui/material/Input';
+import { getUser } from '../api/users';
 
-
-import { postFile, getFile, updateFile, deleteFile } from '../api/files';
-import { ConstructionOutlined } from '@mui/icons-material';
 // import { downloadPDF } from '../firebase/firebase';
 // https://stackoverflow.com/questions/31270145/save-pdf-file-loaded-in-iframe
-
-const iframeStyle = {
-  width: '100%', 
-  height: '2000px', 
-};
 
 const PDF_TestPage = function (): JSX.Element {
   const [iframeSrc, setiframeSrc] = useState<string | undefined >('about:blank');
@@ -37,86 +29,17 @@ const PDF_TestPage = function (): JSX.Element {
     //console.log(bytes);
     return bytes;
     
-  } 
-
-  async function uploadPDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
-    //Read File
-    if (inputEl && inputEl.current){
-      const selectedFile = inputEl.current.files;
-      //Check File is not Empty
-      if (selectedFile && selectedFile.length > 0) {
-        // Select the very first file from list
-        const fileToLoad = selectedFile[0];
-        // FileReader function for read the file.
-        const fileReader = new FileReader();
-        let base64;
-        // Onload of file read the file content
-        fileReader.onload = function(fileLoadedEvent) {
-          if (fileLoadedEvent && fileLoadedEvent.target)
-          {
-            base64 = fileLoadedEvent.target.result;
-            // Print data in console
-            console.log(base64);
-
-            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2');
-          }
-        };
-        // Convert data to base64
-        fileReader.readAsDataURL(fileToLoad);
-      }
-    }
   }
 
-  async function updatePDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
-    //Read File
-    if (getFileUpdateInputEl && getFileUpdateInputEl.current && getFileUpdateStringInputEl && getFileUpdateStringInputEl.current){
-      const selectedFile = getFileUpdateInputEl.current.files;
-      const selectedFileID = getFileUpdateStringInputEl.current.value;
-      //Check File is not Empty
-      if (selectedFile && selectedFile.length > 0) {
-        // Select the very first file from list
-        const fileToLoad = selectedFile[0];
-        // FileReader function for read the file.
-        const fileReader = new FileReader();
-        let base64;
-        // Onload of file read the file content
-        fileReader.onload = function(fileLoadedEvent) {
-          if (fileLoadedEvent && fileLoadedEvent.target)
-          {
-            base64 = fileLoadedEvent.target.result;
-            // Print data in console
-            console.log(base64);
-
-            updateFile(base64 as string, selectedFileID, 'testfilename.pdf');
-          }
-        };
-        // Convert data to base64
-        fileReader.readAsDataURL(fileToLoad);
-      }
-    }
-  }
-
-  async function getPDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
-    if (getFileInputEl && getFileInputEl.current)
-    {
-      const fileString = await getFile(getFileInputEl.current.value);
-      console.log(fileString);
-      setgetFileActivate(true);
-      setiframeSrc(undefined);
-      setiframeSrc(fileString);
-    }
-  }
-
-  async function deletePDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
-    if (getFileDeleteInputEl && getFileDeleteInputEl.current)
-    {
-      const fileString = await deleteFile(getFileDeleteInputEl.current.value);
-    }
-  }
-
-
-  function iframeFunction(){
+  async function iframeFunction(){
     console.log(  getToken());
+    getUser()
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     
   }
 
@@ -170,27 +93,8 @@ const PDF_TestPage = function (): JSX.Element {
 
   return (
     <div>
-      <iframe id="pdfiframe" src={iframeSrc} style={iframeStyle}></iframe>
-      <input id="inputFile" type="file" ref = {inputEl}/>
-      <Button variant="primary" type="submit" onClick={uploadPDF}>
-          Save
-      </Button>
-      {iframeFunction()}
-
-      <Input placeholder="input file id to get it"  inputRef = {getFileInputEl}/>
-      <Button variant="primary" type="submit" onClick={getPDF}>
-          Get PDF
-      </Button>
-
-      <Input placeholder="input file id to update it"  type="file" inputRef = {getFileUpdateInputEl}/>
-      <Input placeholder="input file id string to update it" inputRef = {getFileUpdateStringInputEl}/>
-      <Button variant="primary" type="submit" onClick={updatePDF}>
+      <Button variant="primary" type="submit" onClick={iframeFunction}>
           Update PDF
-      </Button>
-
-      <Input placeholder="input file id to delete it"  inputRef = {getFileDeleteInputEl}/>
-      <Button variant="primary" type="submit" onClick={deletePDF}>
-          Delete PDF
       </Button>
     </div>
   );
