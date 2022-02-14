@@ -68,7 +68,7 @@ export const getUserFiles = async (): Promise<unknown> => {
   });
 };
 
-export const postFile = async (file: string, filename: string, reviewer: string): Promise<void> => {
+export const postFile = async (file: string, filename: string, reviewer: string): Promise<string> => {
   const data = {
     file: file,
     filename: filename,
@@ -78,22 +78,37 @@ export const postFile = async (file: string, filename: string, reviewer: string)
 
   const header = await getHeaders();
 
-  fetch(url + '/files/upload_file', {
-    method: 'POST',
-    mode: 'cors',
-    headers: header,
-    body: JSON.stringify(data)
-  })
-    .then(response => response)
-    .then(data => {
-      console.log(data);
+  return new Promise(function(resolve,reject){
+    fetch(url + '/files/upload_file', {
+      method: 'POST',
+      mode: 'cors',
+      headers: header,
+      body: JSON.stringify(data)
     })
-    .catch((error) => {
-      console.log(error);
-    });
+      .then(async response => {
+        console.log(response);
+        if (response.status == 201) {          
+          resolve('File Uploaded Successfully');
+        }
+        else {
+          if (response.status == 400)
+            reject('Status 400: Bad Request');
+          else if (response.status == 401)
+            reject('Status 401: Unauthorized - the provided token is not valid.');
+          else if (response.status == 404)
+            reject('Status 404: File not found.');
+          else if (response.status == 415)
+            reject('Status 415: Unsupported media type.');
+          else if (response.status == 500)
+            reject('Status 500: Internal API Error.');
+          reject('Error. Please try again later.');
+        }
+      })
+      .catch(err => console.log(err));
+  });
 };
 
-export const updateFile = async (file: string, file_id: string, filename:string): Promise<void> => {
+export const updateFile = async (file: string, file_id: string, filename:string): Promise<string> => {
   const data = {
     file: file,
     file_id: file_id,
@@ -103,37 +118,65 @@ export const updateFile = async (file: string, file_id: string, filename:string)
 
   const header = await getHeaders();
 
-  fetch(url + '/files/update_file', {
-    method: 'PUT',
-    mode: 'cors',
-    headers: header,
-    body: JSON.stringify(data)
-  })
-    .then(response => response)
-    .then(data => {
-      console.log(data);
+  return new Promise(function(resolve,reject){
+    fetch(url + '/files/update_file', {
+      method: 'PUT',
+      mode: 'cors',
+      headers: header,
+      body: JSON.stringify(data)
     })
-    .catch((error) => {
-      console.log(error);
-    });
+      .then(async response => {
+        console.log(response);
+        if (response.status == 200) {          
+          resolve('File Updated Successfully');
+        }
+        else {
+          if (response.status == 400)
+            reject('Status 400: Bad Request');
+          else if (response.status == 401)
+            reject('Status 401: Unauthorized - the provided token is not valid.');
+          else if (response.status == 404)
+            reject('Status 404: File not found.');
+          else if (response.status == 415)
+            reject('Status 415: Unsupported media type.');
+          else if (response.status == 500)
+            reject('Status 500: Internal API Error.');
+          reject('Error. Please try again later.');
+        }
+      })
+      .catch(err => console.log(err));
+  });
 };
 
-export const deleteFile = async (fileID: string): Promise<void> => {
+export const deleteFile = async (fileID: string): Promise<string> => {
   const header = await getHeaders();
 
-  return new Promise(function(){
+  return new Promise(function(resolve,reject){
     fetch(url + '/files/delete_file/' + fileID, {
       method: 'DELETE',
       mode: 'cors',
       headers: header,
     })
-      .then(response => response)
-      .then(data => {
-        console.log(data);
+      .then(async response => {
+        console.log(response);
+        if (response.status == 200) {          
+          resolve('File Deleted Successfully');
+        }
+        else {
+          if (response.status == 400)
+            reject('Status 400: Bad Request');
+          else if (response.status == 401)
+            reject('Status 401: Unauthorized - the provided token is not valid.');
+          else if (response.status == 404)
+            reject('Status 404: File not found.');
+          else if (response.status == 415)
+            reject('Status 415: Unsupported media type.');
+          else if (response.status == 500)
+            reject('Status 500: Internal API Error.');
+          reject('Error. Please try again later.');
+        }
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch(err => console.log(err));
   });
 };
 

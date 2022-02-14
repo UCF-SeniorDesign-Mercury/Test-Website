@@ -1,2 +1,7 @@
 .PDFPage {
 }
+
+.PDFViewMenu {
+    left: 35%;
+    text-align: center;
+}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 import React from 'react';
 import './PDF.css';
 
@@ -70,19 +70,38 @@ const PDFPage = function (): JSX.Element {
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [PDFviewActionSelectValue, setPDFviewActionSelectValue] = useState<number>(0);
   const [PDFviewiframeSrc, setPDFviewiframeSrc] = useState<string | undefined >('about:blank');
+  const [PDFAction, setPDFAction] = useState<string>('nothing');
   const [spinner, setSpinner] = useState(false);
   const [alert, setAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const [helpModal, setHelpModal] = useState(false);
+  const [alertStatus, setAlertStatus] = useState('success');
+  const [viewModal, setViewModal] = useState(false);
+  const [showPDFviewActionInput, setShowPDFviewActionInput] = useState<boolean>(false);
 
   const UploadViewInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const PDFActionInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
+  const PDFActionSelectRef: React.RefObject<HTMLSelectElement> = React.useRef<HTMLSelectElement>(null);
+
   async function uploadPDF(/*event: React.MouseEvent<HTMLButtonElement>*/): Promise<void> {
+
+    setAlert(false);
+    setSpinner(true);
+    setViewModal(false);
+
     //Read File
     if (UploadViewInputRef && UploadViewInputRef.current){
       const selectedFile = UploadViewInputRef.current.files;
       //Check File is not Empty
       if (selectedFile && selectedFile.length > 0) {
+
+        if (!selectedFile[0].name.match(/.(pdf)$/i))
+        {
+          setAlertMessage('Please provide a PDF file to upload');
+          setAlertStatus('error');
+          setAlert(true);
+          setSpinner(false);
+          return;
+        }
         // Select the very first file from list
         const fileToLoad = selectedFile[0];
         // FileReader function for read the file.
@@ -97,12 +116,38 @@ const PDFPage = function (): JSX.Element {
             console.log(base64);
 
             postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2')
-              .catch(err => console.log(err));
+              .then((string) => {
+                setAlertMessage(string);
+                setAlertStatus('success');
+                setAlert(true);
+                setSpinner(false);
+              })
+              .catch((error) => {
+                setAlertMessage(error);
+                setAlertStatus('error');
+                setAlert(true);
+                setSpinner(false);
+                return;
+              });
           }
         };
         // Convert data to base64
         fileReader.readAsDataURL(fileToLoad);
       }
+      else{
+        setAlertMessage('Please Select a File from your computer.');
+        setAlertStatus('error');
+        setAlert(true);
+        setSpinner(false);
+        return;
+      }
+    }
+    else{
+      setAlertMessage('Please Select a File from your computer.');
+      setAlertStatus('error');
+      setAlert(true);
+      setSpinner(false);
+      return;
     }
   }
 
@@ -127,51 +172,9 @@ const PDFPage = function (): JSX.Element {
     setShowBlankFormsView(false);
   }
 
-  async function getPDF(fileID: string): Promise<void> {
-    const fileString = await getFile(fileID);
-    console.log(fileString);
-    setPDFviewiframeSrc(fileString);
-  }
-
-  /*async function updatePDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
-    //Read File
-    if (getFileUpdateInputEl && getFileUpdateInputEl.current && getFileUpdateStringInputEl && getFileUpdateStringInputEl.current){
-      const selectedFile = getFileUpdateInputEl.current.files;
-      const selectedFileID = getFileUpdateStringInputEl.current.value;
-      //Check File is not Empty
-      if (selectedFile && selectedFile.length > 0) {
-        // Select the very first file from list
-        const fileToLoad = selectedFile[0];
-        // FileReader function for read the file.
-        const fileReader = new FileReader();
-        let base64;
-        // Onload of file read the file content
-        fileReader.onload = function(fileLoadedEvent) {
-          if (fileLoadedEvent && fileLoadedEvent.target)
-          {
-            base64 = fileLoadedEvent.target.result;
-            // Print data in console
-            console.log(base64);
-
-            updateFile(base64 as string, selectedFileID, 'testfilename.pdf');
-          }
-        };
-        // Convert data to base64
-        fileReader.readAsDataURL(fileToLoad);
-      }
-    }
-  }*/
-
-  /*async function deletePDF(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
-    if (getFileDeleteInputEl && getFileDeleteInputEl.current)
-    {
-      const fileString = await deleteFile(getFileDeleteInputEl.current.value);
-    }
-  }*/
-
   function handleUploadFileButton()
   {
-    setShowMainMenu(false);
+    setViewModal(true);
     setShowUploadView(true);
   }
 
@@ -185,6 +188,7 @@ const PDFPage = function (): JSX.Element {
 
   async function handleViewYourFilesButton()
   {
+    setAlert(false);
     setShowMainMenu(false);
     setShowFormListView(true);
     setSpinner(true);
@@ -194,6 +198,7 @@ const PDFPage = function (): JSX.Element {
       })
       .catch((error) => {
         setAlertMessage(error);
+        setAlertStatus('error');
         setAlert(true);
       });
     setSpinner(false);
@@ -201,14 +206,17 @@ const PDFPage = function (): JSX.Element {
 
   function handleHelpModalButton()
   {
-    setHelpModal(true);
+    setViewModal(true);
   }
 
   async function handleFormsListButton()
   {
+    setAlert(false);
+
     if (selectionModel.length == 0)
     {
       setAlertMessage('Please select a file to view.');
+      setAlertStatus('error');
       setAlert(true);
       return;
     }
@@ -222,6 +230,7 @@ const PDFPage = function (): JSX.Element {
       })
       .catch((error) => {
         setAlertMessage(error);
+        setAlertStatus('error');
         setAlert(true);
         setSpinner(false);
         return;
@@ -231,25 +240,118 @@ const PDFPage = function (): JSX.Element {
 
   function handlePDFviewActionSelect(event: SelectChangeEvent<unknown>)
   {
-
-    if (event && event.target)
+    console.log(event);
+    if (event && event.target && event.target.value == 1)
     {
       console.log(event.target.value);
-      setPDFviewActionSelectValue(event.target.value as number);
+      setPDFviewActionSelectValue(0);
+      setShowPDFviewActionInput(true);
+      setPDFAction('Update');
+      setViewModal(true);
+    }
+
+    else if (event && event.target && event.target.value == 2)
+    {
+      console.log(event.target.value);
+      setPDFviewActionSelectValue(0);
+      setShowPDFviewActionInput(false);
+      setPDFAction('Delete');
+      setViewModal(true);
     }
   }
 
   async function handlePDFviewActionSubmit()
   {
-    if (PDFviewActionSelectValue == 2)
+    setAlert(false);
+    setSpinner(true);
+    setViewModal(false);
+
+    if (PDFAction == 'Update')
     {
-      console.log('succsdfasdf');
+      //Read File
+      if (PDFActionInputRef && PDFActionInputRef.current){
+        const selectedFile = PDFActionInputRef.current.files;
+
+        const selectedFileID = selectionModel[0] as string;
+        //Check File is not Empty
+        if (selectedFile && selectedFile.length > 0) {
+
+          if (!selectedFile[0].name.match(/.(pdf)$/i))
+          {
+            setAlertMessage('Please provide a PDF file to upload');
+            setAlertStatus('error');
+            setAlert(true);
+            setSpinner(false);
+            return;
+          }
+
+          // Select the very first file from list
+          const fileToLoad = selectedFile[0];
+          // FileReader function for read the file.
+          const fileReader = new FileReader();
+          let base64;
+          // Onload of file read the file content
+          fileReader.onload = function(fileLoadedEvent) {
+            if (fileLoadedEvent && fileLoadedEvent.target)
+            {
+              base64 = fileLoadedEvent.target.result;
+              // Print data in console
+              console.log(base64);
+
+              updateFile(base64 as string, selectedFileID, 'testfilename.pdf')
+                .then((string) => {
+                  setAlertMessage(string);
+                  setAlertStatus('success');
+                  setAlert(true);
+                  setSpinner(false);
+                  setShowMainMenu(true);
+                  setShowPDFview(false);
+                })
+                .catch((error) => {
+                  setAlertMessage(error);
+                  setAlertStatus('error');
+                  setAlert(true);
+                  setSpinner(false);
+                  return;
+                });
+            }
+          };
+          // Convert data to base64
+          fileReader.readAsDataURL(fileToLoad);
+        }
+        else{
+          setAlertMessage('Please Select a File from your computer.');
+          setAlertStatus('error');
+          setAlert(true);
+          setSpinner(false);
+          return;
+        }
+      }
+    }
+    else if (PDFAction == 'Delete')
+    {
+      deleteFile(selectionModel[0] as string)
+        .then((string) => {
+          setAlertMessage(string);
+          setAlertStatus('success');
+          setAlert(true);
+          setSpinner(false);
+          setShowMainMenu(true);
+          setShowPDFview(false);
+        })
+        .catch((error) => {
+          setAlertMessage(error);
+          setAlertStatus('error');
+          setAlert(true);
+          setSpinner(false);
+          return;
+        });
     }
   }
 
   return (
     <div className='PDFPage'>
-      {AlertBox(alert, setAlert, alertMessage)}
+      {AlertBox(alert, setAlert, alertMessage, alertStatus)}
 
       {spinner && <FullPageLoader/>}
 
@@ -304,8 +406,13 @@ const PDFPage = function (): JSX.Element {
       </div>}
 
       {showUploadView && <div className='UploadView'>
-        <Input type='file' inputRef = {UploadViewInputRef}/>
-        <Button onClick={uploadPDF}>Submit</Button>
+        <CustomModal open={viewModal} setOpen={setViewModal}>
+          <div className='PDFViewMenu'>
+            <p >Please select a file from your computer to upload.<br/></p>
+            <Input type='file' inputRef = {UploadViewInputRef}/>
+            <Button onClick={uploadPDF}><br/>Submit</Button>
+          </div>
+        </CustomModal>
       </div>}
 
       {showBlankFormsView && <div className='BlankFormsView'>
@@ -326,7 +433,7 @@ const PDFPage = function (): JSX.Element {
 
       {showFormListView && <div className='FormListView'>
         <Button onClick={handleHelpModalButton}>Open Help Menu</Button>
-        <CustomModal open={helpModal} onClose={() => setHelpModal(false)}>
+        <CustomModal open={viewModal} setOpen={setViewModal}>
           <p>This is help button screen</p>
         </CustomModal>
         <RenderExpandCellGrid 
@@ -354,21 +461,32 @@ const PDFPage = function (): JSX.Element {
       </div>}
 
       {showPDFview && <div className='PDFview'>
+        <Button className='PDFViewMenu' onClick={handleHelpModalButton}>Open Help Menu</Button>
         <Select
+          className='PDFViewMenu' 
           labelId="PDFviewSelectLabel"
           id="PDFviewSelect"
           label="Actions"
-          defaultValue={0}
+          value={PDFviewActionSelectValue}
           onChange={handlePDFviewActionSelect}
+          ref={PDFActionSelectRef}
         >
-          <MenuItem disabled value={0}>Please Select an Action</MenuItem>
-          <MenuItem value={1}>Upload PDF</MenuItem>
-          <MenuItem value={2}>Get PDF</MenuItem>
-          <MenuItem value={3}>Update This PDF</MenuItem>
-          <MenuItem value={4}>Delete This PDF</MenuItem>
+          <MenuItem disabled value={0}>Select an Action</MenuItem>
+          <MenuItem value={1}>Update This PDF</MenuItem>
+          <MenuItem value={2}>Delete This PDF</MenuItem>
         </Select>
-        <Input inputRef = {PDFActionInputRef}/>
-        <Button onClick={handlePDFviewActionSubmit}>Submit</Button>
+        <CustomModal open={viewModal} setOpen={setViewModal}>
+          <div>
+            { showPDFviewActionInput && 
+              <div>
+                <p className='PDFViewMenu'>Please select a file from your computer to replace the current file.<br/></p>
+                <Input inputRef = {PDFActionInputRef} type='file'/> 
+              </div>
+            }
+            <p className='PDFViewMenu'><br/>Press Submit Button to confirm.</p>
+            <Button className='PDFViewMenu' onClick={handlePDFviewActionSubmit}>Submit</Button>
+          </div>
+        </CustomModal>
         <iframe src={PDFviewiframeSrc} style={iframeStyle}></iframe>
       </div>}
 

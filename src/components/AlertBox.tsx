@@ -1,12 +1,12 @@
 
-import Alert from '@mui/material/Alert';
+import Alert, { AlertColor } from '@mui/material/Alert';
 import Zoom from '@mui/material/Zoom';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 
-export default function AlertBox(externalOpen: boolean, externalSetOpen: React.Dispatch<React.SetStateAction<boolean>>, message: string): ReactJSXElement {
+export default function AlertBox(externalOpen: boolean, externalSetOpen: React.Dispatch<React.SetStateAction<boolean>>, message: string, severity: string): ReactJSXElement {
   const [open, setOpen] = [externalOpen, externalSetOpen];
   const icon = (<Alert 
     style={{
@@ -17,7 +17,7 @@ export default function AlertBox(externalOpen: boolean, externalSetOpen: React.D
     }} 
 
     variant='filled'
-    severity="error"
+    severity={severity as AlertColor}
 
     action={
       <IconButton

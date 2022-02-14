@@ -49,7 +49,7 @@ const LoginPage = function (): JSX.Element {
 
   return (
     <div className="div-background">
-      {AlertBox(alert, setAlert, alertMessage)}
+      {AlertBox(alert, setAlert, alertMessage, 'error')}
       <div className="login-header">
         <h1 className="headerText">Welcome Back!</h1>
         <img className="login-img" src={armyLogo}/>

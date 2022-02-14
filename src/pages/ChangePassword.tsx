@@ -50,7 +50,7 @@ const ChangePassword = function (): JSX.Element {
   return (
     <div className="div-background">
       {redirect && <Redirect to="/login" /> }
-      {AlertBox(alert, setAlert, alertMessage)}
+      {AlertBox(alert, setAlert, alertMessage, 'error')}
       <div className="register-header">
         <h1 className="headerText">Reset Password</h1>
       </div>
