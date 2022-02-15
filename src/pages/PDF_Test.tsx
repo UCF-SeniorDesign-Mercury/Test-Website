@@ -7,7 +7,7 @@ import { arrayBuffer } from 'stream/consumers';
 import Button from 'react-bootstrap/Button';
 import React from 'react';
 import { getToken } from '../firebase/firebase';
-import { getUser } from '../api/users';
+import { getUser, updateUser } from '../api/users';
 
 // import { downloadPDF } from '../firebase/firebase';
 // https://stackoverflow.com/questions/31270145/save-pdf-file-loaded-in-iframe
@@ -33,6 +33,17 @@ const PDF_TestPage = function (): JSX.Element {
 
   async function iframeFunction(){
     console.log(  getToken());
+
+    const data = {
+      display_name: 'hello',
+    };
+    updateUser(data)
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     getUser()
       .then((data) => {
         console.log(data);

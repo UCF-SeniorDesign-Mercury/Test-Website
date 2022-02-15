@@ -73,6 +73,7 @@ export const postFile = async (file: string, filename: string, reviewer: string)
     file: file,
     filename: filename,
     reviewer: reviewer,
+    signature: 'signature',
   };
   console.log(JSON.stringify(data));
 

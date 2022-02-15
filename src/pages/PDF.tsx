@@ -212,6 +212,7 @@ const PDFPage = function (): JSX.Element {
   async function handleFormsListButton()
   {
     setAlert(false);
+    console.log(selectionModel[0] as string);
 
     if (selectionModel.length == 0)
     {
