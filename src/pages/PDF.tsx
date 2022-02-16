@@ -20,6 +20,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
 
 import { PDFDocument } from 'pdf-lib';
+import { signatureTest } from '../assets/signature';
 
 const iframeStyle = {
   width: '100%', 
@@ -81,6 +82,42 @@ const PDFPage = function (): JSX.Element {
   const UploadViewInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const PDFActionInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const PDFActionSelectRef: React.RefObject<HTMLSelectElement> = React.useRef<HTMLSelectElement>(null);
+
+  async function insertSignature(fileString: string): Promise<string> {
+  
+    const pdfDoc = await PDFDocument.load(fileString);
+  
+    const pages = pdfDoc.getPages();
+    const firstPage = pages[0];
+    // console.log(pdfDoc.getForm().getFields());
+    // eslint-disable-next-line
+    // const { width, height } = firstPage.getSize();
+    const signatureImage = await pdfDoc.embedPng(signatureTest);
+    pdfDoc.getPage(0).drawImage(signatureImage, {
+      x: 165,
+      y: 225,
+      width: 50,
+      height: 50
+    });
+
+    //const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true })
+    return new Promise(function(resolve,reject)
+    {
+      pdfDoc.saveAsBase64({ dataUri: true })
+        .then( (res) => {
+          console.log('success');
+          resolve(res);
+        })
+        .catch(err => {
+          console.log(err);
+          reject('about:blank');
+        });
+    });
+    //console.log(pdfDataUri);  
+    // eslint-disable-next-line
+    // const pdfBytes = await pdfDoc.save();
+
+  }
 
   async function uploadPDF(/*event: React.MouseEvent<HTMLButtonElement>*/): Promise<void> {
 
@@ -223,8 +260,9 @@ const PDFPage = function (): JSX.Element {
     }
     setSpinner(true);
     await getFile(selectionModel[0] as string)
-      .then((string) => {
-        setPDFviewiframeSrc(string);
+      .then(async (string) => {
+        //setPDFviewiframeSrc(string);
+        setPDFviewiframeSrc(await insertSignature(string));
         setSpinner(false);
         setShowFormListView(false);
         setShowPDFview(true);

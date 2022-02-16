@@ -1,4 +1,5 @@
-.PDFPage {
+div[role=tooltip] {
+    height:100px;
 }
 
 .PDFViewMenu {
