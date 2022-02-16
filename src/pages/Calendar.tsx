@@ -5,6 +5,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Calendar.css';
 import { NavLink } from 'react-router-dom';
 
+import { createEvent, deleteEvent,getEvent,updateEvent,} from '../api/events';
+
 import React from 'react';
 import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, formatDate } from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -23,9 +25,11 @@ export default class CalendarPage extends React.Component<{unkown:any}, DemoAppS
     weekendsVisible: true,
     currentEvents: []
   }
+  
 
   render() {
     return (
+      console.log(getEvent),
       <div className='demo-app'>
         {this.renderSidebar()}
         <div className='demo-app-main'>
@@ -143,57 +147,3 @@ function renderSidebarEvent(event: EventApi) {
     </li>
   );
 }
-
-
-
-
-
-
-// const CalendarPage = function (): JSX.Element {
-//   const [currentEvents, setCurrentEvents] = useState<EventApi[]>([]);
-//   const handleEvents = useCallback(
-//     (events: EventApi[]) => setCurrentEvents(events),
-//     []
-//   );
-//   const handleDateSelect = useCallback((selectInfo: DateSelectArg) => {
-//     const title = prompt('test')?.trim();
-//     const calendarApi = selectInfo.view.calendar;
-//     calendarApi.unselect();
-//     if (title) {
-//       calendarApi.addEvent({
-//         id: createEventId(),
-//         title,
-//         start: selectInfo.startStr,
-//         end: selectInfo.endStr,
-//         allDay: selectInfo.allDay
-//       });
-//     }
-//   }, []);
-//   const handleEventClick = useCallback((clickInfo: EventClickArg) => {
-//     if (
-//       window.confirm(`test2${clickInfo.event.title}test2`)
-//     ) {
-//       clickInfo.event.remove();
-//     }
-//   }, []);
-//   return (
-//     <div className='demo-app'>
-//       <div className='demo-app-main'>
-//         <FullCalendar
-//           plugins={[dayGridPlugin, interactionPlugin]}
-//           initialView='dayGridMonth'
-//           selectable={true}
-//           editable={true}
-//           initialEvents={INITIAL_EVENTS}
-//           locales={allLocales}
-//           locale='ja'
-//           eventsSet={handleEvents}
-//           select={handleDateSelect}
-//           eventClick={handleEventClick}
-//         />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CalendarPage;
