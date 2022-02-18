@@ -130,7 +130,7 @@ const PDFPage = function (): JSX.Element {
       const selectedFile = UploadViewInputRef.current.files;
       //Check File is not Empty
       if (selectedFile && selectedFile.length > 0) {
-
+        
         if (!selectedFile[0].name.match(/.(pdf)$/i))
         {
           setAlertMessage('Please provide a PDF file to upload');
@@ -152,7 +152,7 @@ const PDFPage = function (): JSX.Element {
             // Print data in console
             console.log(base64);
 
-            postFile(base64 as string, 'testfilename.pdf', 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2')
+            postFile(base64 as string, selectedFile[0].name, 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2')
               .then((string) => {
                 setAlertMessage(string);
                 setAlertStatus('success');
