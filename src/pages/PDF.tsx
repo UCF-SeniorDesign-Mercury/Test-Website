@@ -190,7 +190,7 @@ const PDFPage = function (): JSX.Element {
 
   async function getBlankPDFs():Promise<void> 
   {
-    const url = 'https://firebasestorage.googleapis.com/v0/b/electric-eagles.appspot.com/o/RST_Request_Form_Blank.pdf?alt=media&token=2fbae07a-1496-49ba-ab74-6cf5dd87f9b2';
+    const url = 'https://firebasestorage.googleapis.com/v0/b/electric-eagles.appspot.com/o/uploads%2FRST_Blank.pdf?alt=media&token=c2bab592-be4d-4c7e-9ce6-d805cc0daea1';
     const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
   
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
