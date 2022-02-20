@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState } from 'react';
+import { useState } from 'react';
 import React from 'react';
 import './PDF.css';
 
@@ -59,27 +59,39 @@ interface BlankFormListDataGridRowsType
   filename: string;
 }
 
+interface PageView
+{
+  view: 'MainMenu' 
+  | 'BlankForms'
+  | 'UserFormList'
+  | 'PDF';
+}
 
+interface ModalView
+{
+  view: 'Nothing'
+  | 'Upload'
+  | 'UserFormListHelp'
+  | 'PDFHelp'
+  | 'Update'
+  | 'Delete';
+}
 
 const PDFPage = function (): JSX.Element {
-  const [showMainMenu, setShowMainMenu] = useState<boolean>(true);
-  const [showUploadView, setShowUploadView] = useState<boolean>(false);
-  const [showBlankFormsView, setShowBlankFormsView] = useState<boolean>(false);
-  const [showFormListView, setShowFormListView] = useState<boolean>(false);
-  const [showPDFview, setShowPDFview] = useState<boolean>(false);
+  const [currentPageView, setCurrentPageView] = useState<PageView>({view: 'MainMenu'});
+  const [previousPageView, setPreviousPageView] = useState<PageView>({view: 'MainMenu'});
+  const [currentModalView, setCurrentModalView] = useState<ModalView>({view: 'Nothing'});
   const [DataGridRows, setDataGridRows] = useState<FormListDataGridRowsType[] | BlankFormListDataGridRowsType[]>([]);
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
-  const [PDFviewActionSelectValue, setPDFviewActionSelectValue] = useState<number>(0);
-  const [PDFviewiframeSrc, setPDFviewiframeSrc] = useState<string | undefined >('about:blank');
-  const [PDFAction, setPDFAction] = useState<string>('nothing');
+  const [PDFActionSelectValue, setPDFActionSelectValue] = useState<number>(0);
+  const [PDFiframeSrc, setPDFiframeSrc] = useState<string | undefined >('about:blank');
   const [spinner, setSpinner] = useState(false);
   const [alert, setAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertStatus, setAlertStatus] = useState('success');
   const [viewModal, setViewModal] = useState(false);
-  const [showPDFviewActionInput, setShowPDFviewActionInput] = useState<boolean>(false);
 
-  const UploadViewInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
+  const UploadInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const PDFActionInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const PDFActionSelectRef: React.RefObject<HTMLSelectElement> = React.useRef<HTMLSelectElement>(null);
 
@@ -87,8 +99,8 @@ const PDFPage = function (): JSX.Element {
   
     const pdfDoc = await PDFDocument.load(fileString);
   
-    const pages = pdfDoc.getPages();
-    const firstPage = pages[0];
+    // const pages = pdfDoc.getPages();
+    // const firstPage = pages[0];
     // console.log(pdfDoc.getForm().getFields());
     // eslint-disable-next-line
     // const { width, height } = firstPage.getSize();
@@ -119,15 +131,46 @@ const PDFPage = function (): JSX.Element {
 
   }
 
-  async function uploadPDF(/*event: React.MouseEvent<HTMLButtonElement>*/): Promise<void> {
+  async function convertToBase64(file: File): Promise<string>
+  {
+    return new Promise(function(resolve,reject){
+      const fileReader = new FileReader();
+      let base64 = '';
+
+      // Onload of file read the file content
+      fileReader.onload = function(fileLoadedEvent) {
+        if (fileLoadedEvent && fileLoadedEvent.target)
+        {
+          base64 = fileLoadedEvent.target.result as string;
+          // Print data in console
+          // console.log(base64);
+
+          resolve(base64);
+        }
+      };
+
+      fileReader.onerror = function(event) {
+        if (event)
+        {
+          console.log(fileReader.error);
+          reject('Could not convert file to base 64. Please try again');
+        }
+      };
+
+      // Convert data to base64
+      fileReader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadPDF(): Promise<boolean> {
 
     setAlert(false);
     setSpinner(true);
     setViewModal(false);
 
     //Read File
-    if (UploadViewInputRef && UploadViewInputRef.current){
-      const selectedFile = UploadViewInputRef.current.files;
+    if (UploadInputRef && UploadInputRef.current){
+      const selectedFile = UploadInputRef.current.files;
       //Check File is not Empty
       if (selectedFile && selectedFile.length > 0) {
         
@@ -137,46 +180,39 @@ const PDFPage = function (): JSX.Element {
           setAlertStatus('error');
           setAlert(true);
           setSpinner(false);
-          return;
+          return false;
         }
-        // Select the very first file from list
-        const fileToLoad = selectedFile[0];
-        // FileReader function for read the file.
-        const fileReader = new FileReader();
-        let base64;
-        // Onload of file read the file content
-        fileReader.onload = function(fileLoadedEvent) {
-          if (fileLoadedEvent && fileLoadedEvent.target)
-          {
-            base64 = fileLoadedEvent.target.result;
-            // Print data in console
-            console.log(base64);
 
-            postFile(base64 as string, selectedFile[0].name, 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2')
-              .then((string) => {
-                setAlertMessage(string);
-                setAlertStatus('success');
-                setAlert(true);
-                setSpinner(false);
-              })
-              .catch((error) => {
-                setAlertMessage(error);
-                setAlertStatus('error');
-                setAlert(true);
-                setSpinner(false);
-                return;
-              });
-          }
-        };
-        // Convert data to base64
-        fileReader.readAsDataURL(fileToLoad);
+        const base64 = await convertToBase64(selectedFile[0])
+          .catch((error) => {
+            setAlertMessage(error);
+            setAlertStatus('error');
+            setAlert(true);
+            setSpinner(false);
+            return false;
+          });
+
+        postFile(base64 as string, selectedFile[0].name, 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2')
+          .then((string) => {
+            setAlertMessage(string);
+            setAlertStatus('success');
+            setAlert(true);
+            setSpinner(false);
+          })
+          .catch((error) => {
+            setAlertMessage(error);
+            setAlertStatus('error');
+            setAlert(true);
+            setSpinner(false);
+            return false;
+          });
       }
       else{
         setAlertMessage('Please Select a File from your computer.');
         setAlertStatus('error');
         setAlert(true);
         setSpinner(false);
-        return;
+        return false;
       }
     }
     else{
@@ -184,8 +220,10 @@ const PDFPage = function (): JSX.Element {
       setAlertStatus('error');
       setAlert(true);
       setSpinner(false);
-      return;
+      return false;
     }
+
+    return true;
   }
 
   async function getBlankPDFs():Promise<void> 
@@ -204,30 +242,12 @@ const PDFPage = function (): JSX.Element {
         console.log('success');
         return res;
       });
-    setPDFviewiframeSrc(pdfDataUri);
-    setShowPDFview(true);
-    setShowBlankFormsView(false);
+    setPDFiframeSrc(pdfDataUri);
   }
 
-  function handleUploadFileButton()
-  {
-    setViewModal(true);
-    setShowUploadView(true);
-  }
-
-  function handleBlankFilesButton()
-  {
-    setShowMainMenu(false);
-    setShowBlankFormsView(true);
-    setDataGridRows([{id: '1', filename: 'RST'}]);
-  }
-
-
-  async function handleViewYourFilesButton()
+  async function getUserPDFs():Promise<boolean> 
   {
     setAlert(false);
-    setShowMainMenu(false);
-    setShowFormListView(true);
     setSpinner(true);
     await getUserFiles()
       .then((data) => {
@@ -237,16 +257,13 @@ const PDFPage = function (): JSX.Element {
         setAlertMessage(error);
         setAlertStatus('error');
         setAlert(true);
+        return false;
       });
     setSpinner(false);
+    return true;
   }
 
-  function handleHelpModalButton()
-  {
-    setViewModal(true);
-  }
-
-  async function handleFormsListButton()
+  async function getPDF():Promise<boolean> 
   {
     setAlert(false);
     console.log(selectionModel[0] as string);
@@ -256,135 +273,175 @@ const PDFPage = function (): JSX.Element {
       setAlertMessage('Please select a file to view.');
       setAlertStatus('error');
       setAlert(true);
-      return;
+      return false;
     }
+
     setSpinner(true);
     await getFile(selectionModel[0] as string)
       .then(async (string) => {
         //setPDFviewiframeSrc(string);
-        setPDFviewiframeSrc(await insertSignature(string));
+        setPDFiframeSrc(await insertSignature(string));
         setSpinner(false);
-        setShowFormListView(false);
-        setShowPDFview(true);
       })
       .catch((error) => {
         setAlertMessage(error);
         setAlertStatus('error');
         setAlert(true);
         setSpinner(false);
-        return;
+        return false;
       });
+
+    return true;
   }
 
+  async function updatePDF():Promise<boolean>
+  {
+    setAlert(false);
+    setSpinner(true);
 
-  function handlePDFviewActionSelect(event: SelectChangeEvent<unknown>)
+    //Read File
+    if (PDFActionInputRef && PDFActionInputRef.current){
+      const selectedFile = PDFActionInputRef.current.files;
+
+      const selectedFileID = selectionModel[0] as string;
+      //Check File is not Empty
+      if (selectedFile && selectedFile.length > 0) {
+
+        if (!selectedFile[0].name.match(/.(pdf)$/i))
+        {
+          setAlertMessage('Please provide a PDF file to upload');
+          setAlertStatus('error');
+          setAlert(true);
+          setSpinner(false);
+          return false;
+        }
+
+        const base64 = await convertToBase64(selectedFile[0])
+          .catch((error) => {
+            setAlertMessage(error);
+            setAlertStatus('error');
+            setAlert(true);
+            setSpinner(false);
+            return false;
+          });
+
+        updateFile(base64 as string, selectedFileID, selectedFile[0].name)
+          .then((string) => {
+            setAlertMessage(string);
+            setAlertStatus('success');
+            setAlert(true);
+            setSpinner(false);
+          })
+          .catch((error) => {
+            setAlertMessage(error);
+            setAlertStatus('error');
+            setAlert(true);
+            setSpinner(false);
+            return false;
+          });
+      }
+      else{
+        setAlertMessage('Please Select a File from your computer.');
+        setAlertStatus('error');
+        setAlert(true);
+        setSpinner(false);
+        return false;
+      }
+    }
+
+    return true;
+  }
+  
+  async function deletePDF():Promise<boolean>
+  {
+    setAlert(false);
+    setSpinner(true);
+    
+    await deleteFile(selectionModel[0] as string)
+      .then((string) => {
+        setAlertMessage(string);
+        setAlertStatus('success');
+        setAlert(true);
+        setSpinner(false);
+      })
+      .catch((error) => {
+        setAlertMessage(error);
+        setAlertStatus('error');
+        setAlert(true);
+        setSpinner(false);
+        return false;
+      });
+
+    return true;
+  }
+
+  async function pageChange(target: PageView)
+  {
+    setAlert(false);
+    let confirmChange = true;
+
+    if(target.view == 'BlankForms')
+    {
+      setDataGridRows([{id: '1', filename: 'RST'}]);
+    }
+    
+    else if(target.view == 'UserFormList')
+    {
+      confirmChange = await getUserPDFs();
+    }
+
+    else if(target.view == 'PDF')
+    {
+      confirmChange = await getPDF();
+    }
+
+    if(confirmChange)
+      setCurrentPageView(target);
+  }
+
+  async function modalChange(target: ModalView | PageView)
+  {
+    setViewModal(true);
+    let confirmChange = true;
+
+    if (target.view == 'MainMenu')
+    {
+      setAlert(false);
+      setSpinner(true);
+      setViewModal(false);
+  
+      if (currentModalView.view == 'Update')
+      {
+        confirmChange = await updatePDF();
+      }
+      else if (currentModalView.view == 'Delete')
+      {
+        confirmChange = await deletePDF();
+      }
+
+      if(confirmChange)
+        await setCurrentPageView({view: 'MainMenu'});
+      return;
+    }
+
+    setCurrentModalView(target as ModalView);
+  }
+
+  async function handlePDFActionSelect(event: SelectChangeEvent<unknown>)
   {
     console.log(event);
     if (event && event.target && event.target.value == 1)
     {
       console.log(event.target.value);
-      setPDFviewActionSelectValue(0);
-      setShowPDFviewActionInput(true);
-      setPDFAction('Update');
-      setViewModal(true);
+      setPDFActionSelectValue(0);
+      await modalChange({view: 'Update'});
     }
 
     else if (event && event.target && event.target.value == 2)
     {
       console.log(event.target.value);
-      setPDFviewActionSelectValue(0);
-      setShowPDFviewActionInput(false);
-      setPDFAction('Delete');
-      setViewModal(true);
-    }
-  }
-
-  async function handlePDFviewActionSubmit()
-  {
-    setAlert(false);
-    setSpinner(true);
-    setViewModal(false);
-
-    if (PDFAction == 'Update')
-    {
-      //Read File
-      if (PDFActionInputRef && PDFActionInputRef.current){
-        const selectedFile = PDFActionInputRef.current.files;
-
-        const selectedFileID = selectionModel[0] as string;
-        //Check File is not Empty
-        if (selectedFile && selectedFile.length > 0) {
-
-          if (!selectedFile[0].name.match(/.(pdf)$/i))
-          {
-            setAlertMessage('Please provide a PDF file to upload');
-            setAlertStatus('error');
-            setAlert(true);
-            setSpinner(false);
-            return;
-          }
-
-          // Select the very first file from list
-          const fileToLoad = selectedFile[0];
-          // FileReader function for read the file.
-          const fileReader = new FileReader();
-          let base64;
-          // Onload of file read the file content
-          fileReader.onload = function(fileLoadedEvent) {
-            if (fileLoadedEvent && fileLoadedEvent.target)
-            {
-              base64 = fileLoadedEvent.target.result;
-              // Print data in console
-              console.log(base64);
-
-              updateFile(base64 as string, selectedFileID, 'testfilename.pdf')
-                .then((string) => {
-                  setAlertMessage(string);
-                  setAlertStatus('success');
-                  setAlert(true);
-                  setSpinner(false);
-                  setShowMainMenu(true);
-                  setShowPDFview(false);
-                })
-                .catch((error) => {
-                  setAlertMessage(error);
-                  setAlertStatus('error');
-                  setAlert(true);
-                  setSpinner(false);
-                  return;
-                });
-            }
-          };
-          // Convert data to base64
-          fileReader.readAsDataURL(fileToLoad);
-        }
-        else{
-          setAlertMessage('Please Select a File from your computer.');
-          setAlertStatus('error');
-          setAlert(true);
-          setSpinner(false);
-          return;
-        }
-      }
-    }
-    else if (PDFAction == 'Delete')
-    {
-      deleteFile(selectionModel[0] as string)
-        .then((string) => {
-          setAlertMessage(string);
-          setAlertStatus('success');
-          setAlert(true);
-          setSpinner(false);
-          setShowMainMenu(true);
-          setShowPDFview(false);
-        })
-        .catch((error) => {
-          setAlertMessage(error);
-          setAlertStatus('error');
-          setAlert(true);
-          setSpinner(false);
-          return;
-        });
+      setPDFActionSelectValue(0);
+      await modalChange({view: 'Delete'});
     }
   }
 
@@ -394,8 +451,8 @@ const PDFPage = function (): JSX.Element {
 
       {spinner && <FullPageLoader/>}
 
-      {showMainMenu && <div className='MainMenu'>
-        <Button variant='outlined' startIcon={<FileUpload />} onClick={handleUploadFileButton}
+      {currentPageView.view == 'MainMenu' && <div className='MainMenu'>
+        <Button variant='outlined' startIcon={<FileUpload />} onClick={() => modalChange({view: 'Upload'})}
           sx={{
             position: 'absolute',
             top: '30%',
@@ -411,7 +468,7 @@ const PDFPage = function (): JSX.Element {
           Upload a File
         </Button>
 
-        <Button variant='outlined' startIcon={<AddIcon/>} onClick={handleBlankFilesButton}
+        <Button variant='outlined' startIcon={<AddIcon/>} onClick={() => pageChange({view: 'BlankForms'})}
           sx={{
             position: 'absolute',
             top: '30%',
@@ -427,7 +484,7 @@ const PDFPage = function (): JSX.Element {
           Create a Blank File
         </Button>
 
-        <Button variant='outlined' startIcon={<ViewAgendaIcon/>} onClick={handleViewYourFilesButton}
+        <Button variant='outlined' startIcon={<ViewAgendaIcon/>} onClick={() => pageChange({view: 'UserFormList'})}
           sx={{
             position: 'absolute',
             top: '30%',
@@ -444,17 +501,17 @@ const PDFPage = function (): JSX.Element {
         </Button>
       </div>}
 
-      {showUploadView && <div className='UploadView'>
+      {currentModalView.view == 'Upload' && <div className='UploadView'>
         <CustomModal open={viewModal} setOpen={setViewModal}>
           <div className='PDFViewMenu'>
             <p >Please select a file from your computer to upload.<br/></p>
-            <Input type='file' inputRef = {UploadViewInputRef}/>
+            <Input type='file' inputRef = {UploadInputRef}/>
             <Button onClick={uploadPDF}><br/>Submit</Button>
           </div>
         </CustomModal>
       </div>}
 
-      {showBlankFormsView && <div className='BlankFormsView'>
+      {currentPageView.view == 'BlankForms' && <div className='BlankFormsView'>
         <RenderExpandCellGrid 
           columns = {BlankFormListDataGridCols} 
           rows = {DataGridRows}
@@ -467,11 +524,11 @@ const PDFPage = function (): JSX.Element {
           })}
           selectionModel={selectionModel}
         />
-        <Button onClick={getBlankPDFs}>Submit</Button>
+        <Button onClick={() => { getBlankPDFs(); setCurrentPageView({view: 'PDF'}); }}>Submit</Button>
       </div>}
 
-      {showFormListView && <div className='FormListView'>
-        <Button onClick={handleHelpModalButton}>Open Help Menu</Button>
+      {currentPageView.view == 'UserFormList' && <div className='UserFormListView'>
+        <Button onClick={() => modalChange({view: 'UserFormListHelp'})}>Open Help Menu</Button>
         <CustomModal open={viewModal} setOpen={setViewModal}>
           <p>This is help button screen</p>
         </CustomModal>
@@ -488,7 +545,7 @@ const PDFPage = function (): JSX.Element {
             id: false,
           }}
         />
-        <Button onClick={handleFormsListButton}
+        <Button onClick={() => pageChange({view: 'PDF'})}
           sx={{
             height: 70,
             width: '100%',
@@ -499,34 +556,39 @@ const PDFPage = function (): JSX.Element {
           Submit</Button>
       </div>}
 
-      {showPDFview && <div className='PDFview'>
-        <Button className='PDFViewMenu' onClick={handleHelpModalButton}>Open Help Menu</Button>
+      {currentPageView.view == 'PDF' && <div className='PDFview'>
+        <Button className='PDFViewMenu' onClick={() => modalChange({view: 'UserFormListHelp'})}>Open Help Menu</Button>
+        {currentModalView.view == 'PDFHelp' && <CustomModal open={viewModal} setOpen={setViewModal}>
+          <p>This is help button screen</p>
+        </CustomModal>}
         <Select
           className='PDFViewMenu' 
           labelId="PDFviewSelectLabel"
           id="PDFviewSelect"
           label="Actions"
-          value={PDFviewActionSelectValue}
-          onChange={handlePDFviewActionSelect}
+          value={PDFActionSelectValue}
+          onChange={handlePDFActionSelect}
           ref={PDFActionSelectRef}
         >
           <MenuItem disabled value={0}>Select an Action</MenuItem>
           <MenuItem value={1}>Update This PDF</MenuItem>
           <MenuItem value={2}>Delete This PDF</MenuItem>
         </Select>
-        <CustomModal open={viewModal} setOpen={setViewModal}>
+        { currentModalView.view == 'Update' && <CustomModal open={viewModal} setOpen={setViewModal}>
           <div>
-            { showPDFviewActionInput && 
-              <div>
-                <p className='PDFViewMenu'>Please select a file from your computer to replace the current file.<br/></p>
-                <Input inputRef = {PDFActionInputRef} type='file'/> 
-              </div>
-            }
+            <p className='PDFViewMenu'>Please select a file from your computer to replace the current file.<br/></p>
+            <Input inputRef = {PDFActionInputRef} type='file'/> 
             <p className='PDFViewMenu'><br/>Press Submit Button to confirm.</p>
-            <Button className='PDFViewMenu' onClick={handlePDFviewActionSubmit}>Submit</Button>
+            <Button className='PDFViewMenu' onClick={() => modalChange({view: 'MainMenu'})}>Submit</Button>
           </div>
-        </CustomModal>
-        <iframe src={PDFviewiframeSrc} style={iframeStyle}></iframe>
+        </CustomModal>}
+        { currentModalView.view == 'Delete' && <CustomModal open={viewModal} setOpen={setViewModal}>
+          <div>
+            <p className='PDFViewMenu'><br/>Press Submit Button to confirm.</p>
+            <Button className='PDFViewMenu' onClick={() => modalChange({view: 'MainMenu'})}>Submit</Button>
+          </div>
+        </CustomModal>}
+        <iframe src={PDFiframeSrc} style={iframeStyle}></iframe>
       </div>}
 
     </div>
