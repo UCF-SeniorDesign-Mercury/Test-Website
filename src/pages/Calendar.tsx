@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Calendar.css';
 import { NavLink } from 'react-router-dom';
 
-import { createEvent, deleteEvent,getEvent,updateEvent,} from '../api/events';
+import { createEvent, deleteEvent,getEvent,updateEvent,getEvents} from '../api/events';
 
 import React from 'react';
 import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, formatDate } from '@fullcalendar/react';
@@ -19,19 +19,21 @@ interface DemoAppState {
   currentEvents: EventApi[];
 }
 
+
+
 export default class CalendarPage extends React.Component<{unkown:any}, DemoAppState> {
 
   state: DemoAppState = {
     weekendsVisible: true,
     currentEvents: []
   }
-  
+
 
   render() {
     return (
-      console.log(getEvent),
       <div className='demo-app'>
         {this.renderSidebar()}
+        {get_events_test()}
         <div className='demo-app-main'>
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -96,6 +98,7 @@ export default class CalendarPage extends React.Component<{unkown:any}, DemoAppS
 
 
 
+
   handleWeekendsToggle = () => {
     this.setState({
       weekendsVisible: !this.state.weekendsVisible
@@ -149,4 +152,13 @@ function renderSidebarEvent(event: EventApi) {
       <i>{event.title}</i>
     </li>
   );
+}
+
+function get_events_test(){
+  getEvents().then((data) => {
+    console.log(data);
+  })
+    .catch((error) => {
+      console.log('didnt work! :)');
+    });
 }

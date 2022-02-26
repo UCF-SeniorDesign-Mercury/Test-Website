@@ -46,7 +46,7 @@ const RegisterNewUserPage = function (): JSX.Element {
       setSpinner(false);
     }
 
-    await verifyEmail();
+    // await verifyEmail();
     return result;
   }
 
