@@ -2,7 +2,7 @@ import { useState } from 'react';
 import React from 'react';
 import './PDF.css';
 
-import { postFile, getFile, updateFile, deleteFile, getUserFiles } from '../api/files';
+import { postFile, getFile, updateFile, deleteFile, getUserFiles, reviewUserFiles } from '../api/files';
 import { RenderExpandCellGrid } from '../components/RenderExpandCellGrid';
 import FullPageLoader from '../components/FullPageLoader';
 import AlertBox from '../components/AlertBox';
@@ -64,7 +64,9 @@ interface PageView
   view: 'MainMenu' 
   | 'BlankForms'
   | 'UserFormList'
-  | 'PDF';
+  | 'PDF'
+  | 'ReviewList'
+  | 'ReviewPDF';
 }
 
 interface ModalView
@@ -74,8 +76,12 @@ interface ModalView
   | 'UserFormListHelp'
   | 'PDFHelp'
   | 'Update'
-  | 'Delete';
+  | 'Delete'
+  | 'UpdateStatus'
+  | 'UpdateComment';
 }
+
+// report it, request it, review it
 
 const PDFPage = function (): JSX.Element {
   const [currentPageView, setCurrentPageView] = useState<PageView>({view: 'MainMenu'});
@@ -263,6 +269,24 @@ const PDFPage = function (): JSX.Element {
     return true;
   }
 
+  async function reviewUserPDFs():Promise<boolean> 
+  {
+    setAlert(false);
+    setSpinner(true);
+    await reviewUserFiles()
+      .then((data) => {
+        setDataGridRows(data as FormListDataGridRowsType[]);
+      })
+      .catch((error) => {
+        setAlertMessage(error);
+        setAlertStatus('error');
+        setAlert(true);
+        return false;
+      });
+    setSpinner(false);
+    return true;
+  }
+
   async function getPDF():Promise<boolean> 
   {
     setAlert(false);
@@ -380,7 +404,12 @@ const PDFPage = function (): JSX.Element {
     setAlert(false);
     let confirmChange = true;
 
-    if(target.view == 'BlankForms')
+    if(target.view == 'ReviewList')
+    {
+      confirmChange = await reviewUserPDFs();
+    }
+
+    else if(target.view == 'BlankForms')
     {
       setDataGridRows([{id: '1', filename: 'RST'}]);
     }
@@ -452,7 +481,7 @@ const PDFPage = function (): JSX.Element {
       {spinner && <FullPageLoader/>}
 
       {currentPageView.view == 'MainMenu' && <div className='MainMenu'>
-        <Button variant='outlined' startIcon={<FileUpload />} onClick={() => modalChange({view: 'Upload'})}
+        <Button variant='outlined' startIcon={<FileUpload />} onClick={() => pageChange({view: 'ReviewList'})}
           sx={{
             position: 'absolute',
             top: '30%',
@@ -465,7 +494,7 @@ const PDFPage = function (): JSX.Element {
             backgroundColor: '#FFC947'
           }}
         >
-          Upload a File
+          Review it
         </Button>
 
         <Button variant='outlined' startIcon={<AddIcon/>} onClick={() => pageChange({view: 'BlankForms'})}
@@ -481,7 +510,7 @@ const PDFPage = function (): JSX.Element {
             backgroundColor: '#FFC947'
           }}
         >
-          Create a Blank File
+          Request it
         </Button>
 
         <Button variant='outlined' startIcon={<ViewAgendaIcon/>} onClick={() => pageChange({view: 'UserFormList'})}
@@ -497,8 +526,72 @@ const PDFPage = function (): JSX.Element {
             backgroundColor: '#FFC947'
           }}
         >
-          View Your Files 
+          Report it
         </Button>
+      </div>}
+
+      {currentPageView.view == 'ReviewList' && <div className='UserFormListView'>
+        <Button onClick={() => modalChange({view: 'UserFormListHelp'})}>Open Help Menu</Button>
+        <CustomModal open={viewModal} setOpen={setViewModal}>
+          <p>This is help button screen</p>
+        </CustomModal>
+        <RenderExpandCellGrid 
+          columns = {FormListDataGridCols} 
+          rows = {DataGridRows}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          onSelectionModelChange={(newSelection => {
+            setSelectionModel(newSelection);
+          })}
+          selectionModel={selectionModel}
+          columnVisibilityModel={{
+            id: false,
+          }}
+        />
+        <Button onClick={() => pageChange({view: 'PDF'})}
+          sx={{
+            height: 70,
+            width: '100%',
+            backgroundColor: '#FFC947',
+            fontSize: '100%',
+          }}
+        >
+          Submit</Button>
+      </div>}
+
+      {currentPageView.view == 'ReviewPDF' && <div className='PDFview'>
+        <Button className='PDFViewMenu' onClick={() => modalChange({view: 'UserFormListHelp'})}>Open Help Menu</Button>
+        {currentModalView.view == 'PDFHelp' && <CustomModal open={viewModal} setOpen={setViewModal}>
+          <p>This is help button screen</p>
+        </CustomModal>}
+        <Select
+          className='PDFViewMenu' 
+          labelId="PDFviewSelectLabel"
+          id="PDFviewSelect"
+          label="Actions"
+          value={PDFActionSelectValue}
+          onChange={handlePDFActionSelect}
+          ref={PDFActionSelectRef}
+        >
+          <MenuItem disabled value={0}>Select an Action</MenuItem>
+          <MenuItem value={1}>Update Review Status</MenuItem>
+          <MenuItem value={2}>Update Comment</MenuItem>
+        </Select>
+        { currentModalView.view == 'UpdateStatus' && <CustomModal open={viewModal} setOpen={setViewModal}>
+          <div>
+            <p className='PDFViewMenu'>Please select a file from your computer to replace the current file.<br/></p>
+            <Input inputRef = {PDFActionInputRef} type='file'/> 
+            <p className='PDFViewMenu'><br/>Press Submit Button to confirm.</p>
+            <Button className='PDFViewMenu' onClick={() => modalChange({view: 'MainMenu'})}>Submit</Button>
+          </div>
+        </CustomModal>}
+        { currentModalView.view == 'UpdateComment' && <CustomModal open={viewModal} setOpen={setViewModal}>
+          <div>
+            <p className='PDFViewMenu'><br/>Press Submit Button to confirm.</p>
+            <Button className='PDFViewMenu' onClick={() => modalChange({view: 'MainMenu'})}>Submit</Button>
+          </div>
+        </CustomModal>}
+        <iframe src={PDFiframeSrc} style={iframeStyle}></iframe>
       </div>}
 
       {currentModalView.view == 'Upload' && <div className='UploadView'>
