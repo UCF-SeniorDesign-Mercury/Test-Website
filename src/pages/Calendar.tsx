@@ -47,6 +47,7 @@ export default class CalendarPage extends React.Component<{unkown:any}, DemoAppS
             dayMaxEvents={true}
             weekends={this.state.weekendsVisible}
             initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
+            // events={getEvent}
             select={this.handleDateSelect}
             eventContent={renderEventContent} // custom render function
             eventClick={this.handleEventClick}
@@ -92,6 +93,8 @@ export default class CalendarPage extends React.Component<{unkown:any}, DemoAppS
       </div>
     );
   }
+
+
 
   handleWeekendsToggle = () => {
     this.setState({
