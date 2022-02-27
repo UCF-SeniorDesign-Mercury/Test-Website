@@ -7,6 +7,7 @@ import { RenderExpandCellGrid } from '../components/RenderExpandCellGrid';
 import FullPageLoader from '../components/FullPageLoader';
 import AlertBox from '../components/AlertBox';
 import { CustomModal } from '../components/Modal';
+import { FormType, FormList, noFormValue } from '../Forms/form_settings';
 
 import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
@@ -14,6 +15,7 @@ import Select from '@mui/material/Select';
 import { SelectChangeEvent } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import { GridColDef, GridSelectionModel } from '@mui/x-data-grid';
+import { Typography } from '@mui/material';
 
 import { FileUpload } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
@@ -21,6 +23,7 @@ import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
 
 import { PDFDocument } from 'pdf-lib';
 import { signatureTest } from '../assets/signature';
+import { Form } from 'react-bootstrap';
 
 const iframeStyle = {
   width: '100%', 
@@ -66,7 +69,8 @@ interface PageView
   | 'UserFormList'
   | 'PDF'
   | 'ReviewList'
-  | 'ReviewPDF';
+  | 'ReviewPDF'
+  | 'ReportList';
 }
 
 interface ModalView
@@ -74,6 +78,7 @@ interface ModalView
   view: 'Nothing'
   | 'Upload'
   | 'UserFormListHelp'
+  | 'ReportListHelp'
   | 'PDFHelp'
   | 'Update'
   | 'Delete'
@@ -89,6 +94,7 @@ const PDFPage = function (): JSX.Element {
   const [currentModalView, setCurrentModalView] = useState<ModalView>({view: 'Nothing'});
   const [DataGridRows, setDataGridRows] = useState<FormListDataGridRowsType[] | BlankFormListDataGridRowsType[]>([]);
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
+  const [formType, setFormType] = useState<FormType>({formType: noFormValue});
   const [PDFActionSelectValue, setPDFActionSelectValue] = useState<number>(0);
   const [PDFiframeSrc, setPDFiframeSrc] = useState<string | undefined >('about:blank');
   const [spinner, setSpinner] = useState(false);
@@ -409,6 +415,11 @@ const PDFPage = function (): JSX.Element {
       confirmChange = await reviewUserPDFs();
     }
 
+    else if(target.view == 'ReportList')
+    {
+      confirmChange = await getUserPDFs();
+    }
+
     else if(target.view == 'BlankForms')
     {
       setDataGridRows([{id: '1', filename: 'RST'}]);
@@ -513,7 +524,7 @@ const PDFPage = function (): JSX.Element {
           Request it
         </Button>
 
-        <Button variant='outlined' startIcon={<ViewAgendaIcon/>} onClick={() => pageChange({view: 'UserFormList'})}
+        <Button variant='outlined' startIcon={<ViewAgendaIcon/>} onClick={() => pageChange({view: 'ReportList'})}
           sx={{
             position: 'absolute',
             top: '30%',
@@ -594,14 +605,71 @@ const PDFPage = function (): JSX.Element {
         <iframe src={PDFiframeSrc} style={iframeStyle}></iframe>
       </div>}
 
-      {currentModalView.view == 'Upload' && <div className='UploadView'>
-        <CustomModal open={viewModal} setOpen={setViewModal}>
-          <div className='PDFViewMenu'>
-            <p >Please select a file from your computer to upload.<br/></p>
-            <Input type='file' inputRef = {UploadInputRef}/>
-            <Button onClick={uploadPDF}><br/>Submit</Button>
-          </div>
-        </CustomModal>
+      {currentPageView.view == 'ReportList' && <div className='UserFormListView'>
+
+        {currentModalView.view == 'ReportListHelp' && <CustomModal open={viewModal} setOpen={setViewModal}>
+          <p>This is help button screen</p>
+        </CustomModal>}
+
+        {currentModalView.view == 'Upload' && <div className='UploadView'>
+          <CustomModal open={viewModal} setOpen={setViewModal}>
+            <div className='PDFViewMenu'>
+
+              <p>Please select the type of form being submitted.<br/></p>
+              <Select
+                labelId="PDFviewSelectLabel"
+                id="PDFviewSelect"
+                label="Actions"
+                value={formType.formType}
+                onChange={(event) => setFormType({formType: event.target.value as FormType['formType']})}
+              >
+                <MenuItem disabled value={noFormValue}>{noFormValue}</MenuItem>
+                {FormList.map(option => {
+                  return (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+              <p><br/><br/>Please select the form from your computer to upload.<br/></p>
+              <Input type='file' inputRef = {UploadInputRef}/>
+              <Button onClick={uploadPDF}><br/>Submit</Button>
+            </div>
+          </CustomModal>
+        </div>}
+        
+        <Button onClick={() => modalChange({view: 'ReportListHelp'})}>Open Help Menu</Button>
+        <Button onClick={() => modalChange({view: 'Upload'})}>Submit a form</Button>
+        
+        <Typography variant="h4" component="div" gutterBottom sx={{
+          textAlign: 'center',
+        }}>
+          Submitted Forms
+        </Typography>
+
+        <RenderExpandCellGrid 
+          columns = {FormListDataGridCols} 
+          rows = {DataGridRows}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          onSelectionModelChange={(newSelection => {
+            setSelectionModel(newSelection);
+          })}
+          selectionModel={selectionModel}
+          columnVisibilityModel={{
+            id: false,
+          }}
+        />
+        <Button onClick={() => pageChange({view: 'PDF'})}
+          sx={{
+            height: 70,
+            width: '100%',
+            backgroundColor: '#FFC947',
+            fontSize: '100%',
+          }}
+        >
+          Submit</Button>
       </div>}
 
       {currentPageView.view == 'BlankForms' && <div className='BlankFormsView'>
