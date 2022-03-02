@@ -210,11 +210,11 @@ export const assignRole = async (email: string, level: string, rank: string, rol
   });
 };
 
-export const getUsers = async (): Promise<unknown> => {
+export const getUsers = async (extraURLparameters = ''): Promise<unknown> => {
   const header = await getHeaders();
 
   return new Promise(function(resolve,reject){
-    fetch(url + '/users/get_users/', {
+    fetch(url + '/users/get_users?' + extraURLparameters, {
       method: 'GET',
       mode: 'cors',
       headers: header,

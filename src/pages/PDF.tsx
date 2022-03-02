@@ -7,7 +7,7 @@ import { RenderExpandCellGrid } from '../components/RenderExpandCellGrid';
 import FullPageLoader from '../components/FullPageLoader';
 import AlertBox from '../components/AlertBox';
 import { CustomModal } from '../components/Modal';
-import { FormType, FormList, noFormValue } from '../Forms/form_settings';
+import { FormType, FormList, noFormValue, GetFormComponent} from '../Forms/form_settings';
 
 import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
@@ -23,7 +23,6 @@ import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
 
 import { PDFDocument } from 'pdf-lib';
 import { signatureTest } from '../assets/signature';
-import { Form } from 'react-bootstrap';
 
 const iframeStyle = {
   width: '100%', 
@@ -95,6 +94,8 @@ const PDFPage = function (): JSX.Element {
   const [DataGridRows, setDataGridRows] = useState<FormListDataGridRowsType[] | BlankFormListDataGridRowsType[]>([]);
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [formType, setFormType] = useState<FormType>({formType: noFormValue});
+  // eslint-disable-next-line
+  const [UploadFormExtraData, setUploadFormExtraData] = useState<any>('none');
   const [PDFActionSelectValue, setPDFActionSelectValue] = useState<number>(0);
   const [PDFiframeSrc, setPDFiframeSrc] = useState<string | undefined >('about:blank');
   const [spinner, setSpinner] = useState(false);
@@ -632,6 +633,9 @@ const PDFPage = function (): JSX.Element {
                   );
                 })}
               </Select>
+              <GetFormComponent data={{data: UploadFormExtraData, setData: setUploadFormExtraData}} form='1380' functionName='UploadSection'/>
+              {  /*<UploadSection1380 selection={UploadFormExtraData} setSelection={setUploadFormExtraData}/>*/}
+
               <p><br/><br/>Please select the form from your computer to upload.<br/></p>
               <Input type='file' inputRef = {UploadInputRef}/>
               <Button onClick={uploadPDF}><br/>Submit</Button>

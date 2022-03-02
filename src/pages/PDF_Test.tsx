@@ -1,26 +1,26 @@
-import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+//import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 import './PDF.css';
 import { downloadPDF } from '../firebase/firebase';
-import { arrayBuffer } from 'stream/consumers';
+//import { arrayBuffer } from 'stream/consumers';
 import Button from 'react-bootstrap/Button';
 import React from 'react';
 import { getToken } from '../firebase/firebase';
-import { getUser, updateUser } from '../api/users';
+//import { getUser, updateUser } from '../api/users';
 import { signatureTest } from '../assets/signature';
 
 // import { downloadPDF } from '../firebase/firebase';
 // https://stackoverflow.com/questions/31270145/save-pdf-file-loaded-in-iframe
 
 const PDF_TestPage = function (): JSX.Element {
-  const [iframeSrc, setiframeSrc] = useState<string | undefined >('about:blank');
+  /*const [iframeSrc, setiframeSrc] = useState<string | undefined >('about:blank');
   const inputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const getFileInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const getFileDeleteInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const getFileUpdateInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const getFileUpdateStringInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-  const [getFileActivate, setgetFileActivate] = useState<boolean>(false);
+  const [getFileActivate, setgetFileActivate] = useState<boolean>(false);*/
   
   // async function handleOnLogin(email: string, password: string): Promise<boolean | undefined> {
 
@@ -38,7 +38,7 @@ const PDF_TestPage = function (): JSX.Element {
   }
 
   useEffect(() => {
-    async function modifyPdf() {
+    /*async function modifyPdf() {
       const url = 'https://firebasestorage.googleapis.com/v0/b/electric-eagles.appspot.com/o/1380_Blank.pdf?alt=media&token=d21b82a0-2e80-4746-970c-65dd145b93f5';
       const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
     
@@ -82,7 +82,7 @@ const PDF_TestPage = function (): JSX.Element {
         .catch(err => console.log(err))
         .then( () => console.log('success'))
         .catch(() => 'obligatory catch');
-    }
+    }*/
   });
 
   return (
