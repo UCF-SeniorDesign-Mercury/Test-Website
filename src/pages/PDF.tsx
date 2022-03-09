@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import React from 'react';
 import './PDF.css';
 
@@ -7,7 +7,7 @@ import { RenderExpandCellGrid } from '../components/RenderExpandCellGrid';
 import FullPageLoader from '../components/FullPageLoader';
 import AlertBox from '../components/AlertBox';
 import { CustomModal } from '../components/Modal';
-import { FormType, FormList, noFormValue, GetFormComponent} from '../Forms/form_settings';
+import { FormType, FormList, noFormValue, GetFormComponent, convertBackendFormName} from '../Forms/form_settings';
 
 import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
@@ -93,9 +93,11 @@ const PDFPage = function (): JSX.Element {
   const [currentModalView, setCurrentModalView] = useState<ModalView>({view: 'Nothing'});
   const [DataGridRows, setDataGridRows] = useState<FormListDataGridRowsType[] | BlankFormListDataGridRowsType[]>([]);
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
+  // eslint-disable-next-line
+  const [FormComponent, setFormComponent] = useState<React.ReactElement>(<div><p>FORM Component</p></div>);
   const [formType, setFormType] = useState<FormType>({formType: noFormValue});
   // eslint-disable-next-line
-  const [UploadFormExtraData, setUploadFormExtraData] = useState<any>('none');
+  const [UploadFormExtraData, setUploadFormExtraData] = useState<any>(noFormValue);
   const [PDFActionSelectValue, setPDFActionSelectValue] = useState<number>(0);
   const [PDFiframeSrc, setPDFiframeSrc] = useState<string | undefined >('about:blank');
   const [spinner, setSpinner] = useState(false);
@@ -622,19 +624,27 @@ const PDFPage = function (): JSX.Element {
                 id="PDFviewSelect"
                 label="Actions"
                 value={formType.formType}
-                onChange={(event) => setFormType({formType: event.target.value as FormType['formType']})}
+                onChange={(event) => {
+                  setFormType({formType: event.target.value as FormType['formType']});
+                  const newProps = {
+                    data: {data: UploadFormExtraData, setData: setUploadFormExtraData}, 
+                    form: {formType: event.target.value as FormType['formType']}, 
+                    functionName: 'UploadSection',
+                  };
+                  setFormComponent(<GetFormComponent {...newProps}/>);
+                }}
               >
                 <MenuItem disabled value={noFormValue}>{noFormValue}</MenuItem>
                 {FormList.map(option => {
                   return (
                     <MenuItem key={option} value={option}>
-                      {option}
+                      {convertBackendFormName(option)}
                     </MenuItem>
                   );
                 })}
               </Select>
-              <GetFormComponent data={{data: UploadFormExtraData, setData: setUploadFormExtraData}} form='1380' functionName='UploadSection'/>
-              {  /*<UploadSection1380 selection={UploadFormExtraData} setSelection={setUploadFormExtraData}/>*/}
+              {/*<GetFormComponent data={{data: UploadFormExtraData, setData: setUploadFormExtraData}} form={formType} functionName='UploadSection'/>*/}
+              {FormComponent}
 
               <p><br/><br/>Please select the form from your computer to upload.<br/></p>
               <Input type='file' inputRef = {UploadInputRef}/>

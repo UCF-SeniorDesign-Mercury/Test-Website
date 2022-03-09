@@ -1,5 +1,7 @@
-import React, { useEffect, useState, lazy } from 'react';
+import React, { useState, useEffect } from 'react';
+import * as FormNone from './None';
 import * as Form1380 from './1380';
+import * as FormRST from './RST';
 
 export const noFormValue = 'none';
 
@@ -25,16 +27,22 @@ export const FormNameList = [
 
 // links names to form files
 const FormFunctionList: { [key: string]: any } = {
+  'none': FormNone.functionList,
   '1380': Form1380.functionList,
+  'RST': FormRST.functionList,
 };
 
 export function convertBackendFormName(name: string): string
 {
+  if (name == noFormValue)
+    return noFormValue;
   return FormNameList[FormList.indexOf(name)];
 }
 
 export function convertFrontendFormName(name: string): string
 {
+  if (name == noFormValue)
+    return noFormValue;
   return FormList[FormNameList.indexOf(name)];
 }
 
@@ -46,13 +54,17 @@ export interface FormDataTransferProps
   setData: React.Dispatch<React.SetStateAction<any>>;
 }
 
-export const GetFormComponent: React.FC<{data: FormDataTransferProps; form: string; functionName: string}> = 
-(props: {data: FormDataTransferProps; form: string; functionName: string}) =>
+const dummyComponent: React.FC<void> = () => {
+  return(<div><h1>dummy</h1></div>);
+};
+
+export const GetFormComponent: React.FC<{data: FormDataTransferProps; form: FormType; functionName: string}> = 
+(props: {data: FormDataTransferProps; form: FormType; functionName: string}) =>
 {
   return(<div>
-    <h1>ddd</h1>
-    {FormFunctionList[props.form][props.functionName](props.data)}
-    
+    {FormFunctionList[convertBackendFormName(props.form.formType as string)][props.functionName](props.data)}
     {/*<Form1380.UploadSection {...props.data} />*/}
+
+
   </div>);
 };
