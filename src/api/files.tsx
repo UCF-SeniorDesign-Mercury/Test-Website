@@ -47,7 +47,7 @@ export const getUserFiles = async (): Promise<unknown> => {
         console.log(response);
         if (response.status == 200) {          
           const data = await response.json();
-          //console.log(data);
+          console.log(data);
           resolve(data);
         }
         else {
@@ -102,13 +102,18 @@ export const reviewUserFiles = async (): Promise<unknown> => {
   });
 };
 
-export const postFile = async (file: string, filename: string, reviewer: string): Promise<string> => {
-  const data = {
+export const postFile = async (file: string, filename: string, fileType: string, reviewer: string, recommender?: string): Promise<string> => {
+  const data: any = {
     file: file,
     filename: filename,
+    filetype: fileType,
     reviewer: reviewer,
     signature: 'signature',
   };
+
+  if (fileType == 'rst_request')
+    data.recommender = recommender;
+
   console.log(JSON.stringify(data));
 
   const header = await getHeaders();

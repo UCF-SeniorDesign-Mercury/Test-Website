@@ -7,7 +7,7 @@ import { RenderExpandCellGrid } from '../components/RenderExpandCellGrid';
 import FullPageLoader from '../components/FullPageLoader';
 import AlertBox from '../components/AlertBox';
 import { CustomModal } from '../components/Modal';
-import { FormType, FormList, noFormValue, GetFormComponent, convertBackendFormName} from '../Forms/form_settings';
+import { FormType, FormList, noFormValue, convertBackendFormName,} from '../Forms/form_settings';
 
 import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
@@ -23,6 +23,8 @@ import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
 
 import { PDFDocument } from 'pdf-lib';
 import { signatureTest } from '../assets/signature';
+import { getUsers } from '../api/users';
+import Upload from '../components/PDF_Components/Upload';
 
 const iframeStyle = {
   width: '100%', 
@@ -61,7 +63,7 @@ interface BlankFormListDataGridRowsType
   filename: string;
 }
 
-interface PageView
+export interface PageView
 {
   view: 'MainMenu' 
   | 'BlankForms'
@@ -88,16 +90,17 @@ interface ModalView
 // report it, request it, review it
 
 const PDFPage = function (): JSX.Element {
+
+  // page and modal view variables
   const [currentPageView, setCurrentPageView] = useState<PageView>({view: 'MainMenu'});
   const [previousPageView, setPreviousPageView] = useState<PageView>({view: 'MainMenu'});
   const [currentModalView, setCurrentModalView] = useState<ModalView>({view: 'Nothing'});
+
+  // Datagrid variables
   const [DataGridRows, setDataGridRows] = useState<FormListDataGridRowsType[] | BlankFormListDataGridRowsType[]>([]);
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
-  // eslint-disable-next-line
-  const [FormComponent, setFormComponent] = useState<React.ReactElement>(<div><p>FORM Component</p></div>);
-  const [formType, setFormType] = useState<FormType>({formType: noFormValue});
-  // eslint-disable-next-line
-  const [UploadFormExtraData, setUploadFormExtraData] = useState<any>(noFormValue);
+
+
   const [PDFActionSelectValue, setPDFActionSelectValue] = useState<number>(0);
   const [PDFiframeSrc, setPDFiframeSrc] = useState<string | undefined >('about:blank');
   const [spinner, setSpinner] = useState(false);
@@ -106,7 +109,6 @@ const PDFPage = function (): JSX.Element {
   const [alertStatus, setAlertStatus] = useState('success');
   const [viewModal, setViewModal] = useState(false);
 
-  const UploadInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const PDFActionInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const PDFActionSelectRef: React.RefObject<HTMLSelectElement> = React.useRef<HTMLSelectElement>(null);
 
@@ -177,70 +179,6 @@ const PDFPage = function (): JSX.Element {
     });
   }
 
-  async function uploadPDF(): Promise<boolean> {
-
-    setAlert(false);
-    setSpinner(true);
-    setViewModal(false);
-
-    //Read File
-    if (UploadInputRef && UploadInputRef.current){
-      const selectedFile = UploadInputRef.current.files;
-      //Check File is not Empty
-      if (selectedFile && selectedFile.length > 0) {
-        
-        if (!selectedFile[0].name.match(/.(pdf)$/i))
-        {
-          setAlertMessage('Please provide a PDF file to upload');
-          setAlertStatus('error');
-          setAlert(true);
-          setSpinner(false);
-          return false;
-        }
-
-        const base64 = await convertToBase64(selectedFile[0])
-          .catch((error) => {
-            setAlertMessage(error);
-            setAlertStatus('error');
-            setAlert(true);
-            setSpinner(false);
-            return false;
-          });
-
-        postFile(base64 as string, selectedFile[0].name, 'ljwZn5ciNGOGAWBVl0GCNQWXbjk2')
-          .then((string) => {
-            setAlertMessage(string);
-            setAlertStatus('success');
-            setAlert(true);
-            setSpinner(false);
-          })
-          .catch((error) => {
-            setAlertMessage(error);
-            setAlertStatus('error');
-            setAlert(true);
-            setSpinner(false);
-            return false;
-          });
-      }
-      else{
-        setAlertMessage('Please Select a File from your computer.');
-        setAlertStatus('error');
-        setAlert(true);
-        setSpinner(false);
-        return false;
-      }
-    }
-    else{
-      setAlertMessage('Please Select a File from your computer.');
-      setAlertStatus('error');
-      setAlert(true);
-      setSpinner(false);
-      return false;
-    }
-
-    return true;
-  }
-
   async function getBlankPDFs():Promise<void> 
   {
     const url = 'https://firebasestorage.googleapis.com/v0/b/electric-eagles.appspot.com/o/uploads%2FRST_Blank.pdf?alt=media&token=c2bab592-be4d-4c7e-9ce6-d805cc0daea1';
@@ -266,6 +204,14 @@ const PDFPage = function (): JSX.Element {
     setSpinner(true);
     await getUserFiles()
       .then((data) => {
+        let i = 0;
+        for (i = 0; i < (data as any[]).length; i++)
+        {
+          if (!(data as any[])[i].reviewer_visible)
+          {
+            (data as any[])[i].reviewer = (data as any[])[i].recommender;
+          }
+        }
         setDataGridRows(data as FormListDataGridRowsType[]);
       })
       .catch((error) => {
@@ -615,42 +561,16 @@ const PDFPage = function (): JSX.Element {
         </CustomModal>}
 
         {currentModalView.view == 'Upload' && <div className='UploadView'>
-          <CustomModal open={viewModal} setOpen={setViewModal}>
-            <div className='PDFViewMenu'>
 
-              <p>Please select the type of form being submitted.<br/></p>
-              <Select
-                labelId="PDFviewSelectLabel"
-                id="PDFviewSelect"
-                label="Actions"
-                value={formType.formType}
-                onChange={(event) => {
-                  setFormType({formType: event.target.value as FormType['formType']});
-                  const newProps = {
-                    data: {data: UploadFormExtraData, setData: setUploadFormExtraData}, 
-                    form: {formType: event.target.value as FormType['formType']}, 
-                    functionName: 'UploadSection',
-                  };
-                  setFormComponent(<GetFormComponent {...newProps}/>);
-                }}
-              >
-                <MenuItem disabled value={noFormValue}>{noFormValue}</MenuItem>
-                {FormList.map(option => {
-                  return (
-                    <MenuItem key={option} value={option}>
-                      {convertBackendFormName(option)}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-              {/*<GetFormComponent data={{data: UploadFormExtraData, setData: setUploadFormExtraData}} form={formType} functionName='UploadSection'/>*/}
-              {FormComponent}
-
-              <p><br/><br/>Please select the form from your computer to upload.<br/></p>
-              <Input type='file' inputRef = {UploadInputRef}/>
-              <Button onClick={uploadPDF}><br/>Submit</Button>
-            </div>
-          </CustomModal>
+          <Upload 
+            mainViewModal={viewModal}
+            mainSetViewModal={setViewModal}
+            mainSetSpinner={setSpinner}
+            mainSetAlert={setAlert}
+            mainSetAlertMessage={setAlertMessage}
+            mainSetAlertStatus={setAlertStatus}
+            pageChange={pageChange}
+          />
         </div>}
         
         <Button onClick={() => modalChange({view: 'ReportListHelp'})}>Open Help Menu</Button>

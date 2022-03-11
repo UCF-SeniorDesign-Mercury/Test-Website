@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import * as FormNone from './None';
-import * as Form1380 from './1380';
-import * as FormRST from './RST';
 
 export const noFormValue = 'none';
 
@@ -25,13 +22,6 @@ export const FormNameList = [
   'RST',
 ];
 
-// links names to form files
-const FormFunctionList: { [key: string]: any } = {
-  'none': FormNone.functionList,
-  '1380': Form1380.functionList,
-  'RST': FormRST.functionList,
-};
-
 export function convertBackendFormName(name: string): string
 {
   if (name == noFormValue)
@@ -54,17 +44,44 @@ export interface FormDataTransferProps
   setData: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const dummyComponent: React.FC<void> = () => {
+/*
+// links names to form files
+const FormFunctionList: { [key: string]: any } = {
+  'none': FormNone.functionList,
+  '1380': Form1380.functionList,
+  'RST': FormRST.functionList,
+};
+
+export interface FormDataTransferProps
+{
+  // eslint-disable-next-line
+  data: any; 
+  // eslint-disable-next-line
+  setData: React.Dispatch<React.SetStateAction<any>>;
+}
+
+const DummyComponent: React.FC<unknown> = () => {
   return(<div><h1>dummy</h1></div>);
 };
+
+export interface GetFormComponentProps
+{
+  data: FormDataTransferProps;
+  form: FormType; 
+  functionName: string;
+}
 
 export const GetFormComponent: React.FC<{data: FormDataTransferProps; form: FormType; functionName: string}> = 
 (props: {data: FormDataTransferProps; form: FormType; functionName: string}) =>
 {
+
+  //const NewComponent = FormFunctionList[convertBackendFormName(props.form.formType as string)][props.functionName](props.data);
+
   return(<div>
-    {FormFunctionList[convertBackendFormName(props.form.formType as string)][props.functionName](props.data)}
-    {/*<Form1380.UploadSection {...props.data} />*/}
-
-
+    {FormFunctionList[convertBackendFormName(props.form.formType as string)][props.functionName](props.data)  }
   </div>);
+
 };
+*/
+
+/*<GetFormComponent data={{data: UploadFormExtraData, setData: setUploadFormExtraData}} form={formType} functionName='UploadSection'/>*/
