@@ -8,29 +8,29 @@ import React, { useEffect, useState } from 'react';
 import { postFile } from '../../api/files';
 import { getUsers } from '../../api/users';
 import { convertBackendFormName, FormList, FormType, noFormValue } from '../../Forms/form_settings';
-import { PageView } from '../../pages/PDF';
+import { convertToBase64, PageView } from '../../pages/PDF';
 import { CustomModal } from '../Modal';
 
 const UploadPage: React.FC<{
-  mainViewModal: boolean;
-  mainSetViewModal: React.Dispatch<React.SetStateAction<boolean>>; 
-  mainSetSpinner: React.Dispatch<React.SetStateAction<boolean>>; 
-  mainSetAlert: React.Dispatch<React.SetStateAction<boolean>>;
-  mainSetAlertMessage: React.Dispatch<React.SetStateAction<string>>;
-  mainSetAlertStatus: React.Dispatch<React.SetStateAction<string>>;
-  pageChange: (target: PageView) => void;
+  viewModal: boolean;
+  setViewModal: React.Dispatch<React.SetStateAction<boolean>>; 
+  setSpinner: React.Dispatch<React.SetStateAction<boolean>>; 
+  setAlert: React.Dispatch<React.SetStateAction<boolean>>;
+  setAlertMessage: React.Dispatch<React.SetStateAction<string>>;
+  setAlertStatus: React.Dispatch<React.SetStateAction<string>>;
+  pageChange: (target: PageView) => Promise<void>;
 }> = (props: {
-  mainViewModal: boolean;
-  mainSetViewModal: React.Dispatch<React.SetStateAction<boolean>>; 
-  mainSetSpinner: React.Dispatch<React.SetStateAction<boolean>>;
-  mainSetAlert: React.Dispatch<React.SetStateAction<boolean>>;
-  mainSetAlertMessage: React.Dispatch<React.SetStateAction<string>>;
-  mainSetAlertStatus: React.Dispatch<React.SetStateAction<string>>;
-  pageChange: (target: PageView) => void;
+  viewModal: boolean;
+  setViewModal: React.Dispatch<React.SetStateAction<boolean>>; 
+  setSpinner: React.Dispatch<React.SetStateAction<boolean>>;
+  setAlert: React.Dispatch<React.SetStateAction<boolean>>;
+  setAlertMessage: React.Dispatch<React.SetStateAction<string>>;
+  setAlertStatus: React.Dispatch<React.SetStateAction<string>>;
+  pageChange: (target: PageView) => Promise<void>;
 }) => {
   
   const pageChange = props.pageChange;
-  const [viewModal, setViewModal] = [props.mainViewModal, props.mainSetViewModal];
+  const [viewModal, setViewModal] = [props.viewModal, props.setViewModal];
   const [formType, setFormType] = useState<FormType>({formType: noFormValue});
   // eslint-disable-next-line
   const [extraFormData, setExtraFormData] = useState<any>({});
@@ -40,44 +40,12 @@ const UploadPage: React.FC<{
   const [recommender, setRecommender] = useState<string>('none');
   const [recommenderList, setRecommenderList] = useState<string[]>([]);
 
-  // get from props and replace names
-  const setSpinner = props.mainSetSpinner;
-  const setAlert = props.mainSetAlert;
-  const setAlertMessage = props.mainSetAlertMessage;
-  const setAlertStatus = props.mainSetAlertStatus;
+  const setSpinner = props.setSpinner;
+  const setAlert = props.setAlert;
+  const setAlertMessage = props.setAlertMessage;
+  const setAlertStatus = props.setAlertStatus;
 
   const UploadInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-
-  async function convertToBase64(file: File): Promise<string>
-  {
-    return new Promise(function(resolve,reject){
-      const fileReader = new FileReader();
-      let base64 = '';
-
-      // Onload of file read the file content
-      fileReader.onload = function(fileLoadedEvent) {
-        if (fileLoadedEvent && fileLoadedEvent.target)
-        {
-          base64 = fileLoadedEvent.target.result as string;
-          // Print data in console
-          // console.log(base64);
-
-          resolve(base64);
-        }
-      };
-
-      fileReader.onerror = function(event) {
-        if (event)
-        {
-          console.log(fileReader.error);
-          reject('Could not convert file to base 64. Please try again');
-        }
-      };
-
-      // Convert data to base64
-      fileReader.readAsDataURL(file);
-    });
-  }
 
   async function uploadPDF(): Promise<boolean> {
 

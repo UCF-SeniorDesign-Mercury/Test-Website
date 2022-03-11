@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from 'react';
-
 export const noFormValue = 'none';
 
 // track names of forms in backend
@@ -36,13 +34,6 @@ export function convertFrontendFormName(name: string): string
   return FormList[FormNameList.indexOf(name)];
 }
 
-export interface FormDataTransferProps
-{
-  // eslint-disable-next-line
-  data: any; 
-  // eslint-disable-next-line
-  setData: React.Dispatch<React.SetStateAction<any>>;
-}
 
 /*
 // links names to form files
