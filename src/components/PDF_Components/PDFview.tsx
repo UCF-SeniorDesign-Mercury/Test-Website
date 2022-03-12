@@ -20,7 +20,9 @@ interface ModalView
   view: 'Nothing'
   | 'PDFHelp'
   | 'Update'
-  | 'Delete';
+  | 'Delete'
+  | 'UpdateStatus'
+  | 'UpdateComment';
 }
 
 const PDFviewPage: React.FC<{
@@ -30,7 +32,7 @@ const PDFviewPage: React.FC<{
   setAlert: React.Dispatch<React.SetStateAction<boolean>>;
   setAlertMessage: React.Dispatch<React.SetStateAction<string>>;
   setAlertStatus: React.Dispatch<React.SetStateAction<string>>;
-  pageChange: (target: PageView) => Promise<void>;
+  pageChange: (target: PageView) => void;
   fileID: string;
 }> = (props: {
   viewModal: boolean;
@@ -39,7 +41,7 @@ const PDFviewPage: React.FC<{
   setAlert: React.Dispatch<React.SetStateAction<boolean>>;
   setAlertMessage: React.Dispatch<React.SetStateAction<string>>;
   setAlertStatus: React.Dispatch<React.SetStateAction<string>>;
-  pageChange: (target: PageView) => Promise<void>;
+  pageChange: (target: PageView) => void;
   fileID: string;
 }) => {
 
@@ -225,7 +227,8 @@ const PDFviewPage: React.FC<{
   }
 
   useEffect(() => {
-    getPDF();
+    getPDF()
+      .catch((err) => console.log(err));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

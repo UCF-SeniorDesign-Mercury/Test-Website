@@ -18,7 +18,7 @@ const UploadPage: React.FC<{
   setAlert: React.Dispatch<React.SetStateAction<boolean>>;
   setAlertMessage: React.Dispatch<React.SetStateAction<string>>;
   setAlertStatus: React.Dispatch<React.SetStateAction<string>>;
-  pageChange: (target: PageView) => Promise<void>;
+  pageChange: (target: PageView) => void;
 }> = (props: {
   viewModal: boolean;
   setViewModal: React.Dispatch<React.SetStateAction<boolean>>; 
@@ -26,7 +26,7 @@ const UploadPage: React.FC<{
   setAlert: React.Dispatch<React.SetStateAction<boolean>>;
   setAlertMessage: React.Dispatch<React.SetStateAction<string>>;
   setAlertStatus: React.Dispatch<React.SetStateAction<string>>;
-  pageChange: (target: PageView) => Promise<void>;
+  pageChange: (target: PageView) => void;
 }) => {
   
   const pageChange = props.pageChange;
