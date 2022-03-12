@@ -70,8 +70,6 @@ export interface ModalView
   | 'UserFormListHelp'
   | 'ReportListHelp'
   | 'PDFHelp'
-  | 'Update'
-  | 'Delete'
   | 'UpdateStatus'
   | 'UpdateComment';
 }
@@ -229,33 +227,6 @@ const PDFPage = function (): JSX.Element {
       setCurrentPageView(target);
   }
 
-  async function modalChange(target: ModalView | PageView)
-  {
-    setViewModal(true);
-    /*let confirmChange = true;
-
-    if (target.view == 'MainMenu')
-    {
-      setAlert(false);
-      setSpinner(true);
-      setViewModal(false);
-  
-      if (currentModalView.view == 'Update')
-      {
-        confirmChange = await updatePDF();
-      }
-      else if (currentModalView.view == 'Delete')
-      {
-        confirmChange = await deletePDF();
-      }
-
-      if(confirmChange)
-        await setCurrentPageView({view: 'MainMenu'});
-      return;
-    }*/
-
-    setCurrentModalView(target as ModalView);
-  }
   return (
     <div className='PDFPage'>
       {AlertBox(alert, setAlert, alertMessage, alertStatus)}
@@ -313,7 +284,7 @@ const PDFPage = function (): JSX.Element {
       </div>}
 
       {currentPageView.view == 'ReviewList' && <div className='UserFormListView'>
-        <Button onClick={() => modalChange({view: 'UserFormListHelp'})}>Open Help Menu</Button>
+        <Button onClick={() => {setViewModal(true); setCurrentModalView({view: 'UserFormListHelp'});}}>Open Help Menu</Button>
         <CustomModal open={viewModal} setOpen={setViewModal}>
           <p>This is help button screen</p>
         </CustomModal>
@@ -363,8 +334,8 @@ const PDFPage = function (): JSX.Element {
           />
         </div>}
         
-        <Button onClick={() => modalChange({view: 'ReportListHelp'})}>Open Help Menu</Button>
-        <Button onClick={() => modalChange({view: 'Upload'})}>Submit a form</Button>
+        <Button onClick={() => {setViewModal(true); setCurrentModalView({view: 'ReportListHelp'});}}>Open Help Menu</Button>
+        <Button onClick={() => {setViewModal(true); setCurrentModalView({view: 'Upload'});}}>Submit a form</Button>
         
         <Typography variant="h4" component="div" gutterBottom sx={{
           textAlign: 'center',

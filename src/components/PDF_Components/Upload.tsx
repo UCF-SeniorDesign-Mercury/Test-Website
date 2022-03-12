@@ -81,7 +81,7 @@ const UploadPage: React.FC<{
           base64 as string,
           selectedFile[0].name,
           formType.formType,
-          extraFormData,
+          reviewer,
           formType.formType == 'rst_request' ? recommender : undefined,
         ];
 
