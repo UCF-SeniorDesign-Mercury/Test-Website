@@ -9,6 +9,7 @@ import React from 'react';
 import { getToken } from '../firebase/firebase';
 //import { getUser, updateUser } from '../api/users';
 import { signatureTest } from '../assets/signature';
+import { getUser } from '../api/users';
 
 // import { downloadPDF } from '../firebase/firebase';
 // https://stackoverflow.com/questions/31270145/save-pdf-file-loaded-in-iframe
@@ -34,6 +35,16 @@ const PDF_TestPage = function (): JSX.Element {
 
   async function iframeFunction(){
     console.log(getToken());
+    getUser()
+      .then((data) => {
+        console.log(data);
+        console.log((data as any).display_name);
+        const name = (data as any).display_name;
+        console.log('name: ' + name);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
   }
 
