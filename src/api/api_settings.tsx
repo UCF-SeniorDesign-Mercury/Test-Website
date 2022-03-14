@@ -1,6 +1,7 @@
 import { getToken } from '../firebase/firebase';
 
 export const url = 'https://mercury456.herokuapp.com';
+// export const url = 'https://mercury-backend-dev.herokuapp.com';
 
 export const getHeaders = async (): Promise<HeadersInit> => {
   const token = await getToken();
