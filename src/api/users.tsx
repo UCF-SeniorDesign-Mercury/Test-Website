@@ -91,7 +91,7 @@ export const getUser = async (): Promise<unknown> => {
         console.log(response);
         if (response.status == 200) {          
           const data = await response.json();
-          //console.log(data);
+          // console.log(data);
           resolve(data);
         }
         else {
@@ -144,21 +144,21 @@ export const deleteUser = async (userID: string): Promise<string> => {
   });
 };
 
-//revoke role
-
-export const revokeRole = async (email: string): Promise<string> => {
+export const getUsers = async (extraURLparameters = ''): Promise<unknown> => {
   const header = await getHeaders();
 
-  return new Promise(function (resolve, reject) {
-    fetch(url + '/users/revoke_role/' + email, {
-      method: 'DELETE',
+  return new Promise(function(resolve,reject){
+    fetch(url + '/users/get_users?' + extraURLparameters, {
+      method: 'GET',
       mode: 'cors',
       headers: header,
     })
       .then(async response => {
         console.log(response);
-        if (response.status == 200) {
-          resolve('File Deleted Successfully');
+        if (response.status == 200) {          
+          const data = await response.json();
+          //console.log(data);
+          resolve(data);
         }
         else {
           if (response.status == 400)
@@ -178,43 +178,11 @@ export const revokeRole = async (email: string): Promise<string> => {
   });
 };
 
-export const assignRole = async (email: string, level: string, rank: string, role: string): Promise<string> => {
-  const data = {
-    email: email,
-    level: level,
-    rank: rank,
-    role: role,
-  };
-  console.log(JSON.stringify(data));
-
+export const getSubordinates = async (dod:string): Promise<unknown> => {
   const header = await getHeaders();
 
   return new Promise(function(resolve,reject){
-    fetch(url + '/users/assign_role', {
-      method: 'POST',
-      mode: 'cors',
-      headers: header,
-      body: JSON.stringify(data)
-    })
-      .then(async response => {
-        console.log(response);
-        if (response.status == 200) {          
-          resolve('User Role Uploaded Successfully');
-        }
-        else {
-          if (response.status == 404)
-            reject('Status 404: User not found.');
-        }
-      })
-      .catch(err => console.log(err));
-  });
-};
-
-export const getUsers = async (extraURLparameters = ''): Promise<unknown> => {
-  const header = await getHeaders();
-
-  return new Promise(function(resolve,reject){
-    fetch(url + '/users/get_users?' + extraURLparameters, {
+    fetch(url + '/users/get_subordinates', {
       method: 'GET',
       mode: 'cors',
       headers: header,

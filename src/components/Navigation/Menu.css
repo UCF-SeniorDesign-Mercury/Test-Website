@@ -1,5 +1,7 @@
 .Menu {
-    background-color: #FFC947;
+    background-image: linear-gradient(#02233f , black);
+    color:white;
+    
 }
 
 .Menu .menu-icon {
@@ -31,12 +33,12 @@
 }
 
 .regular-menu nav ul li:hover {
-    border-bottom: 5px solid black;
+    border-bottom: 5px solid white;
 }
 
 .regular-menu nav ul li a{
     text-decoration: none;
-    color:black;
+    color:white;
 }
 
 .hamburger-menu {
@@ -60,10 +62,10 @@
 }
 
 .hamburger-menu nav ul li:hover {
-    border-bottom: 5px solid black;
+    border-bottom: 5px solid white;
 }
 
 .hamburger-menu nav ul li a{
     text-decoration: none;
-    color:black;
+    color:white ;
 }

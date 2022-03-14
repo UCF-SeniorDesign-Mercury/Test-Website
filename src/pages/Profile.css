@@ -1,19 +1,22 @@
 .profile-page {
-    background: rgba(198, 212, 252, 0.452);
+    /* background: rgba(198, 212, 252, 0.452); */
+    background: white;
 }
 
 .profile-page .username-display {
-    display: inline-block;
+    display: block;
     margin-top: 20px;
     margin-bottom: 20px;
-    margin-left: 60px;
-    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    width: 500px;
     height: 48px;
     left: 82px;
     top: 131px;
     text-align: center;
     background-color: #FFC947;
     color: #000000;
+    border-radius: 10px;
 }
 
 .btn.module-button{
@@ -23,6 +26,8 @@
     margin-left: 100px;
     margin-bottom: 50px;
     display: inline-block;
+    
+    border-radius: 10px;
 
     background: #C4C4C4;
 

@@ -5,14 +5,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Calendar.css';
 import { NavLink } from 'react-router-dom';
 
-import { createEvent, deleteEvent,getEvent,updateEvent,getEvents} from '../api/events';
-
+import { confirmEvent,createEvent, getEvents, deleteEvent,updateEvent,} from '../api/events';
 import React from 'react';
 import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, formatDate } from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { INITIAL_EVENTS, createEventId } from './event-utils';
+import {createEventId,testEvent } from './event-utils';
 
 interface DemoAppState {
   weekendsVisible: boolean;
@@ -48,8 +47,9 @@ export default class CalendarPage extends React.Component<{unkown:any}, DemoAppS
             selectMirror={true}
             dayMaxEvents={true}
             weekends={this.state.weekendsVisible}
-            initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
+            // initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
             // events={getEvent}
+            events={testEvent}
             select={this.handleDateSelect}
             eventContent={renderEventContent} // custom render function
             eventClick={this.handleEventClick}
