@@ -16,20 +16,21 @@ const iframeStyle = {
   height: '2000px', 
 };
 interface userInformation{
+  name: string;
+  email: string;
   branch: string;
   commander: boolean;
-  description: string;
+  // description: string;
   dod: number | string;
-  email: string;
   grade: number | string;
   level: number | string;
-  name: string;
+  officer: boolean | string;
   phone: string;
   rank: string;
-  signature: string;
   superior: number | string;
   // uid: string;
-  userStatus: number | string;
+  // userStatus: number | string;
+  signature: string;
 }
 
 function SubmitHandler(event: React.FormEvent<HTMLFormElement>): void {
@@ -45,20 +46,21 @@ const ProfilePage = function (): JSX.Element {
   // const test = get_user_test();
   // console.log('fuck' +test);
   const [userInfo, setUserInfo] = useState<userInformation>({
+    name: '',
+    email: '',
     branch: '',
     commander: true,
-    description: '',
+    // description: '',
     dod: '',
-    email: '',
     grade: '',
     level: '',
-    name: '',
+    officer: true,
     phone: '',
     rank: '',
-    signature: '',
     superior: '',
     // uid: '',
-    userStatus: '',
+    // userStatus: '',
+    signature: '',
   });
 
   function get_user_test(){
@@ -68,35 +70,23 @@ const ProfilePage = function (): JSX.Element {
         // const userName = (data as any).display_name;
         // console.log('name: ' + userName);
         const userData: userInformation = {
+          name: (data as any).name,
+          email: (data as any).email,
           branch: (data as any).branch,
           commander:(data as any).commander,
-          description: (data as any).description,
+          // description: (data as any).description,
           dod: (data as any).dod,
-          email: (data as any).email,
           grade: (data as any).grade,
           level: (data as any).level,
-          name: (data as any).name,
+          officer:(data as any).officer,
           phone: (data as any).phone,
           rank: (data as any).rank,
-          signature: (data as any).signature,
           superior: (data as any).superior,
           // uid: (data as any).uid,
-          userStatus: (data as any).user_status,
+          // userStatus: (data as any).user_status,
+          signature: (data as any).signature,
         };
-        console.log('User Email: ' + userData.email);
-        console.log('User name: ' + userData.name);
-        console.log('User status: ' + userData.userStatus);
         setUserInfo(userData);
-        // console.log('User signature: ' + userData.signature);
-        // modifyPdf(userData.signature);
-        
-        // renderNameContent(userName);
-        // return(
-        //   // <>
-        //   //   <h1 className="username-display">{'super test: ' + userData.name}</h1>
-        //   // </>
-        //   // userData
-        // );
          
       }) 
       .catch((error) => {
@@ -106,7 +96,6 @@ const ProfilePage = function (): JSX.Element {
 
   useEffect(()=>{
     get_user_test();
-    console.log('firing everytime :)');
   },[]);
 
   return (
@@ -114,20 +103,79 @@ const ProfilePage = function (): JSX.Element {
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossOrigin="anonymous" />
       <link rel="stylesheet" href="Profile.css" />
       <div className="profile-page">
-        <h1 className="username-display">{context.var1}</h1>
+        {/* <h1 className="username-display">{context.var1}</h1> */}
         {/* {'test' + get_user_test()} */}
         {/* <h1 className="username-display">{get_user_test}</h1> */}
         
-        { Object.keys(userInfo).map((key) => 
-        { if ((key as string) == 'commander' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == true){
-          return(<h2 className='username-display' key={'commander'}>commander</h2>);
-        }
-        else if((key as string) == 'signature'){
-          return(<iframe src={(userInfo as { [key: string]: any })[key]} style={iframeStyle}></iframe>);
-        }
-        else{
-          return(<h2 className='username-display' key={key}>{(userInfo as { [key: string]: any })[key]}</h2>);
-        }
+        { Object.keys(userInfo).map((key) =>{
+          if((key as string) == 'name'){
+            return(
+              <h2 className='username-display' key={key}>Name: {(userInfo as { [key: string]: any })[key]}</h2>  
+            );
+          }
+          else if((key as string) == 'email'){
+            return(
+              <h2 className='username-display' key={key}>Email: {(userInfo as { [key: string]: any })[key]}</h2>  
+            );
+          }
+          else if((key as string) == 'branch'){
+            return(
+              <h2 className='username-display' key={key}>Branch: {(userInfo as { [key: string]: any })[key]}</h2>  
+            );
+          } 
+          else if ((key as string) == 'commander' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == true){
+            return(<h2 className='username-display' key={'commander'}>commander</h2>);
+          }
+          else if ((key as string) == 'commander' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == false){
+            return(<h2 className='username-display' key={'commander'}>not Commander</h2>);
+          }
+          else if((key as string) == 'dod'){
+            return(
+              <h2 className='username-display' key={key}>DOD: {(userInfo as { [key: string]: any })[key]}</h2>  
+            );
+          }
+          else if((key as string) == 'grade'){
+            return(
+              <h2 className='username-display' key={key}>Grade: {(userInfo as { [key: string]: any })[key]}</h2>  
+            );
+          }
+          else if((key as string) == 'level'){
+            return(
+              <h2 className='username-display' key={key}>Level: {(userInfo as { [key: string]: any })[key]}</h2>  
+            );
+          }
+          else if ((key as string) == 'officer' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == true){
+            return(<h2 className='username-display' key={'officer'}>Officer</h2>);
+          }
+          else if ((key as string) == 'officer' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == false){
+            return(<h2 className='username-display' key={'officer'}>not Officer</h2>);
+          }
+          
+          else if((key as string) == 'signature'){
+            return(
+              <div className='wrap center'>
+              Signature: <iframe className='frame' scrolling="no" src={(userInfo as { [key: string]: any })[key]}></iframe>
+              </div>  
+            );
+          }
+          else if((key as string) == 'phone'){
+            return(
+              <h2 className='username-display' key={key}>Phone: {(userInfo as { [key: string]: any })[key]}</h2>  
+            );
+          }
+          else if((key as string) == 'rank'){
+            return(
+              <h2 className='username-display' key={key}>Rank: {(userInfo as { [key: string]: any })[key]}</h2>  
+            );
+          }
+          else if((key as string) == 'superior'){
+            return(
+              <h2 className='username-display' key={key}>Superior: {(userInfo as { [key: string]: any })[key]}</h2>  
+            );
+          }
+          else{
+            return(<h2 className='username-display' key={key}>{(userInfo as { [key: string]: any })[key]}</h2>);
+          }
         }
         )
         }

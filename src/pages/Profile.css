@@ -41,3 +41,34 @@
     color: #000000;
     background-color: #FFC947;
 }
+.center {
+  margin: auto;
+  width: 50%;
+  /* padding: 10px; */
+  background-color: #FFC947;
+}
+.wrap {
+    width: 400px;
+    height: 250px;
+    padding: 0;
+    overflow: hidden;
+
+}
+
+.frame {
+    width: 1200px;
+    height: 1000px;
+    border: 0;
+    -ms-transform: scale(0.25);
+    -moz-transform: scale(0.25);
+    -o-transform: scale(0.25);
+    -webkit-transform: scale(0.25);
+    transform: scale(0.25);
+    overflow: hidden;
+
+    -ms-transform-origin: 0 0;
+    -moz-transform-origin: 0 0;
+    -o-transform-origin: 0 0;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+}
