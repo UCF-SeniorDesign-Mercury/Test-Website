@@ -216,21 +216,4 @@ export default ProfilePage;
 //     });
 // }
 
-// function renderNameContent(userName:any) {
-//   return (
-//     <>
-//       <h1>{userName}</h1>
-//     </>
-//   );
-// }
-// async function fuck(){
-//   const account = await getUser();
-//   const data = {
-//     description: account.description,
-//     display_name: account.display_name,
-//     phone: account.phone,
-//     email: account.email
-//   };
-// }
-
  
