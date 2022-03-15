@@ -19,7 +19,7 @@ interface userInformation{
   name: string;
   email: string;
   branch: string;
-  commander: boolean;
+  // commander: boolean;
   // description: string;
   dod: number | string;
   grade: number | string;
@@ -30,7 +30,7 @@ interface userInformation{
   superior: number | string;
   // uid: string;
   // userStatus: number | string;
-  signature: string;
+  // signature: string;
 }
 
 function SubmitHandler(event: React.FormEvent<HTMLFormElement>): void {
@@ -49,7 +49,7 @@ const ProfilePage = function (): JSX.Element {
     name: '',
     email: '',
     branch: '',
-    commander: true,
+    // commander: true,
     // description: '',
     dod: '',
     grade: '',
@@ -60,7 +60,7 @@ const ProfilePage = function (): JSX.Element {
     superior: '',
     // uid: '',
     // userStatus: '',
-    signature: '',
+    // signature: '',
   });
 
   function get_user_test(){
@@ -73,7 +73,7 @@ const ProfilePage = function (): JSX.Element {
           name: (data as any).name,
           email: (data as any).email,
           branch: (data as any).branch,
-          commander:(data as any).commander,
+          // commander:(data as any).commander,
           // description: (data as any).description,
           dod: (data as any).dod,
           grade: (data as any).grade,
@@ -84,7 +84,7 @@ const ProfilePage = function (): JSX.Element {
           superior: (data as any).superior,
           // uid: (data as any).uid,
           // userStatus: (data as any).user_status,
-          signature: (data as any).signature,
+          // signature: (data as any).signature,
         };
         setUserInfo(userData);
          
@@ -123,12 +123,12 @@ const ProfilePage = function (): JSX.Element {
               <h2 className='username-display' key={key}>Branch: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           } 
-          else if ((key as string) == 'commander' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == true){
-            return(<h2 className='username-display' key={'commander'}>commander</h2>);
-          }
-          else if ((key as string) == 'commander' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == false){
-            return(<h2 className='username-display' key={'commander'}>not Commander</h2>);
-          }
+          // else if ((key as string) == 'commander' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == true){
+          //   return(<h2 className='username-display' key={'commander'}>commander</h2>);
+          // }
+          // else if ((key as string) == 'commander' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == false){
+          //   return(<h2 className='username-display' key={'commander'}>not Commander</h2>);
+          // }
           else if((key as string) == 'dod'){
             return(
               <h2 className='username-display' key={key}>DOD: {(userInfo as { [key: string]: any })[key]}</h2>  
@@ -151,13 +151,13 @@ const ProfilePage = function (): JSX.Element {
             return(<h2 className='username-display' key={'officer'}>not Officer</h2>);
           }
           
-          else if((key as string) == 'signature'){
-            return(
-              <div className='wrap center'>
-              Signature: <iframe className='frame' scrolling="no" src={(userInfo as { [key: string]: any })[key]}></iframe>
-              </div>  
-            );
-          }
+          // else if((key as string) == 'signature'){
+          //   return(
+          //     <div className='wrap center'>
+          //     Signature: <iframe className='frame' scrolling="no" src={(userInfo as { [key: string]: any })[key]}></iframe>
+          //     </div>  
+          //   );
+          // }
           else if((key as string) == 'phone'){
             return(
               <h2 className='username-display' key={key}>Phone: {(userInfo as { [key: string]: any })[key]}</h2>  
