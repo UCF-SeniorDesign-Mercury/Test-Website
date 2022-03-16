@@ -1,7 +1,21 @@
 import { url, getHeaders } from './api_settings';
 
 //Update User
-export const updateUser = async (data: unknown): Promise<unknown> => {
+export const updateUser = async (branch: string,  description: string,  dod: string,  grade: string,  level: number | string,  name: string,  phone: string,  profile_picture: string,  rank: string,  superior: string): Promise<string | number> => {
+  const data = {
+    branch: branch,
+    description: description,
+    dod: dod,
+    grade: grade,
+    level: level,
+    name: name,
+    phone: phone,
+    profile_picture: profile_picture,
+    rank: rank,
+    superior: superior
+  };
+  console.log(JSON.stringify(data));
+
   const header = await getHeaders();
 
   return new Promise(function(resolve,reject){
@@ -35,12 +49,18 @@ export const updateUser = async (data: unknown): Promise<unknown> => {
 };
 
 //Register User
-export const registerUser = async (descritption: string, display_name: string, phone: string, profile_picture: string): Promise<string> => {
+export const registerUser = async (branch: string,  description: string,  dod: string,  grade: string,  level: number | string,  name: string,  phone: string,  profile_picture: string,  rank: string,  superior: string): Promise<string | number> => {
   const data = {
-    descritption: descritption,
-    display_name: display_name,
+    branch: branch,
+    description: description,
+    dod: dod,
+    grade: grade,
+    level: level,
+    name: name,
     phone: phone,
     profile_picture: profile_picture,
+    rank: rank,
+    superior: superior
   };
   console.log(JSON.stringify(data));
 
