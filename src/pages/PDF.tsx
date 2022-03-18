@@ -12,6 +12,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
 
 import PDFview from '../components/PDF_Components/PDFview';
+import { PDFviewMode } from '../components/PDF_Components/PDFview';
 import FormList from '../components/PDF_Components/FormList';
 
 export interface PageView
@@ -65,6 +66,7 @@ const PDFPage = function (): JSX.Element {
   const [previousPageView, setPreviousPageView] = useState<PageView>({view: 'MainMenu'});
 
   const [fileID, setFileID] = useState<string>('');
+  const [PDFMode, setPDFMode] = useState<PDFviewMode>({mode: 'View'});
 
   const [spinner, setSpinner] = useState(false);
   const [alert, setAlert] = useState(false);
@@ -72,13 +74,17 @@ const PDFPage = function (): JSX.Element {
   const [alertStatus, setAlertStatus] = useState('success');
   const [viewModal, setViewModal] = useState(false);
 
-  function pageChange(target: PageView, inputFileID?: string)
+  function pageChange(target: PageView, inputFileID?: string, previousPage?: PageView)
   {
     setAlert(false);
     const confirmChange = true;
     
-    if(target.view == 'PDF' && inputFileID)
+    if(target.view == 'PDF' && inputFileID && previousPage)
     {
+      if (previousPage.view == 'ReportList')
+        setPDFMode({mode: 'View'});
+      else if (previousPage.view == 'ReviewList')
+        setPDFMode({mode: 'Review'});
       setFileID(inputFileID);
     }
 
@@ -181,6 +187,7 @@ const PDFPage = function (): JSX.Element {
           setAlertStatus={setAlertStatus}
           pageChange={pageChange}
           fileID={fileID}
+          PDFviewMode={PDFMode}
         />
       </div>}
 

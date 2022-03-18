@@ -36,9 +36,9 @@ const UploadPage: React.FC<{
   const [extraFormData, setExtraFormData] = useState<any>({});
 
   const [reviewer, setReviewer] = useState<string>('none');
-  const [reviewerList, setReviewerList] = useState<string[]>([]);
+  const [reviewerList, setReviewerList] = useState<{name: string; dod: string}[]>([]);
   const [recommender, setRecommender] = useState<string>('none');
-  const [recommenderList, setRecommenderList] = useState<string[]>([]);
+  const [recommenderList, setRecommenderList] = useState<{name: string; dod: string}[]>([]);
 
   const setSpinner = props.setSpinner;
   const setAlert = props.setAlert;
@@ -122,13 +122,13 @@ const UploadPage: React.FC<{
 
   useEffect(() => {
     if (formType.formType == '1380_form') {
-      const officerArr:string[] = [];
+      const officerArr:{name: string; dod: string}[] = [];
       getUsers('target=officer')
         .then((data) => {
           for (let i = 0; i < (data as unknown[]).length; i++)
           {
             // eslint-disable-next-line
-            officerArr.push((data as any)[i].name);
+            officerArr.push({name: (data as any)[i].name as string, dod: (data as any)[i].dod as string});
           }
           setReviewerList(officerArr);
         })
@@ -137,25 +137,25 @@ const UploadPage: React.FC<{
 
     else if (formType.formType == 'rst_request')
     {
-      const commanderArr:string[] = [];
+      const commanderArr:{name: string; dod: string}[] = [];
       getUsers('target=commander')
         .then((data) => {
           for (let i = 0; i < (data as unknown[]).length; i++)
           {
             // eslint-disable-next-line
-            commanderArr.push((data as any)[i].name);
+            commanderArr.push({name: (data as any)[i].name as string, dod: (data as any)[i].dod as string});
           }
           setReviewerList(commanderArr);
         })
         .catch((err)=> console.log(err));
 
-      const officerArr:string[] = [];
+      const officerArr:{name: string; dod: string}[] = [];
       getUsers('target=officer')
         .then((data) => {
           for (let i = 0; i < (data as unknown[]).length; i++)
           {
             // eslint-disable-next-line
-            officerArr.push((data as any)[i].name);
+            officerArr.push({name: (data as any)[i].name as string, dod: (data as any)[i].dod as string});
           }
           setRecommenderList(officerArr);
         })
@@ -200,8 +200,8 @@ const UploadPage: React.FC<{
             {
               reviewerList.map(option => {
                 return (
-                  <MenuItem key={option} value={option}>
-                    {option}
+                  <MenuItem key={option.dod} value={option.dod}>
+                    {option.name}
                   </MenuItem>
                 );
               })
@@ -219,8 +219,8 @@ const UploadPage: React.FC<{
             {
               recommenderList.map(option => {
                 return (
-                  <MenuItem key={option} value={option}>
-                    {option}
+                  <MenuItem key={option.dod} value={option.dod}>
+                    {option.name}
                   </MenuItem>
                 );
               })
@@ -236,8 +236,8 @@ const UploadPage: React.FC<{
             {
               reviewerList.map(option => {
                 return (
-                  <MenuItem key={option} value={option}>
-                    {option}
+                  <MenuItem key={option.dod} value={option.dod}>
+                    {option.name}
                   </MenuItem>
                 );
               })

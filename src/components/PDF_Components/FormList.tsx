@@ -4,7 +4,8 @@ import { GridColDef, GridSelectionModel } from '@mui/x-data-grid';
 import { PDFDocument } from 'pdf-lib';
 
 import { useEffect, useState } from 'react';
-import { getUserFiles, reviewUserFiles } from '../../api/files';
+import { getRecommendationFiles, getUserFiles, reviewUserFiles } from '../../api/files';
+import { getUser, getUsers } from '../../api/users';
 
 import { PageView } from '../../pages/PDF';
 import { CustomModal } from '../Modal';
@@ -58,7 +59,7 @@ const FormListPage: React.FC<{
   setAlert: React.Dispatch<React.SetStateAction<boolean>>;
   setAlertMessage: React.Dispatch<React.SetStateAction<string>>;
   setAlertStatus: React.Dispatch<React.SetStateAction<string>>;
-  pageChange: (target: PageView, inputFileID?: string) => void;
+  pageChange: (target: PageView, inputFileID?: string, previousPage?: PageView) => void;
   currentPageView: PageView;
 }> = (props: {
   viewModal: boolean;
@@ -67,7 +68,7 @@ const FormListPage: React.FC<{
   setAlert: React.Dispatch<React.SetStateAction<boolean>>;
   setAlertMessage: React.Dispatch<React.SetStateAction<string>>;
   setAlertStatus: React.Dispatch<React.SetStateAction<string>>;
-  pageChange: (target: PageView, inputFileID?: string) => void;
+  pageChange: (target: PageView, inputFileID?: string, previousPage?: PageView) => void;
   currentPageView: PageView;
 }) => {
 
@@ -108,7 +109,16 @@ const FormListPage: React.FC<{
     setAlert(false);
     setSpinner(true);
     await reviewUserFiles()
-      .then((data) => {
+      .then(async (data) => {
+        let i: number;  
+        for (i = 0; i < (data as any[]).length; i++)
+        {
+
+          await getUsers('dod='+(data as any[])[i].reviewer)
+            .then((userData) => {
+              (data as any[])[i].reviewer = (userData as any[])[0].name;
+            });
+        }
         setDataGridRows(data as FormListDataGridRowsType[]);
       })
       .catch((error) => {
@@ -118,6 +128,32 @@ const FormListPage: React.FC<{
         setAlert(true);
         return false;
       });
+    
+    /*await getRecommendationFiles()
+      .then(async (recommendData) => {
+        let i: number;  
+        for (i = 0; i < (recommendData as any[]).length; i++)
+        {
+
+          await getUsers('dod='+(recommendData as any[])[i].reviewer)
+            .then((userData) => {
+              (recommendData as any[])[i].reviewer = (userData as any[])[0].name;
+            });
+        }
+        const newData: FormListDataGridRowsType[] | BlankFormListDataGridRowsType[] = DataGridRows.concat(recommendData as FormListDataGridRowsType[]); 
+        console.log(newData);
+        setDataGridRows(newData as FormListDataGridRowsType[]);
+        console.log(newData);
+      })
+      .catch((error) => {
+        pageChange({view: 'MainMenu'});
+        setAlertMessage(error);
+        setAlertStatus('error');
+        setAlert(true);
+        return false;
+      });*/
+
+
     setSpinner(false);
     return true;
   }
@@ -127,7 +163,7 @@ const FormListPage: React.FC<{
     setAlert(false);
     setSpinner(true);
     await getUserFiles()
-      .then((data) => {
+      .then(async (data) => {
         let i = 0;
         // eslint-disable-next-line
         for (i = 0; i < (data as any[]).length; i++)
@@ -138,6 +174,11 @@ const FormListPage: React.FC<{
             // eslint-disable-next-line
             (data as any[])[i].reviewer = (data as any[])[i].recommender;
           }
+
+          await getUsers('dod='+(data as any[])[i].reviewer)
+            .then((userData) => {
+              (data as any[])[i].reviewer = (userData as any[])[0].name;
+            });
         }
         setDataGridRows(data as FormListDataGridRowsType[]);
       })
@@ -205,7 +246,8 @@ const FormListPage: React.FC<{
     <Typography variant="h4" component="div" gutterBottom sx={{
       textAlign: 'center',
     }}>
-        Submitted Forms
+      {currentPageView.view == 'ReviewList' && 'Review Forms' }
+      {currentPageView.view == 'ReportList' && 'Submitted Forms' }
     </Typography>
 
     <RenderExpandCellGrid 
@@ -229,7 +271,7 @@ const FormListPage: React.FC<{
         setAlert(true);
         return;
       }
-      pageChange({view: 'PDF'}, selectionModel[0] as string);
+      pageChange({view: 'PDF'}, selectionModel[0] as string, currentPageView);
     }}
     sx={{
       height: 70,

@@ -72,7 +72,41 @@ export const reviewUserFiles = async (): Promise<unknown> => {
   const header = await getHeaders();
   console.log(header);
   return new Promise(function(resolve,reject){
-    fetch(url + '/files/review_user_files', {
+    fetch(url + '/files/get_review_files', {
+      method: 'GET',
+      mode: 'cors',
+      headers: header,
+    })
+      .then(async response => {
+        console.log(response);
+        if (response.status == 200) {          
+          const data = await response.json();
+          //console.log(data);
+          resolve(data);
+        }
+        else {
+          if (response.status == 400)
+            reject('Status 400: Bad Request');
+          else if (response.status == 401)
+            reject('Status 401: Unauthorized - the provided token is not valid.');
+          else if (response.status == 404)
+            reject('Status 404: File not found.');
+          else if (response.status == 415)
+            reject('Status 415: Unsupported media type.');
+          else if (response.status == 500)
+            reject('Status 500: Internal API Error.');
+          reject('Error. Please try again later.');
+        }
+      })
+      .catch(err => console.log(err));
+  });
+};
+
+export const getRecommendationFiles = async (): Promise<unknown> => {
+  const header = await getHeaders();
+  console.log(header);
+  return new Promise(function(resolve,reject){
+    fetch(url + '/files/get_recommend_files', {
       method: 'GET',
       mode: 'cors',
       headers: header,
@@ -219,4 +253,45 @@ export const deleteFile = async (fileID: string): Promise<string> => {
       .catch(err => console.log(err));
   });
 };
+
+export const reviewFile = async (comment: string, decision: number, file: string, file_id: string): Promise<string> => {
+
+  const data = {
+    comment: comment, 
+    decision: decision,
+    file: file,
+    file_id: file_id,
+  };
+  const header = await getHeaders();
+
+  return new Promise(function(resolve,reject){
+    fetch(url + '/files/review_file', {
+      method: 'PUT',
+      mode: 'cors',
+      headers: header,
+      body: JSON.stringify(data),
+    })
+      .then(async response => {
+        console.log(response);
+        if (response.status == 200) {          
+          resolve('File Reviewed Successfully');
+        }
+        else {
+          if (response.status == 400)
+            reject('Status 400: Bad Request');
+          else if (response.status == 401)
+            reject('Status 401: Unauthorized - the provided token is not valid.');
+          else if (response.status == 404)
+            reject('Status 404: File not found.');
+          else if (response.status == 415)
+            reject('Status 415: Unsupported media type.');
+          else if (response.status == 500)
+            reject('Status 500: Internal API Error.');
+          reject('Error. Please try again later.');
+        }
+      })
+      .catch(err => console.log(err));
+  });
+};
+
 
