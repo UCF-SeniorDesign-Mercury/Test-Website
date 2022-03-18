@@ -1,4 +1,4 @@
-import { TextField } from '@mui/material';
+import { TextareaAutosize, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import Input from '@mui/material/Input';
 import MenuItem from '@mui/material/MenuItem';
@@ -199,7 +199,8 @@ const PDFviewPage: React.FC<{
           setSpinner(false);
           return false;
         }
-
+        
+        const comment = CommentTextAreaRef.current.value;
         const base64 = await convertToBase64(selectedFile[0])
           .catch((error) => {
             setAlertMessage(error);
@@ -208,8 +209,8 @@ const PDFviewPage: React.FC<{
             setSpinner(false);
             return false;
           });
-
-        await reviewFile('first Comment', PDFActionSelectValue, base64 as string, selectedFileID)
+        
+        await reviewFile(comment, PDFActionSelectValue + 3, base64 as string, selectedFileID)
           .then((string) => {
             pageChange({view: 'MainMenu'});
             setAlertMessage(string);
@@ -297,6 +298,14 @@ const PDFviewPage: React.FC<{
       console.log(event.target.value);
       setPDFActionSelectValue(0);
       setCurrentModalView({view: 'GiveReview'});
+    }
+  }
+
+  async function testtest()
+  {
+    if (CommentTextAreaRef && CommentTextAreaRef.current)
+    {
+      console.log(CommentTextAreaRef.current.value);
     }
   }
 

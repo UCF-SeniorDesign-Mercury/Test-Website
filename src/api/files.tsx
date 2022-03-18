@@ -262,6 +262,7 @@ export const reviewFile = async (comment: string, decision: number, file: string
     file: file,
     file_id: file_id,
   };
+
   const header = await getHeaders();
 
   return new Promise(function(resolve,reject){
