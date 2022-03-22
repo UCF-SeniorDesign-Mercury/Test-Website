@@ -242,6 +242,7 @@ const FormListPage: React.FC<{
       />
     </div>}
     
+    <Button onClick={() => {pageChange({view: 'MainMenu'});}}>Go Back</Button>
     <Button onClick={() => {setViewModal(true); setCurrentModalView({view: 'ReportListHelp'});}}>Open Help Menu</Button>
     <Button onClick={() => {setViewModal(true); setCurrentModalView({view: 'Upload'});}}>Submit a form</Button>
     

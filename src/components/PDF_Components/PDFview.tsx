@@ -23,7 +23,8 @@ interface ModalView
   | 'Update'
   | 'Delete'
   | 'GiveReview'
-  | 'GiveRecommendation';
+  | 'GiveRecommendation'
+  | 'InsertSignatureReminder';
 }
 
 export interface PDFviewMode {
@@ -80,7 +81,7 @@ const PDFviewPage: React.FC<{
         //setPDFviewiframeSrc(string);
         console.log(data);
         setPDFData(data);
-        setPDFiframeSrc(await insertSignature((data as any).file));
+        setPDFiframeSrc((data as any).file);
         setSpinner(false);
       })
       .catch((error) => {
@@ -129,7 +130,7 @@ const PDFviewPage: React.FC<{
 
         updateFile(base64 as string, selectedFileID, selectedFile[0].name)
           .then((string) => {
-            pageChange({view: 'MainMenu'});
+            pageChange({view: 'PDF'});
             setAlertMessage(string);
             setAlertStatus('success');
             setAlert(true);
@@ -311,13 +312,58 @@ const PDFviewPage: React.FC<{
     // console.log(pdfDoc.getForm().getFields());
     // eslint-disable-next-line
     // const { width, height } = firstPage.getSize();
-    const signatureImage = await pdfDoc.embedPng(signatureTest);
-    pdfDoc.getPage(0).drawImage(signatureImage, {
+    let signaturePosition: {x:number; y: number; width: number; height: number} = {
       x: 165,
       y: 225,
       width: 50,
       height: 50
-    });
+    };
+
+    if (props.PDFviewMode.mode == 'View')
+    {
+      if ((PDFData as any)?.filetype == '1380_form') { 
+        signaturePosition = {
+          x: 165,
+          y: 225,
+          width: 50,
+          height: 50
+        };
+      }
+
+      else if ((PDFData as any)?.filetype == 'rst_request') { 
+        signaturePosition = {
+          x: 165,
+          y: 225,
+          width: 50,
+          height: 50
+        };
+      }
+    }
+
+    else if (props.PDFviewMode.mode == 'Review')
+    {
+      if ((PDFData as any)?.filetype == '1380_form') { 
+        signaturePosition = {
+          x: 165,
+          y: 225,
+          width: 50,
+          height: 50
+        };
+      }
+      else if ((PDFData as any)?.filetype == 'rst_request') {
+        if ((PDFData as any)?.reviewer_visible == false)
+        {
+          signaturePosition = {
+            x: 317,
+            y: 205,
+            width: 50,
+            height: 50
+          };
+        }
+      }
+    }
+    const signatureImage = await pdfDoc.embedPng(signatureTest);
+    pdfDoc.getPage(0).drawImage(signatureImage, signaturePosition);
 
     //const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true })
     return new Promise(function(resolve,reject)
@@ -370,6 +416,21 @@ const PDFviewPage: React.FC<{
       setPDFActionSelectValue(0);
       setCurrentModalView({view: 'GiveRecommendation'});
     }
+
+    else if (event && event.target && event.target.value == 5)
+    {
+      console.log(event.target.value);
+      setPDFActionSelectValue(0);
+      setPDFiframeSrc(await insertSignature(PDFiframeSrc as string));
+      setCurrentModalView({view: 'InsertSignatureReminder'});
+    }
+
+    else if (event && event.target && event.target.value == 6)
+    {
+      getPDF()
+        .catch((err) => console.log(err));
+      setCurrentModalView({view: 'Nothing'});
+    }
   }
 
   async function testtest()
@@ -387,6 +448,13 @@ const PDFviewPage: React.FC<{
   }, []);
 
   return(<div>
+
+    <Button onClick={() => {
+      if (props.PDFviewMode.mode == 'View')
+        pageChange({view: 'ReportList'});
+      else if(props.PDFviewMode.mode == 'Review')
+        pageChange({view: 'ReviewList'});
+    }}>Go Back</Button>
     <Button className='PDFViewMenu' onClick={() => {setCurrentModalView({view: 'PDFHelp'}); setViewModal(true);}}>Open Help Menu</Button>
     {currentModalView.view == 'PDFHelp' && <CustomModal open={viewModal} setOpen={setViewModal}>
       <p>This is help button screen</p>
@@ -403,15 +471,27 @@ const PDFviewPage: React.FC<{
     >
       <MenuItem disabled value={0}>Select an Action</MenuItem>
 
+      {props.PDFviewMode.mode == 'View' && <MenuItem value={5}>Insert Signature</MenuItem>}
       {props.PDFviewMode.mode == 'View' && <MenuItem value={1}>Update This PDF</MenuItem>}
       {props.PDFviewMode.mode == 'View' && <MenuItem value={2}>Delete This PDF</MenuItem>}
 
+      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={5}>Insert Signature</MenuItem>}
+      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={6}>Remove Signature</MenuItem>}
       {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={3}>Give Review</MenuItem>}
 
+      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.reviewer_visible == false && <MenuItem value={5}>Insert Signature</MenuItem>}
+      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.reviewer_visible == false && <MenuItem value={6}>Remove Signature</MenuItem>}
       {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.reviewer_visible == false && <MenuItem value={4}>Give Recommendation</MenuItem>}
       {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.reviewer_visible == true && <MenuItem value={3}>Give Review</MenuItem>}
 
     </Select>
+
+    { currentModalView.view == 'InsertSignatureReminder' && <CustomModal open={viewModal} setOpen={setViewModal}>
+      <div>
+        <p className='PDFViewMenu'>Signature inserted. Please save the PDF and update it.<br/></p>
+      </div>
+    </CustomModal>}
+
 
     { currentModalView.view == 'Update' && <CustomModal open={viewModal} setOpen={setViewModal}>
       <div>
