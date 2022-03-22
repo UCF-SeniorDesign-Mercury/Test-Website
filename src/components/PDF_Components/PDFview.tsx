@@ -321,16 +321,7 @@ const PDFviewPage: React.FC<{
 
     if (props.PDFviewMode.mode == 'View')
     {
-      if ((PDFData as any)?.filetype == '1380_form') { 
-        signaturePosition = {
-          x: 165,
-          y: 225,
-          width: 50,
-          height: 50
-        };
-      }
-
-      else if ((PDFData as any)?.filetype == 'rst_request') { 
+      if ((PDFData as any)?.filetype == 'rst_request') { 
         signaturePosition = {
           x: 165,
           y: 225,
@@ -344,8 +335,8 @@ const PDFviewPage: React.FC<{
     {
       if ((PDFData as any)?.filetype == '1380_form') { 
         signaturePosition = {
-          x: 165,
-          y: 225,
+          x: 350,
+          y: 60,
           width: 50,
           height: 50
         };
@@ -471,7 +462,7 @@ const PDFviewPage: React.FC<{
     >
       <MenuItem disabled value={0}>Select an Action</MenuItem>
 
-      {props.PDFviewMode.mode == 'View' && <MenuItem value={5}>Insert Signature</MenuItem>}
+      {props.PDFviewMode.mode == 'View'  && (PDFData as any)?.filetype == 'rst_request' && <MenuItem value={5}>Insert Signature</MenuItem>}
       {props.PDFviewMode.mode == 'View' && <MenuItem value={1}>Update This PDF</MenuItem>}
       {props.PDFviewMode.mode == 'View' && <MenuItem value={2}>Delete This PDF</MenuItem>}
 
