@@ -63,7 +63,7 @@ const ProfilePage = function (): JSX.Element {
     // signature: '',
   });
 
-  function get_user_test(){
+  function get_user(){
     getUser()
       .then((data) => {
         console.log(data);
@@ -87,7 +87,7 @@ const ProfilePage = function (): JSX.Element {
           // signature: (data as any).signature,
         };
         setUserInfo(userData);
-         
+        // console.log(userData.name + 'testtest');
       }) 
       .catch((error) => {
         console.log('didnt work! :)');
@@ -95,7 +95,7 @@ const ProfilePage = function (): JSX.Element {
   }
 
   useEffect(()=>{
-    get_user_test();
+    get_user();
   },[]);
 
   return (
@@ -183,16 +183,6 @@ const ProfilePage = function (): JSX.Element {
       </div>
     </header>
   );
-
-  
-  // async function modifyPdf(userData:any) {
-  //   const url = 'data:image/png;base64,'+userData;
-  //   const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
-  
-  //   const pdfDoc = await PDFDocument.load(existingPdfBytes);
-  
-  //   const pages = pdfDoc.getPages();
-  // }
   
   
 };
