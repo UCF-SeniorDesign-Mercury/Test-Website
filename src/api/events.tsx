@@ -1,4 +1,3 @@
-import internal from 'stream';
 import { url, getHeaders } from './api_settings';
 
 
@@ -196,7 +195,7 @@ export const getEvents = async (): Promise<unknown> => {
           else if (response.status == 401)
             reject('Status 401: Unauthorized - the provided token is not valid.');
           else if (response.status == 404)
-            reject('Status 404: File not found.');
+            reject('Status 404: Event not found.');
           else if (response.status == 415)
             reject('Status 415: Unsupported media type.');
           else if (response.status == 500)
@@ -208,11 +207,11 @@ export const getEvents = async (): Promise<unknown> => {
   });
 };
 
-export const getEvent = async (): Promise<unknown> => {
+export const getEvent = async (eventID: string): Promise<unknown> => {
   const header = await getHeaders();
 
   return new Promise(function (resolve, reject) {
-    fetch(url + '/events/get_event/', {
+    fetch(url + '/events/get_event/' + eventID, {
       method: 'GET',
       mode: 'cors',
       headers: header,
@@ -231,7 +230,7 @@ export const getEvent = async (): Promise<unknown> => {
           else if (response.status == 401)
             reject('Status 401: Unauthorized - the provided token is not valid.');
           else if (response.status == 404)
-            reject('Status 404: File not found.');
+            reject('Status 404: Event not found.');
           else if (response.status == 415)
             reject('Status 415: Unsupported media type.');
           else if (response.status == 500)
