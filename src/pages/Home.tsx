@@ -26,12 +26,12 @@ const HomePage = function (): JSX.Element {
         <h1 className="username-display">{context.var1}</h1>
 
         <Form className="home-form" onSubmit={SubmitHandler}>
-          <Button variant="primary" className="module-button" type="submit">
+          {/* <Button variant="primary" className="module-button" type="submit">
             Events
-          </Button>
-          <Button variant="primary" className="module-button" type="submit">
+          </Button> */}
+          {/* <Button variant="primary" className="module-button" type="submit">
             Chat
-          </Button>
+          </Button> */}
           <NavLink to="/pdf">
             <Button variant="primary" className="module-button" type="submit">
               PDF&apos;s
@@ -50,17 +50,17 @@ const HomePage = function (): JSX.Element {
               Profile
             </Button>
           </NavLink>
-          <Button variant="primary" className="module-button" type="submit">
+          {/* <Button variant="primary" className="module-button" type="submit">
             Module
-          </Button>
+          </Button> */}
           <NavLink to="/pdf_test">
             <Button variant="primary" className="module-button" type="submit">
               PDF_test&apos;s
             </Button>
           </NavLink>
-          <Button variant="primary" className="module-button" type="submit">
+          {/* <Button variant="primary" className="module-button" type="submit">
             Test
-          </Button>
+          </Button> */}
         </Form>
       </div>
     </header>
