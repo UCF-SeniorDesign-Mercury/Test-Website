@@ -1,111 +1,182 @@
-//import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useEffect, useState } from 'react';
-import './PDF.css';
-import { downloadPDF } from '../firebase/firebase';
-//import { arrayBuffer } from 'stream/consumers';
+
+
+
+import mainContext from '../context/MainContext';
+import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './Calendar.css';
+import { NavLink } from 'react-router-dom';
+
+import { confirmEvent,createEvent, getEvents, deleteEvent,updateEvent,getEvent} from '../api/events';
 import React from 'react';
-import { getToken } from '../firebase/firebase';
-//import { getUser, updateUser } from '../api/users';
-import { signatureTest } from '../assets/signature';
-import { getUser } from '../api/users';
+import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, formatDate } from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import {createEventId,testEvent } from './event-utils';
 
-// import { downloadPDF } from '../firebase/firebase';
-// https://stackoverflow.com/questions/31270145/save-pdf-file-loaded-in-iframe
+interface DemoAppState {
+  weekendsVisible: boolean;
+  currentEvents: EventApi[];
+}
 
-const PDF_TestPage = function (): JSX.Element {
-  /*const [iframeSrc, setiframeSrc] = useState<string | undefined >('about:blank');
-  const inputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-  const getFileInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-  const getFileDeleteInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-  const getFileUpdateInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-  const getFileUpdateStringInputEl: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
-  const [getFileActivate, setgetFileActivate] = useState<boolean>(false);*/
-  
-  // async function handleOnLogin(email: string, password: string): Promise<boolean | undefined> {
 
-  async function byteDownload(){
-    const bytes = await downloadPDF('RST_base64.txt');
-    // const bytesString = bytes.toString();
-    //console.log(bytes);
-    return bytes;
-    
+
+export default class CalendarPage extends React.Component<{unkown:any}, DemoAppState> {
+
+  state: DemoAppState = {
+    weekendsVisible: true,
+    currentEvents: []
   }
 
-  async function iframeFunction(){
-    console.log(getToken());
-    getUser()
-      .then((data) => {
-        console.log(data);
-        console.log((data as any).display_name);
-        const name = (data as any).display_name;
-        console.log('name: ' + name);
-      })
-      .catch((err) => {
-        console.log(err);
+
+  render() {
+    return (
+      <div className='demo-app'>
+        {this.renderSidebar()}
+        {get_events_test()}
+        <div className='demo-app-main'>
+          <FullCalendar
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            }}
+            initialView='dayGridMonth'
+            editable={true}
+            selectable={true}
+            selectMirror={true}
+            dayMaxEvents={true}
+            weekends={this.state.weekendsVisible}
+            // initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
+            // events={getEvent}
+            events={testEvent}
+            select={this.handleDateSelect}
+            eventContent={renderEventContent} // custom render function
+            eventClick={this.handleEventClick}
+            eventsSet={this.handleEvents} // called after events are initialized/added/changed/removed
+            /* you can update a remote database when these fire:
+            eventAdd={function(){}}
+            eventChange={function(){}}
+            eventRemove={function(){}}
+            */
+          />
+        </div>
+      </div>
+    );
+  }
+
+  renderSidebar() {
+    return (
+      <div className='demo-app-sidebar'>
+        <div className='demo-app-sidebar-section'>
+          <h2>Instructions</h2>
+          <ul>
+            <li>Select dates and you will be prompted to create a new event</li>
+            <li>Drag, drop, and resize events</li>
+            <li>Click an event to delete it</li>
+          </ul>
+        </div>
+        <div className='demo-app-sidebar-section'>
+          <label>
+            <input
+              type='checkbox'
+              checked={this.state.weekendsVisible}
+              onChange={this.handleWeekendsToggle}
+            ></input>
+            toggle weekends
+          </label>
+        </div>
+        <div className='demo-app-sidebar-section'>
+          <h2>All Events ({this.state.currentEvents.length})</h2>
+          <ul>
+            {this.state.currentEvents.map(renderSidebarEvent)}
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
+
+
+
+  handleWeekendsToggle = () => {
+    this.setState({
+      weekendsVisible: !this.state.weekendsVisible
+    });
+  }
+
+  handleDateSelect = (selectInfo: DateSelectArg) => {
+    const title = prompt('Please enter a new title for your event');
+    const calendarApi = selectInfo.view.calendar;
+
+    calendarApi.unselect(); // clear date selection
+
+    if (title) {
+      calendarApi.addEvent({
+        id: createEventId(),
+        title,
+        start: selectInfo.startStr,
+        end: selectInfo.endStr,
+        allDay: selectInfo.allDay
       });
-
+    }
   }
 
-  useEffect(() => {
-    /*async function modifyPdf() {
-      const url = 'https://firebasestorage.googleapis.com/v0/b/electric-eagles.appspot.com/o/1380_Blank.pdf?alt=media&token=d21b82a0-2e80-4746-970c-65dd145b93f5';
-      const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
-    
-      const pdfDoc = await PDFDocument.load(existingPdfBytes);
-      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    
-      const pages = pdfDoc.getPages();
-      const firstPage = pages[0];
-      //console.log(pdfDoc.getForm().getFields());
-      // eslint-disable-next-line
-      const { width, height } = firstPage.getSize();
-      // firstPage.drawText('Testing writing on a form :)', {
-      //   x: 5,
-      //   y: height / 2 + 300,
-      //   size: 50,
-      //   font: helveticaFont,
-      //   color: rgb(0.95, 0.1, 0.1),
-      //   rotate: degrees(-45),
-      // });
-
-      const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true })
-        .catch(err => {
-          console.log(err);
-          return undefined;
-        })
-        .then( (res) => {
-          console.log('success');
-          return res;
-        });
-      //console.log(pdfDataUri);
-      // setiframeSrc(pdfDataUri);
-      setiframeSrc(await byteDownload());
-    
-      // eslint-disable-next-line
-      const pdfBytes = await pdfDoc.save();
+  handleEventClick = (clickInfo: EventClickArg) => {
+    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
+      clickInfo.event.remove();
     }
+  }
 
-    if (!getFileActivate)
-    {
-      modifyPdf()
-        .catch(err => console.log(err))
-        .then( () => console.log('success'))
-        .catch(() => 'obligatory catch');
-    }*/
-  });
+  handleEvents = (events: EventApi[]) => {
+    this.setState({
+      currentEvents: events
+    });
+  }
 
+}
+
+function renderEventContent(eventContent: EventContentArg) {
   return (
-    <div>
-      <Button variant="primary" type="submit" onClick={iframeFunction}>
-          Update PDF
-      </Button>
-      <img
-        src={signatureTest}
-      />
-    </div>
+    <>
+      <b>{eventContent.timeText}</b>
+      <i>{eventContent.event.title}</i>
+    </>
   );
-};
+}
 
-export default PDF_TestPage;
+function renderSidebarEvent(event: EventApi) {
+  return (
+    <li key={event.id}>
+      <b>{formatDate(event.start!, {year: 'numeric', month: 'short', day: 'numeric'})}</b>
+      <i>{event.title}</i>
+    </li>
+  );
+}
+
+function get_events_test(){
+  getEvents().then((data) => {
+    console.log(data);
+  })
+    .catch((error) => {
+      console.log('didnt work! :)');
+    });
+}
+
+// function get_events_test(){
+//   getEvents()
+//     .then((data) => {
+//       console.log(data);
+//       console.log((data as any).author);
+//       const author = (data as any).author;
+//       console.log('name: ' + author);
+//       // renderNameContent(userName);
+//       return author;
+//     }) 
+//     .catch((error) => {
+//       console.log('didnt work! :)');
+//     });
+// }
