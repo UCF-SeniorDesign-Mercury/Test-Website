@@ -108,6 +108,9 @@ const FormListPage: React.FC<{
   {
     setAlert(false);
     setSpinner(true);
+
+    let fileData: FormListDataGridRowsType[] | BlankFormListDataGridRowsType[] = [];
+
     await reviewUserFiles()
       .then(async (data) => {
         let i: number;  
@@ -119,7 +122,7 @@ const FormListPage: React.FC<{
               (data as any[])[i].reviewer = (userData as any[])[0].name;
             });
         }
-        setDataGridRows(data as FormListDataGridRowsType[]);
+        fileData = fileData.concat(data as FormListDataGridRowsType[]);
       })
       .catch((error) => {
         pageChange({view: 'MainMenu'});
@@ -129,21 +132,18 @@ const FormListPage: React.FC<{
         return false;
       });
     
-    /*await getRecommendationFiles()
-      .then(async (recommendData) => {
+    await getRecommendationFiles()
+      .then(async (data) => {
         let i: number;  
-        for (i = 0; i < (recommendData as any[]).length; i++)
+        for (i = 0; i < (data as any[]).length; i++)
         {
 
-          await getUsers('dod='+(recommendData as any[])[i].reviewer)
+          await getUsers('dod='+(data as any[])[i].reviewer)
             .then((userData) => {
-              (recommendData as any[])[i].reviewer = (userData as any[])[0].name;
+              (data as any[])[i].reviewer = (userData as any[])[0].name;
             });
         }
-        const newData: FormListDataGridRowsType[] | BlankFormListDataGridRowsType[] = DataGridRows.concat(recommendData as FormListDataGridRowsType[]); 
-        console.log(newData);
-        setDataGridRows(newData as FormListDataGridRowsType[]);
-        console.log(newData);
+        fileData = fileData.concat(data as FormListDataGridRowsType[]);
       })
       .catch((error) => {
         pageChange({view: 'MainMenu'});
@@ -151,7 +151,9 @@ const FormListPage: React.FC<{
         setAlertStatus('error');
         setAlert(true);
         return false;
-      });*/
+      });
+
+    setDataGridRows(fileData as FormListDataGridRowsType[]);
 
 
     setSpinner(false);
@@ -240,6 +242,7 @@ const FormListPage: React.FC<{
       />
     </div>}
     
+    <Button onClick={() => {pageChange({view: 'MainMenu'});}}>Go Back</Button>
     <Button onClick={() => {setViewModal(true); setCurrentModalView({view: 'ReportListHelp'});}}>Open Help Menu</Button>
     <Button onClick={() => {setViewModal(true); setCurrentModalView({view: 'Upload'});}}>Submit a form</Button>
     
