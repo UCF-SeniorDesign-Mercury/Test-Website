@@ -116,6 +116,10 @@ const FormListPage: React.FC<{
         let i: number;  
         for (i = 0; i < (data as any[]).length; i++)
         {
+          await getUsers('uid='+(data as any[])[i].author)
+            .then((userData) => {
+              (data as any[])[i].author = (userData as any[])[0].name;
+            });
 
           await getUsers('dod='+(data as any[])[i].reviewer)
             .then((userData) => {
@@ -138,6 +142,11 @@ const FormListPage: React.FC<{
         for (i = 0; i < (data as any[]).length; i++)
         {
 
+          await getUsers('uid='+(data as any[])[i].author)
+            .then((userData) => {
+              (data as any[])[i].author = (userData as any[])[0].name;
+            });
+
           await getUsers('dod='+(data as any[])[i].reviewer)
             .then((userData) => {
               (data as any[])[i].reviewer = (userData as any[])[0].name;
@@ -152,7 +161,7 @@ const FormListPage: React.FC<{
         setAlert(true);
         return false;
       });
-
+      
     setDataGridRows(fileData as FormListDataGridRowsType[]);
 
 
@@ -170,12 +179,20 @@ const FormListPage: React.FC<{
         // eslint-disable-next-line
         for (i = 0; i < (data as any[]).length; i++)
         {
+
+          (data as any[])[i].timestamp = (new Date((data as any[])[i].timestamp)).toLocaleString();
+
           // eslint-disable-next-line
           if (!(data as any[])[i].reviewer_visible)
           {
             // eslint-disable-next-line
             (data as any[])[i].reviewer = (data as any[])[i].recommender;
           }
+
+          await getUsers('uid='+(data as any[])[i].author)
+            .then((userData) => {
+              (data as any[])[i].author = (userData as any[])[0].name;
+            });
 
           await getUsers('dod='+(data as any[])[i].reviewer)
             .then((userData) => {
@@ -244,7 +261,7 @@ const FormListPage: React.FC<{
     
     <Button onClick={() => {pageChange({view: 'MainMenu'});}}>Go Back</Button>
     <Button onClick={() => {setViewModal(true); setCurrentModalView({view: 'ReportListHelp'});}}>Open Help Menu</Button>
-    <Button onClick={() => {setViewModal(true); setCurrentModalView({view: 'Upload'});}}>Submit a form</Button>
+    {currentPageView.view == 'ReportList' && <Button onClick={() => {setViewModal(true); setCurrentModalView({view: 'Upload'});}}>Submit a form</Button>}
     
     <Typography variant="h4" component="div" gutterBottom sx={{
       textAlign: 'center',
