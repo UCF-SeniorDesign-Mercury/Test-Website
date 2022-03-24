@@ -81,7 +81,7 @@ export const reviewUserFiles = async (): Promise<unknown> => {
         console.log(response);
         if (response.status == 200) {          
           const data = await response.json();
-          //console.log(data);
+          console.log(data);
           resolve(data);
         }
         else {
