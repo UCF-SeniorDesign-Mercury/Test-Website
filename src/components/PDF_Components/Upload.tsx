@@ -188,8 +188,10 @@ const UploadPage: React.FC<{
           })}
         </Select>
 
+        <p><br/></p>
+
         {formType.formType == '1380_form' && <div>
-          <p>Please select the officer to sign off.<br/></p>
+          <p><br/>Please select the officer to sign off.</p>
           <Select
             value={reviewer}
             onChange={(event) => {
@@ -245,7 +247,7 @@ const UploadPage: React.FC<{
           </Select>
         </div>}
 
-        <p><br/><br/>Please select the form from your computer to upload.<br/></p>
+        <p><br/>Please select the form from your computer to upload.<br/></p>
         <Input type='file' inputRef = {UploadInputRef}/>
         <Button onClick={uploadPDF}><br/>Submit</Button>
       </div>

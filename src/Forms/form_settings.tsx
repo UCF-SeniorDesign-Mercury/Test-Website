@@ -34,6 +34,18 @@ export function convertFrontendFormName(name: string): string
   return FormList[FormNameList.indexOf(name)];
 }
 
+const fileStatuses = [
+  'Requested', 
+  'Pending',
+  'Review Submitted', 
+  'Approved', 
+  'Rejected',
+];
+
+export function convertFileStatus(status: number): string
+{
+  return fileStatuses[status - 1];
+}
 
 /*
 // links names to form files

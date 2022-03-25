@@ -305,6 +305,9 @@ const PDFviewPage: React.FC<{
 
   async function insertSignature(fileString: string): Promise<string> {
   
+    const url = 'https://firebasestorage.googleapis.com/v0/b/electric-eagles.appspot.com/signature/04f0cec8-3e07-425c-b1df-406fd85e30c5';
+    const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
+    console.log(existingPdfBytes);
     const pdfDoc = await PDFDocument.load(fileString);
   
     // const pages = pdfDoc.getPages();
@@ -483,7 +486,6 @@ const PDFviewPage: React.FC<{
       </div>
     </CustomModal>}
 
-
     { currentModalView.view == 'Update' && <CustomModal open={viewModal} setOpen={setViewModal}>
       <div>
         <p className='PDFViewMenu'>Please select a file from your computer to replace the current file.<br/></p>
@@ -502,8 +504,9 @@ const PDFviewPage: React.FC<{
 
     { currentModalView.view == 'GiveReview' && <CustomModal open={viewModal} setOpen={setViewModal}>
       <div className='PDFViewMenu'>
+        <p>Please add a comment.</p>
         <TextField multiline label="Add Comment" inputRef={CommentTextAreaRef}/> 
-        <p><br/>Please select a file status.<br/></p>
+        <p><br/>Please select a file status.</p>
         <Select
           labelId="PDFviewSelectLabel"
           id="PDFviewSelect"
@@ -530,7 +533,7 @@ const PDFviewPage: React.FC<{
           <MenuItem value={1}>Approved</MenuItem>
           <MenuItem value={2}>Rejected</MenuItem>
         </Select>
-        <p>Please select a file from your computer to replace the current file.<br/></p>
+        <p><br/>Please select a file from your computer to replace the current file.<br/></p>
         <Input inputRef = {PDFActionInputRef} type='file'/> 
         <p><br/>Press Submit Button to confirm.</p>
         <Button onClick={submitReview}>Submit</Button>
@@ -539,6 +542,7 @@ const PDFviewPage: React.FC<{
 
     { currentModalView.view == 'GiveRecommendation' && <CustomModal open={viewModal} setOpen={setViewModal}>
       <div className='PDFViewMenu'>
+        <p>Please add a comment.</p>
         <TextField multiline label="Add Comment" inputRef={CommentTextAreaRef}/> 
         <p><br/>Please select a file status.<br/></p>
         <Select
@@ -567,7 +571,7 @@ const PDFviewPage: React.FC<{
           <MenuItem value={1}>Recommend</MenuItem>
           <MenuItem value={2}>Do Not Recommend</MenuItem>
         </Select>
-        <p>Please select a file from your computer to replace the current file.<br/></p>
+        <p><br/>Please select a file from your computer to replace the current file.<br/></p>
         <Input inputRef = {PDFActionInputRef} type='file'/> 
         <p><br/>Press Submit Button to confirm.</p>
         <Button onClick={submitRecommendation}>Submit</Button>
