@@ -11,6 +11,8 @@ import React, { useEffect, useState } from 'react';
 import { useContext } from 'react';
 import { deleteUser,getSubordinates,getUser,getUsers,updateUser} from '../api/users';
 
+import blankProfile from '../assets/blank-profile-picture.png';
+
 const iframeStyle = {
   width: '100%', 
   height: '2000px', 
@@ -98,6 +100,7 @@ const ProfilePage = function (): JSX.Element {
     get_user();
   },[]);
 
+
   return (
     <header>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossOrigin="anonymous" />
@@ -106,23 +109,30 @@ const ProfilePage = function (): JSX.Element {
         {/* <h1 className="username-display">{context.var1}</h1> */}
         {/* {'test' + get_user_test()} */}
         {/* <h1 className="username-display">{get_user_test}</h1> */}
+        <div className="profile-img">
+          <img src={blankProfile} alt="No IMG found"/>
+          <div className="file btn btn-lg btn-primary center">
+              Change Photo
+            <input id="file" type="file" name="file"/>
+          </div>
+        </div>
         
         { Object.keys(userInfo).map((key) =>{
           if((key as string) == 'name'){
             return(
-              <h2 className='username-display' key={key}>Name: {(userInfo as { [key: string]: any })[key]}</h2>  
+              <h2 className='center' key={key}>Name: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
           else if((key as string) == 'email'){
             return(
-              <h2 className='username-display' key={key}>Email: {(userInfo as { [key: string]: any })[key]}</h2>  
+              <h2 className='center' key={key}>Email: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
-          else if((key as string) == 'branch'){
-            return(
-              <h2 className='username-display' key={key}>Branch: {(userInfo as { [key: string]: any })[key]}</h2>  
-            );
-          } 
+          // else if((key as string) == 'branch'){
+          //   return(
+          //     <h2 className='username-display' key={key}>Branch: {(userInfo as { [key: string]: any })[key]}</h2>  
+          //   );
+          // } 
           // else if ((key as string) == 'commander' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == true){
           //   return(<h2 className='username-display' key={'commander'}>commander</h2>);
           // }
@@ -131,25 +141,25 @@ const ProfilePage = function (): JSX.Element {
           // }
           else if((key as string) == 'dod'){
             return(
-              <h2 className='username-display' key={key}>DOD: {(userInfo as { [key: string]: any })[key]}</h2>  
+              <h2 className='center' key={key}>DOD: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
-          else if((key as string) == 'grade'){
-            return(
-              <h2 className='username-display' key={key}>Grade: {(userInfo as { [key: string]: any })[key]}</h2>  
-            );
-          }
-          else if((key as string) == 'level'){
-            return(
-              <h2 className='username-display' key={key}>Level: {(userInfo as { [key: string]: any })[key]}</h2>  
-            );
-          }
-          else if ((key as string) == 'officer' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == true){
-            return(<h2 className='username-display' key={'officer'}>Officer</h2>);
-          }
-          else if ((key as string) == 'officer' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == false){
-            return(<h2 className='username-display' key={'officer'}>not Officer</h2>);
-          }
+          // else if((key as string) == 'grade'){
+          //   return(
+          //     <h2 className='username-display' key={key}>Grade: {(userInfo as { [key: string]: any })[key]}</h2>  
+          //   );
+          // }
+          // else if((key as string) == 'level'){
+          //   return(
+          //     <h2 className='username-display' key={key}>Level: {(userInfo as { [key: string]: any })[key]}</h2>  
+          //   );
+          // }
+          // else if ((key as string) == 'officer' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == true){
+          //   return(<h2 className='username-display' key={'officer'}>Officer</h2>);
+          // }
+          // else if ((key as string) == 'officer' && ((userInfo as { [key: string]: any })[key] as unknown as boolean) == false){
+          //   return(<h2 className='username-display' key={'officer'}>not Officer</h2>);
+          // }
           
           // else if((key as string) == 'signature'){
           //   return(
@@ -160,22 +170,22 @@ const ProfilePage = function (): JSX.Element {
           // }
           else if((key as string) == 'phone'){
             return(
-              <h2 className='username-display' key={key}>Phone: {(userInfo as { [key: string]: any })[key]}</h2>  
+              <h2 className='center' key={key}>Phone: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
-          else if((key as string) == 'rank'){
-            return(
-              <h2 className='username-display' key={key}>Rank: {(userInfo as { [key: string]: any })[key]}</h2>  
-            );
-          }
+          // else if((key as string) == 'rank'){
+          //   return(
+          //     <h2 className='username-display' key={key}>Rank: {(userInfo as { [key: string]: any })[key]}</h2>  
+          //   );
+          // }
           else if((key as string) == 'superior'){
             return(
-              <h2 className='username-display' key={key}>Superior: {(userInfo as { [key: string]: any })[key]}</h2>  
+              <h2 className='center' key={key}>Superior: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
-          else{
-            return(<h2 className='username-display' key={key}>{(userInfo as { [key: string]: any })[key]}</h2>);
-          }
+          // else{
+          //   return(<h2 className='username-display' key={key}>{(userInfo as { [key: string]: any })[key]}</h2>);
+          // }
         }
         )
         }
