@@ -120,12 +120,12 @@ const ProfilePage = function (): JSX.Element {
         { Object.keys(userInfo).map((key) =>{
           if((key as string) == 'name'){
             return(
-              <h2 className='center' key={key}>Name: {(userInfo as { [key: string]: any })[key]}</h2>  
+              <h2 className='center userdata-color' key={key}>Name: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
           else if((key as string) == 'email'){
             return(
-              <h2 className='center' key={key}>Email: {(userInfo as { [key: string]: any })[key]}</h2>  
+              <h2 className='center userdata-color' key={key}>Email: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
           // else if((key as string) == 'branch'){
@@ -141,7 +141,7 @@ const ProfilePage = function (): JSX.Element {
           // }
           else if((key as string) == 'dod'){
             return(
-              <h2 className='center' key={key}>DOD: {(userInfo as { [key: string]: any })[key]}</h2>  
+              <h2 className='center userdata-color' key={key}>DOD: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
           // else if((key as string) == 'grade'){
@@ -170,7 +170,7 @@ const ProfilePage = function (): JSX.Element {
           // }
           else if((key as string) == 'phone'){
             return(
-              <h2 className='center' key={key}>Phone: {(userInfo as { [key: string]: any })[key]}</h2>  
+              <h2 className='center userdata-color' key={key}>Phone: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
           // else if((key as string) == 'rank'){
@@ -180,7 +180,7 @@ const ProfilePage = function (): JSX.Element {
           // }
           else if((key as string) == 'superior'){
             return(
-              <h2 className='center' key={key}>Superior: {(userInfo as { [key: string]: any })[key]}</h2>  
+              <h2 className='center userdata-color' key={key}>Superior: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
           // else{
