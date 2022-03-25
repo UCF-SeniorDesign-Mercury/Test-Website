@@ -104,7 +104,7 @@ const GridCellExpand = React.memo(function GridCellExpand(
             style={{ minHeight: wrapper.current!==null ? wrapper.current.offsetHeight - 3 : 0 }}
             sx={{ whiteSpace: 'normal', overflowWrap: 'break-word' , textOverflow: 'ellipsis' }}
           >
-            <Typography variant="body2" style={{ padding: 8 }}>
+            <Typography variant="body2" style={{ padding: 8, textAlign: 'center' }}>
               {value}
             </Typography>
           </Paper>

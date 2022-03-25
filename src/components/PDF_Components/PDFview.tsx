@@ -7,7 +7,7 @@ import { PDFDocument, popGraphicsState } from 'pdf-lib';
 
 import React, { useEffect, useState } from 'react';
 import { deleteFile, getFile, recommendFile, reviewFile, updateFile } from '../../api/files';
-import { signatureTest } from '../../assets/signature';
+import { getUser } from '../../api/users';
 import { convertToBase64, PageView } from '../../pages/PDF';
 import { CustomModal } from '../Modal';
 
@@ -304,7 +304,7 @@ const PDFviewPage: React.FC<{
   }
 
   async function insertSignature(fileString: string): Promise<string> {
-  
+
     const pdfDoc = await PDFDocument.load(fileString);
   
     // const pages = pdfDoc.getPages();
@@ -353,7 +353,13 @@ const PDFviewPage: React.FC<{
         }
       }
     }
-    const signatureImage = await pdfDoc.embedPng(signatureTest);
+
+    let userSignature = 'blank';
+    await getUser()
+      .then((data) => {
+        userSignature = (data as any).signature as string;
+      });
+    const signatureImage = await pdfDoc.embedPng(userSignature);
     pdfDoc.getPage(0).drawImage(signatureImage, signaturePosition);
 
     //const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true })
@@ -483,7 +489,6 @@ const PDFviewPage: React.FC<{
       </div>
     </CustomModal>}
 
-
     { currentModalView.view == 'Update' && <CustomModal open={viewModal} setOpen={setViewModal}>
       <div>
         <p className='PDFViewMenu'>Please select a file from your computer to replace the current file.<br/></p>
@@ -502,8 +507,9 @@ const PDFviewPage: React.FC<{
 
     { currentModalView.view == 'GiveReview' && <CustomModal open={viewModal} setOpen={setViewModal}>
       <div className='PDFViewMenu'>
+        <p>Please add a comment.</p>
         <TextField multiline label="Add Comment" inputRef={CommentTextAreaRef}/> 
-        <p><br/>Please select a file status.<br/></p>
+        <p><br/>Please select a file status.</p>
         <Select
           labelId="PDFviewSelectLabel"
           id="PDFviewSelect"
@@ -530,7 +536,7 @@ const PDFviewPage: React.FC<{
           <MenuItem value={1}>Approved</MenuItem>
           <MenuItem value={2}>Rejected</MenuItem>
         </Select>
-        <p>Please select a file from your computer to replace the current file.<br/></p>
+        <p><br/>Please select a file from your computer to replace the current file.<br/></p>
         <Input inputRef = {PDFActionInputRef} type='file'/> 
         <p><br/>Press Submit Button to confirm.</p>
         <Button onClick={submitReview}>Submit</Button>
@@ -539,6 +545,7 @@ const PDFviewPage: React.FC<{
 
     { currentModalView.view == 'GiveRecommendation' && <CustomModal open={viewModal} setOpen={setViewModal}>
       <div className='PDFViewMenu'>
+        <p>Please add a comment.</p>
         <TextField multiline label="Add Comment" inputRef={CommentTextAreaRef}/> 
         <p><br/>Please select a file status.<br/></p>
         <Select
@@ -567,7 +574,7 @@ const PDFviewPage: React.FC<{
           <MenuItem value={1}>Recommend</MenuItem>
           <MenuItem value={2}>Do Not Recommend</MenuItem>
         </Select>
-        <p>Please select a file from your computer to replace the current file.<br/></p>
+        <p><br/>Please select a file from your computer to replace the current file.<br/></p>
         <Input inputRef = {PDFActionInputRef} type='file'/> 
         <p><br/>Press Submit Button to confirm.</p>
         <Button onClick={submitRecommendation}>Submit</Button>

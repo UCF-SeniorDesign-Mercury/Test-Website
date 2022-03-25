@@ -6,6 +6,7 @@ import { PDFDocument } from 'pdf-lib';
 import { useEffect, useState } from 'react';
 import { getRecommendationFiles, getUserFiles, reviewUserFiles } from '../../api/files';
 import { getUser, getUsers } from '../../api/users';
+import { convertBackendFormName, convertFileStatus } from '../../Forms/form_settings';
 
 import { PageView } from '../../pages/PDF';
 import { CustomModal } from '../Modal';
@@ -22,9 +23,11 @@ interface ModalView
 const FormListDataGridCols: GridColDef[] = [
   { field: 'id', headerName: 'ID', flex: 1},
   { field: 'filename', headerName: 'File Name', flex: 1},
+  { field: 'filetype', headerName: 'File Type', flex: 1},
   { field: 'status', headerName: 'Status'},
   { field: 'timestamp', headerName: 'Timestamp', flex: 1},
   { field: 'author', headerName: 'Author', flex: 0.5},
+  { field: 'recommender', headerName: 'Recommender', flex: 0.5},
   { field: 'reviewer', headerName: 'Reviewer', flex: 0.5},
   { field: 'comment', headerName: 'Comment', flex: 1},
 ];
@@ -104,6 +107,45 @@ const FormListPage: React.FC<{
     //setPDFiframeSrc(pdfDataUri);
   }
 
+  async function formatDataRows(data: any): Promise<any>
+  {
+    let i = 0;
+    // eslint-disable-next-line
+    for (i = 0; i < (data as any[]).length; i++)
+    {
+
+      (data as any[])[i].timestamp = (new Date((data as any[])[i].timestamp)).toLocaleString();
+      (data as any[])[i].filetype = convertBackendFormName((data as any[])[i].filetype as string);
+      (data as any[])[i].status = convertFileStatus((data as any[])[i].status as number);
+
+      // eslint-disable-next-line
+      if (!(data as any[])[i].recommender)
+      {
+        // eslint-disable-next-line
+        (data as any[])[i].recommender = 'N/A';
+      }
+      else
+      {
+        await getUsers('dod='+(data as any[])[i].recommender)
+          .then((userData) => {
+            (data as any[])[i].recommender = (userData as any[])[0].name;
+          });
+      }
+
+      await getUsers('uid='+(data as any[])[i].author)
+        .then((userData) => {
+          (data as any[])[i].author = (userData as any[])[0].name;
+        });
+
+      await getUsers('dod='+(data as any[])[i].reviewer)
+        .then((userData) => {
+          (data as any[])[i].reviewer = (userData as any[])[0].name;
+        });
+    }
+
+    return data;
+  }
+
   async function getReviewUserPDFs():Promise<boolean> 
   {
     setAlert(false);
@@ -113,19 +155,7 @@ const FormListPage: React.FC<{
 
     await reviewUserFiles()
       .then(async (data) => {
-        let i: number;  
-        for (i = 0; i < (data as any[]).length; i++)
-        {
-          await getUsers('uid='+(data as any[])[i].author)
-            .then((userData) => {
-              (data as any[])[i].author = (userData as any[])[0].name;
-            });
-
-          await getUsers('dod='+(data as any[])[i].reviewer)
-            .then((userData) => {
-              (data as any[])[i].reviewer = (userData as any[])[0].name;
-            });
-        }
+        data = await formatDataRows(data);
         fileData = fileData.concat(data as FormListDataGridRowsType[]);
       })
       .catch((error) => {
@@ -138,20 +168,7 @@ const FormListPage: React.FC<{
     
     await getRecommendationFiles()
       .then(async (data) => {
-        let i: number;  
-        for (i = 0; i < (data as any[]).length; i++)
-        {
-
-          await getUsers('uid='+(data as any[])[i].author)
-            .then((userData) => {
-              (data as any[])[i].author = (userData as any[])[0].name;
-            });
-
-          await getUsers('dod='+(data as any[])[i].reviewer)
-            .then((userData) => {
-              (data as any[])[i].reviewer = (userData as any[])[0].name;
-            });
-        }
+        data = await formatDataRows(data);
         fileData = fileData.concat(data as FormListDataGridRowsType[]);
       })
       .catch((error) => {
@@ -175,30 +192,8 @@ const FormListPage: React.FC<{
     setSpinner(true);
     await getUserFiles()
       .then(async (data) => {
-        let i = 0;
-        // eslint-disable-next-line
-        for (i = 0; i < (data as any[]).length; i++)
-        {
-
-          (data as any[])[i].timestamp = (new Date((data as any[])[i].timestamp)).toLocaleString();
-
-          // eslint-disable-next-line
-          if (!(data as any[])[i].reviewer_visible)
-          {
-            // eslint-disable-next-line
-            (data as any[])[i].reviewer = (data as any[])[i].recommender;
-          }
-
-          await getUsers('uid='+(data as any[])[i].author)
-            .then((userData) => {
-              (data as any[])[i].author = (userData as any[])[0].name;
-            });
-
-          await getUsers('dod='+(data as any[])[i].reviewer)
-            .then((userData) => {
-              (data as any[])[i].reviewer = (userData as any[])[0].name;
-            });
-        }
+        
+        data = await formatDataRows(data);
         setDataGridRows(data as FormListDataGridRowsType[]);
       })
       .catch((error) => {
@@ -270,7 +265,7 @@ const FormListPage: React.FC<{
       {currentPageView.view == 'ReportList' && 'Submitted Forms' }
     </Typography>
 
-    <RenderExpandCellGrid 
+    <RenderExpandCellGrid
       columns = {FormListDataGridCols} 
       rows = {DataGridRows}
       pageSize={5}
