@@ -23,26 +23,6 @@ interface eventInformation{
   title: string;
   type: string;
 }
-const testEvent2:EventInput[] = [
-    
-  {
-    author: 'test',
-    title: 'hello',
-    start:'2022-03-12',
-    end: '2022-03-12' 
-  }
-  // {
-  //   id: createEventId(),
-  //   title: 'Timed event',
-  //   start: '2022-03-12'
-  // },
-  // {
-  //   id: createEventId(),
-  //   title: 'test',
-  //   start:'2022-03-12'
-
-  // }
-];
 
 
 
@@ -61,35 +41,13 @@ const EventPage = function (this: any): JSX.Element {
     type: '',
   });
   const [eventArray, seteventArray] = useState<eventInformation[]>([]);
-  const [testEvent, settestEvent] = useState<EventInput[]>([{
+  
+  const [displayEvent, setdisplayEvent] = useState<EventInput[]>([{
 
     title: '',
     start:'',
     end:''
   }]);
-  //  const testEvent:EventInput[] = [
-    
-  // {
-  //   author: element.author,
-  //   title: element.title,
-  //   start: element.starttime,
-  //   end: element.endtime,
-  //   id: element.event_id,
-  //   description: element.description
-  // }
-  // {
-  //   id: createEventId(),
-  //   title: 'Timed event',
-  //   start: '2022-03-12'
-  // },
-  // {
-  //   id: createEventId(),
-  //   title: 'test',
-  //   start:'2022-03-12'
-
-  // }
-  // ];
-
 
   function get_events(){
     getEvents()
@@ -112,33 +70,15 @@ const EventPage = function (this: any): JSX.Element {
           type: (data as any).type,
         };
 
-        let testEvent4:EventInput[]= []; 
+        let displayEvent:EventInput[]= []; 
         (data as any).forEach((element: any) => {
-          testEvent4 = testEvent4.concat({
+          displayEvent = displayEvent.concat({
             title: (element as any).title,
             start: (element as any).starttime,
             end: (element as any).endtime
           });
         });
-        const testEvent3: EventInput[] = [{
-          title: (data as any).title,
-          start: (data as any).starttime,
-          end: (data as any).endtime
-        },
-        {
-          author: 'test',
-          title: 'hello',
-          start:'2022-03-12',
-          end: '2022-03-12' 
-        },
-        {
-          author: 'test',
-          title: 'hello2',
-          start:'2022-03-12',
-          end: '2022-03-12' 
-        }
-        ];
-        settestEvent(testEvent4);
+        setdisplayEvent(displayEvent);
         seteventInfo(eventData);
       })
       // .then(() =>{
@@ -216,16 +156,14 @@ const EventPage = function (this: any): JSX.Element {
             //   );
             // }
             // return(<h2 key={key}>{(element as { [key: string]: any })[key]}</h2>);
-            
-            
           }
           ))        
           }
-          {console.log(testEvent)}
+          {console.log(displayEvent)}
 
           {<FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            events={testEvent}
+            events={displayEvent}
             headerToolbar={{
               left: 'prev,next today',
               center: 'title',
