@@ -7,7 +7,7 @@ import { PDFDocument, popGraphicsState } from 'pdf-lib';
 
 import React, { useEffect, useState } from 'react';
 import { deleteFile, getFile, recommendFile, reviewFile, updateFile } from '../../api/files';
-import { signatureTest } from '../../assets/signature';
+import { getUser } from '../../api/users';
 import { convertToBase64, PageView } from '../../pages/PDF';
 import { CustomModal } from '../Modal';
 
@@ -304,10 +304,7 @@ const PDFviewPage: React.FC<{
   }
 
   async function insertSignature(fileString: string): Promise<string> {
-  
-    const url = 'https://firebasestorage.googleapis.com/v0/b/electric-eagles.appspot.com/signature/04f0cec8-3e07-425c-b1df-406fd85e30c5';
-    const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
-    console.log(existingPdfBytes);
+
     const pdfDoc = await PDFDocument.load(fileString);
   
     // const pages = pdfDoc.getPages();
@@ -356,7 +353,13 @@ const PDFviewPage: React.FC<{
         }
       }
     }
-    const signatureImage = await pdfDoc.embedPng(signatureTest);
+
+    let userSignature = 'blank';
+    await getUser()
+      .then((data) => {
+        userSignature = (data as any).signature as string;
+      });
+    const signatureImage = await pdfDoc.embedPng(userSignature);
     pdfDoc.getPage(0).drawImage(signatureImage, signaturePosition);
 
     //const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true })
