@@ -142,7 +142,6 @@ export const postFile = async (file: string, filename: string, fileType: string,
     filename: filename,
     filetype: fileType,
     reviewer: reviewer,
-    signature: 'signature',
   };
 
   if (fileType == 'rst_request')

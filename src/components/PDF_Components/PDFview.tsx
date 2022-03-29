@@ -24,7 +24,8 @@ interface ModalView
   | 'Delete'
   | 'GiveReview'
   | 'GiveRecommendation'
-  | 'InsertSignatureReminder';
+  | 'InsertSignatureReminder'
+  | 'TimestampHistory';
 }
 
 export interface PDFviewMode {
@@ -342,7 +343,7 @@ const PDFviewPage: React.FC<{
         };
       }
       else if ((PDFData as any)?.filetype == 'rst_request') {
-        if ((PDFData as any)?.reviewer_visible == false)
+        if ((PDFData as any)?.status == 1)
         {
           signaturePosition = {
             x: 317,
@@ -359,6 +360,7 @@ const PDFviewPage: React.FC<{
       .then((data) => {
         userSignature = (data as any).signature as string;
       });
+
     const signatureImage = await pdfDoc.embedPng(userSignature);
     pdfDoc.getPage(0).drawImage(signatureImage, signaturePosition);
 
@@ -428,13 +430,12 @@ const PDFviewPage: React.FC<{
         .catch((err) => console.log(err));
       setCurrentModalView({view: 'Nothing'});
     }
-  }
 
-  async function testtest()
-  {
-    if (CommentTextAreaRef && CommentTextAreaRef.current)
+    else if (event && event.target && event.target.value == 7)
     {
-      console.log(CommentTextAreaRef.current.value);
+      console.log(event.target.value);
+      setPDFActionSelectValue(0);
+      setCurrentModalView({view: 'TimestampHistory'});
     }
   }
 
@@ -468,18 +469,18 @@ const PDFviewPage: React.FC<{
     >
       <MenuItem disabled value={0}>Select an Action</MenuItem>
 
-      {props.PDFviewMode.mode == 'View'  && (PDFData as any)?.filetype == 'rst_request' && <MenuItem value={5}>Insert Signature</MenuItem>}
-      {props.PDFviewMode.mode == 'View' && <MenuItem value={1}>Update This PDF</MenuItem>}
+      {<MenuItem value={7}>Timestamp History</MenuItem>}
+
       {props.PDFviewMode.mode == 'View' && <MenuItem value={2}>Delete This PDF</MenuItem>}
 
       {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={5}>Insert Signature</MenuItem>}
       {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={6}>Remove Signature</MenuItem>}
       {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={3}>Give Review</MenuItem>}
 
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.reviewer_visible == false && <MenuItem value={5}>Insert Signature</MenuItem>}
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.reviewer_visible == false && <MenuItem value={6}>Remove Signature</MenuItem>}
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.reviewer_visible == false && <MenuItem value={4}>Give Recommendation</MenuItem>}
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.reviewer_visible == true && <MenuItem value={3}>Give Review</MenuItem>}
+      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={5}>Insert Signature</MenuItem>}
+      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={6}>Remove Signature</MenuItem>}
+      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={4}>Give Recommendation</MenuItem>}
+      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 2 && <MenuItem value={3}>Give Review</MenuItem>}
 
     </Select>
 
@@ -578,6 +579,19 @@ const PDFviewPage: React.FC<{
         <Input inputRef = {PDFActionInputRef} type='file'/> 
         <p><br/>Press Submit Button to confirm.</p>
         <Button onClick={submitRecommendation}>Submit</Button>
+      </div>
+    </CustomModal>}
+
+    { currentModalView.view == 'TimestampHistory' && <CustomModal open={viewModal} setOpen={setViewModal}>
+      <div className='PDFViewMenu'>
+        {
+          ((PDFData as any).timestamp as any[]).map(time => {
+            
+            return (
+              <p key={((PDFData as any).timestamp as any[]).indexOf(time)}>{time}:      {((PDFData as any).timestamp_string as any[])[((PDFData as any).timestamp as any[]).indexOf(time)]}</p>
+            );
+          })
+        }
       </div>
     </CustomModal>}
 

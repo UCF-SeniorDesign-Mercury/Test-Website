@@ -25,7 +25,7 @@ const FormListDataGridCols: GridColDef[] = [
   { field: 'filename', headerName: 'File Name', flex: 1},
   { field: 'filetype', headerName: 'File Type', flex: 1},
   { field: 'status', headerName: 'Status'},
-  { field: 'timestamp', headerName: 'Timestamp', flex: 1},
+  { field: 'timestamp', headerName: 'Recent Timestamp', flex: 1},
   { field: 'author', headerName: 'Author', flex: 0.5},
   { field: 'recommender', headerName: 'Recommender', flex: 0.5},
   { field: 'reviewer', headerName: 'Reviewer', flex: 0.5},
@@ -114,7 +114,7 @@ const FormListPage: React.FC<{
     for (i = 0; i < (data as any[]).length; i++)
     {
 
-      (data as any[])[i].timestamp = (new Date((data as any[])[i].timestamp)).toLocaleString();
+      (data as any[])[i].timestamp = (new Date((data as any[])[i].timestamp[0])).toLocaleString();
       (data as any[])[i].filetype = convertBackendFormName((data as any[])[i].filetype as string);
       (data as any[])[i].status = convertFileStatus((data as any[])[i].status as number);
 

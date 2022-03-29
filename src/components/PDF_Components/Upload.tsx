@@ -2,11 +2,12 @@ import Button from '@mui/material/Button';
 import Input from '@mui/material/Input';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import { PDFDocument } from 'pdf-lib';
 
 import React, { useEffect, useState } from 'react';
 
 import { postFile } from '../../api/files';
-import { getUsers } from '../../api/users';
+import { getUser, getUsers } from '../../api/users';
 import { convertBackendFormName, FormList, FormType, noFormValue } from '../../Forms/form_settings';
 import { convertToBase64, PageView } from '../../pages/PDF';
 import { CustomModal } from '../Modal';
@@ -46,6 +47,49 @@ const UploadPage: React.FC<{
   const setAlertStatus = props.setAlertStatus;
 
   const UploadInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
+  
+  async function insertSignature(fileString: string): Promise<string> {
+    const pdfDoc = await PDFDocument.load(fileString);
+  
+    // const pages = pdfDoc.getPages();
+    // const firstPage = pages[0];
+    // console.log(pdfDoc.getForm().getFields());
+    // eslint-disable-next-line
+    // const { width, height } = firstPage.getSize();
+    const signaturePosition: {x:number; y: number; width: number; height: number} = {
+      x: 165,
+      y: 225,
+      width: 50,
+      height: 50
+    };
+
+
+    let userSignature = 'blank';
+    await getUser()
+      .then((data) => {
+        userSignature = (data as any).signature as string;
+      });
+    const signatureImage = await pdfDoc.embedPng(userSignature);
+    pdfDoc.getPage(0).drawImage(signatureImage, signaturePosition);
+
+    //const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true })
+    return new Promise(function(resolve,reject)
+    {
+      pdfDoc.saveAsBase64({ dataUri: true })
+        .then( (res) => {
+          console.log('success');
+          resolve(res);
+        })
+        .catch(err => {
+          console.log(err);
+          reject('about:blank');
+        });
+    });
+    //console.log(pdfDataUri);  
+    // eslint-disable-next-line
+    // const pdfBytes = await pdfDoc.save();
+
+  }
 
   async function uploadPDF(): Promise<boolean> {
 
@@ -69,6 +113,17 @@ const UploadPage: React.FC<{
         }
 
         const base64 = await convertToBase64(selectedFile[0])
+          .then(async (fileString) => {
+            console.log(fileString);
+            if (formType.formType == 'rst_request')
+            {
+              const newfile = await insertSignature(fileString as string);
+              return newfile;
+            }
+
+            return fileString;
+          }) 
+
           .catch((error) => {
             setAlertMessage(error);
             setAlertStatus('error');
