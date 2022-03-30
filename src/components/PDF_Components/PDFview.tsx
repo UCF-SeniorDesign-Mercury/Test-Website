@@ -588,7 +588,7 @@ const PDFviewPage: React.FC<{
           ((PDFData as any).timestamp as any[]).map(time => {
             
             return (
-              <p key={((PDFData as any).timestamp as any[]).indexOf(time)}>{time}:      {((PDFData as any).timestamp_string as any[])[((PDFData as any).timestamp as any[]).indexOf(time)]}</p>
+              <p key={((PDFData as any).timestamp as any[]).indexOf(time)}> {time}:      <b>{((PDFData as any).timestamp_string as any[])[((PDFData as any).timestamp as any[]).indexOf(time)]} </b></p>
             );
           })
         }
