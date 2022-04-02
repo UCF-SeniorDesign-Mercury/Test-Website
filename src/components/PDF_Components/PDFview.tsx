@@ -82,6 +82,8 @@ const PDFviewPage: React.FC<{
         //setPDFviewiframeSrc(string);
         console.log(data);
         setPDFData(data);
+        if (!((data as any).file as string).startsWith('data:application/pdf;base64,'))
+          (data as any).file = 'data:application/pdf;base64,'.concat(((data as any).file as string));
         setPDFiframeSrc((data as any).file);
         setSpinner(false);
       })
