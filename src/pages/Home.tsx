@@ -26,9 +26,11 @@ const HomePage = function (): JSX.Element {
         <h1 className="username-display">{context.var1}</h1>
 
         <Form className="home-form" onSubmit={SubmitHandler}>
-          {/* <Button variant="primary" className="module-button" type="submit">
-            Events
-          </Button> */}
+          <NavLink to="/pdf">
+            <Button variant="primary" className="module-button" type="submit">
+              Events
+            </Button>
+          </NavLink>
           {/* <Button variant="primary" className="module-button" type="submit">
             Chat
           </Button> */}
