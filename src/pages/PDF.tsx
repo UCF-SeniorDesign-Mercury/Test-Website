@@ -63,7 +63,6 @@ const PDFPage = function (): JSX.Element {
 
   // page variables
   const [currentPageView, setCurrentPageView] = useState<PageView>({view: 'MainMenu'});
-  const [previousPageView, setPreviousPageView] = useState<PageView>({view: 'MainMenu'});
 
   const [fileID, setFileID] = useState<string>('');
   const [PDFMode, setPDFMode] = useState<PDFviewMode>({mode: 'View'});

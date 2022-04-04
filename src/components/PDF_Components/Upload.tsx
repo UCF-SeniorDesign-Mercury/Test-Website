@@ -67,6 +67,7 @@ const UploadPage: React.FC<{
     let userSignature = 'blank';
     await getUser()
       .then((data) => {
+        // eslint-disable-next-line
         userSignature = (data as any).signature as string;
       });
     const signatureImage = await pdfDoc.embedPng(userSignature);
