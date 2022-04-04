@@ -53,13 +53,17 @@ export const confirmEvent = async (): Promise<unknown> => {
 };
 
 //create event
-export const createEvent = async (description: string, endtime: Date, organizer: string, starttime: Date, title: string): Promise<string | Date> => {
+export const createEvent = async (description: string, endtime: string, organizer: string, starttime: string, title: string, invitees_dod:string[], period:boolean, type:string): Promise<string> => {
   const data = {
     description: description,
     endtime: endtime,
     organizer: organizer,
     starttime: starttime,
     title: title,
+    invitees_dod: invitees_dod,
+    period:period,
+    type:type
+
   };
   console.log(JSON.stringify(data));
 
@@ -129,7 +133,7 @@ export const deleteEvent = async (eventID: string): Promise<string> => {
   });
 };
 //update event
-export const updateEvent = async (description: string, endtime: Date, organizer: string, starttime: Date, title: string): Promise<string> => {
+export const updateEvent = async (description: string, endtime: Date, organizer: string, starttime: Date, title: string, type:string): Promise<string> => {
   const data = {
     description: description,
     endtime: endtime,
