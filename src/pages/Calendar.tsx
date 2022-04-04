@@ -17,6 +17,7 @@ import Button from '@mui/material/Button';
 
 import { CustomModal } from '../components/Modal';
 import AlertBox from '../components/AlertBox';
+import { getMedicalData } from '../api/medical';
 
 interface eventInformation{
   author: string;
@@ -62,8 +63,11 @@ const EventPage = function (this: any): JSX.Element {
   const [alertStatus, setAlertStatus] = useState('success');
   const [viewModal, setViewModal] = useState(false);
 
-  function get_events(){
-    getEvents()
+  async function get_events(){
+
+    let deezEvents:EventInput[]= []; 
+
+    await getEvents()
       .then((data) => {
         seteventArray(data as eventInformation[]);
         // settestEvent(data as EventInput[]);
@@ -84,15 +88,13 @@ const EventPage = function (this: any): JSX.Element {
           type: (data as any).type,
         };
 
-        let displayEvent:EventInput[]= []; 
         (data as any).forEach((element: any) => {
-          displayEvent = displayEvent.concat({
+          deezEvents = deezEvents.concat({
             title: (element as any).title,
             start: (element as any).starttime,
             end: (element as any).endtime
           });
         });
-        setdisplayEvent(displayEvent);
         // seteventInfo(eventData);
       })
       // .then(() =>{
@@ -102,12 +104,42 @@ const EventPage = function (this: any): JSX.Element {
       .catch((error) => {
         console.log('didnt work! :)');
       });
+
+    await getMedicalData()
+      .then((data) => {
+        console.log(data);
+        deezEvents = deezEvents.concat({
+          title: 'Dental Due Date',
+          start: (new Date((data as any).dent_date as string)).toISOString(),
+          end: (new Date((data as any).dent_date as string)).toISOString(),
+        });
+        deezEvents = deezEvents.concat({
+          title: 'Physical Due Date',
+          start: (new Date((data as any).pha_date as string)).toISOString(),
+          end: (new Date((data as any).pha_date as string)).toISOString(),
+        });
+        // seteventInfo(eventData);
+      })
+      // .then(() =>{
+      //   console.log(eventArray[0] + 'test');
+      //   console.log('test pt 2 :)'); 
+      // }) 
+      .catch((error) => {
+        console.log('didnt work! :)');
+      });
+
+    console.log(deezEvents);
+    setdisplayEvent(deezEvents);
   }
 
   useEffect(()=>{
     get_events();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
+
+  useEffect(()=>{
+    console.log(displayEvent);
+  },[displayEvent]);
 
   function renderEventContent(eventContent: EventContentArg) {
     return (
