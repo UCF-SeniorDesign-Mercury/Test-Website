@@ -36,19 +36,19 @@ interface eventInformation{
 
 
 const EventPage = function (this: any): JSX.Element {
-  const [eventInfo, seteventInfo] = useState<eventInformation>({
-    author: '',
-    confirmed_dod: [],
-    description: '',
-    endtime: '',
-    event_id: '',
-    organizer: '',
-    period: true,
-    starttime: '',
-    timeStamp: '',
-    title: '',
-    type: '',
-  });
+  // const [eventInfo, seteventInfo] = useState<eventInformation>({
+  //   author: '',
+  //   confirmed_dod: [],
+  //   description: '',
+  //   endtime: '',
+  //   event_id: '',
+  //   organizer: '',
+  //   period: true,
+  //   starttime: '',
+  //   timeStamp: '',
+  //   title: '',
+  //   type: '',
+  // });
   const [eventArray, seteventArray] = useState<eventInformation[]>([]);
   const [displayEvent, setdisplayEvent] = useState<EventInput[]>([{
 
@@ -93,7 +93,7 @@ const EventPage = function (this: any): JSX.Element {
           });
         });
         setdisplayEvent(displayEvent);
-        seteventInfo(eventData);
+        // seteventInfo(eventData);
       })
       // .then(() =>{
       //   console.log(eventArray[0] + 'test');
