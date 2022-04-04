@@ -1,9 +1,9 @@
-import { TextareaAutosize, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import Input from '@mui/material/Input';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { PDFDocument, popGraphicsState } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 
 import React, { useEffect, useState } from 'react';
 import { deleteFile, getFile, recommendFile, reviewFile, updateFile } from '../../api/files';
@@ -82,8 +82,11 @@ const PDFviewPage: React.FC<{
         //setPDFviewiframeSrc(string);
         console.log(data);
         setPDFData(data);
+        // eslint-disable-next-line
         if (!((data as any).file as string).startsWith('data:application/pdf;base64,'))
+          // eslint-disable-next-line
           (data as any).file = 'data:application/pdf;base64,'.concat(((data as any).file as string));
+        // eslint-disable-next-line
         setPDFiframeSrc((data as any).file);
         setSpinner(false);
       })
@@ -324,6 +327,7 @@ const PDFviewPage: React.FC<{
 
     if (props.PDFviewMode.mode == 'View')
     {
+      // eslint-disable-next-line
       if ((PDFData as any)?.filetype == 'rst_request') { 
         signaturePosition = {
           x: 165,
@@ -336,6 +340,7 @@ const PDFviewPage: React.FC<{
 
     else if (props.PDFviewMode.mode == 'Review')
     {
+      // eslint-disable-next-line
       if ((PDFData as any)?.filetype == '1380_form') { 
         signaturePosition = {
           x: 350,
@@ -344,7 +349,9 @@ const PDFviewPage: React.FC<{
           height: 50
         };
       }
+      // eslint-disable-next-line
       else if ((PDFData as any)?.filetype == 'rst_request') {
+        // eslint-disable-next-line
         if ((PDFData as any)?.status == 1)
         {
           signaturePosition = {
@@ -360,6 +367,7 @@ const PDFviewPage: React.FC<{
     let userSignature = 'blank';
     await getUser()
       .then((data) => {
+        // eslint-disable-next-line
         userSignature = (data as any).signature as string;
       });
 
@@ -474,15 +482,22 @@ const PDFviewPage: React.FC<{
       {<MenuItem value={7}>Timestamp History</MenuItem>}
 
       {props.PDFviewMode.mode == 'View' && <MenuItem value={2}>Delete This PDF</MenuItem>}
+      
+      {// eslint-disable-next-line
+        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={5}>Insert Signature</MenuItem>}
+      {// eslint-disable-next-line
+        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={6}>Remove Signature</MenuItem>}
+      {// eslint-disable-next-line
+        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={3}>Give Review</MenuItem>}
 
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={5}>Insert Signature</MenuItem>}
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={6}>Remove Signature</MenuItem>}
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == '1380_form' && <MenuItem value={3}>Give Review</MenuItem>}
-
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={5}>Insert Signature</MenuItem>}
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={6}>Remove Signature</MenuItem>}
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={4}>Give Recommendation</MenuItem>}
-      {props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 2 && <MenuItem value={3}>Give Review</MenuItem>}
+      {// eslint-disable-next-line
+        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={5}>Insert Signature</MenuItem>}
+      {// eslint-disable-next-line
+        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={6}>Remove Signature</MenuItem>}
+      {// eslint-disable-next-line
+        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={4}>Give Recommendation</MenuItem>}
+      {// eslint-disable-next-line
+        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 2 && <MenuItem value={3}>Give Review</MenuItem>}
 
     </Select>
 
@@ -587,9 +602,11 @@ const PDFviewPage: React.FC<{
     { currentModalView.view == 'TimestampHistory' && <CustomModal open={viewModal} setOpen={setViewModal}>
       <div className='PDFViewMenu'>
         {
+          // eslint-disable-next-line
           ((PDFData as any).timestamp as any[]).map(time => {
             
             return (
+              // eslint-disable-next-line
               <p key={((PDFData as any).timestamp as any[]).indexOf(time)}> {time}:      <b>{((PDFData as any).timestamp_string as any[])[((PDFData as any).timestamp as any[]).indexOf(time)]} </b></p>
             );
           })
