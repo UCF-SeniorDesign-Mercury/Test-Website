@@ -137,12 +137,12 @@ export const getRecommendationFiles = async (): Promise<unknown> => {
 };
 
 export const postFile = async (file: string, filename: string, fileType: string, reviewer: string, recommender?: string): Promise<string> => {
+  // eslint-disable-next-line
   const data: any = {
     file: file,
     filename: filename,
     filetype: fileType,
     reviewer: reviewer,
-    signature: 'signature',
   };
 
   if (fileType == 'rst_request')

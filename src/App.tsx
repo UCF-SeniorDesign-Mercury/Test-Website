@@ -15,6 +15,7 @@ import ChangePassword from './pages/ChangePassword';
 import ProfilePage from './pages/Profile';
 import CalendarPage from './pages/Calendar';
 import Notification from './pages/Notification';
+import MedicalPage from './pages/MedicalPage';
 
 const App = function (): JSX.Element {
   // keeps track of id and token in the website
@@ -57,6 +58,7 @@ const App = function (): JSX.Element {
               {var1 && <Route path="/calendar" component={CalendarPage} />}
               {var1 && <Route path="/pdf" component={PDFPage} />}
               {var1 && <Route path="/notification" component={Notification} />}
+              {var1 && <Route path="/medicalPage" component={MedicalPage} />}
               {var1 && <Route path="/pdf_test" component={PDF_TestPage} />}
             </Switch>
           </main>
