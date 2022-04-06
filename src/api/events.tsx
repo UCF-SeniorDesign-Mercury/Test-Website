@@ -53,7 +53,7 @@ export const confirmEvent = async (): Promise<unknown> => {
 };
 
 //create event
-export const createEvent = async (description: string, endtime: string, organizer: string, starttime: string, title: string, invitees_dod:string[], period:boolean, type:string): Promise<string> => {
+export const createEvent = async (description: string, endtime: string, organizer: string, starttime: string, title: string, invitees_dod:string[], period:boolean, type:string): Promise<string | Date> => {
   const data = {
     description: description,
     endtime: endtime,

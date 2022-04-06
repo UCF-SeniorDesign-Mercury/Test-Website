@@ -34,7 +34,9 @@ b {
   display: flex;
   min-height: 100%;
   font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
+  color:black;
+  /* background: darkblue; */
 }
 
 .demo-app-sidebar {
@@ -71,4 +73,16 @@ b {
   width: 8.7%;
   background-color: #FFC947;
 }
+
+.modalText{
+  color:black;
+  font-weight: bold;
+  font-size: larger;
+  /* background: orange; */
+  width: 100%;
+}
+ ::placeholder{
+   color:black;
+   font-weight: lighter;
+ }
 
