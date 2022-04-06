@@ -1,14 +1,14 @@
 import { TextField } from '@mui/material';
 import Button from '@mui/material/Button';
-import Input from '@mui/material/Input';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { PDFDocument } from 'pdf-lib';
 
 import React, { useEffect, useState } from 'react';
-import { deleteFile, getFile, recommendFile, reviewFile, updateFile } from '../../api/files';
+import { deleteFile, getFile, recommendFile, reviewFile, } from '../../api/files';
 import { getUser } from '../../api/users';
-import { convertToBase64, PageView } from '../../pages/PDF';
+import { Checkmark } from '../../assets/checkmark';
+import { PageView } from '../../pages/PDF';
 import { CustomModal } from '../Modal';
 
 const iframeStyle = {
@@ -20,7 +20,6 @@ interface ModalView
 {
   view: 'Nothing'
   | 'PDFHelp'
-  | 'Update'
   | 'Delete'
   | 'GiveReview'
   | 'GiveRecommendation'
@@ -57,7 +56,8 @@ const PDFviewPage: React.FC<{
   const [PDFiframeSrc, setPDFiframeSrc] = useState<string | undefined>('about:blank');
   const [PDFData, setPDFData] = useState<unknown>();
 
-  const PDFActionInputRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
+  const [userDODID , setUserDODID] = useState<string>('');
+
   const PDFActionSelectRef: React.RefObject<HTMLSelectElement> = React.useRef<HTMLSelectElement>(null);
   const CommentTextAreaRef: React.RefObject<HTMLInputElement> = React.useRef<HTMLInputElement>(null);
   const [PDFActionSelectValue, setPDFActionSelectValue] = useState<number>(0);
@@ -102,66 +102,6 @@ const PDFviewPage: React.FC<{
     return true;
   }
 
-  async function updatePDF():Promise<boolean>
-  {
-    setAlert(false);
-    setSpinner(true);
-    setViewModal(false);
-
-    //Read File
-    if (PDFActionInputRef && PDFActionInputRef.current){
-      const selectedFile = PDFActionInputRef.current.files;
-
-      const selectedFileID = fileID;
-      //Check File is not Empty
-      if (selectedFile && selectedFile.length > 0) {
-
-        if (!selectedFile[0].name.match(/.(pdf)$/i))
-        {
-          setAlertMessage('Please provide a PDF file to upload');
-          setAlertStatus('error');
-          setAlert(true);
-          setSpinner(false);
-          return false;
-        }
-
-        const base64 = await convertToBase64(selectedFile[0])
-          .catch((error) => {
-            setAlertMessage(error);
-            setAlertStatus('error');
-            setAlert(true);
-            setSpinner(false);
-            return false;
-          });
-
-        updateFile(base64 as string, selectedFileID, selectedFile[0].name)
-          .then((string) => {
-            pageChange({view: 'PDF'});
-            setAlertMessage(string);
-            setAlertStatus('success');
-            setAlert(true);
-            setSpinner(false);
-          })
-          .catch((error) => {
-            setAlertMessage(error);
-            setAlertStatus('error');
-            setAlert(true);
-            setSpinner(false);
-            return false;
-          });
-      }
-      else{
-        setAlertMessage('Please Select a File from your computer.');
-        setAlertStatus('error');
-        setAlert(true);
-        setSpinner(false);
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   async function deletePDF():Promise<boolean>
   {
     setAlert(false);
@@ -194,55 +134,67 @@ const PDFviewPage: React.FC<{
     setViewModal(false);
 
     //Read File
-    if (PDFActionInputRef && PDFActionInputRef.current && CommentTextAreaRef && CommentTextAreaRef.current ){
-      const selectedFile = PDFActionInputRef.current.files;
+    if (CommentTextAreaRef && CommentTextAreaRef.current ){
 
+
+      const comment = CommentTextAreaRef.current.value;
+      let selectedFileString = PDFiframeSrc as string;
       const selectedFileID = fileID;
-      //Check File is not Empty
-      if (selectedFile && selectedFile.length > 0) {
 
-        if (!selectedFile[0].name.match(/.(pdf)$/i))
+      const pdfDoc = await PDFDocument.load(selectedFileString);
+      
+
+      // eslint-disable-next-line
+      if ((PDFData as any)?.filetype == 'rst_request') {
+        const textProps = {
+          x: 470,
+          y: 195,
+          size: 12,
+        };
+
+        pdfDoc.getPage(0).drawText(new Date().toLocaleDateString(), textProps);
+
+        const checkmarkImage = await pdfDoc.embedPng(Checkmark);
+        const imageDims = checkmarkImage.scale(0.333);
+
+
+        let checkmarkProps = {
+          x: 131,
+          y: 187,
+          width: imageDims.width,
+          height: imageDims.height,
+        };
+
+        if (PDFActionSelectValue == 2)
         {
-          setAlertMessage('Please provide a PDF file to upload');
+          checkmarkProps = {
+            x: 203,
+            y: 187,
+            width: imageDims.width,
+            height: imageDims.height,
+          };
+        }
+        pdfDoc.getPage(0).drawImage(checkmarkImage, checkmarkProps);
+
+      }
+
+      selectedFileString = await pdfDoc.saveAsBase64({ dataUri: true });
+      
+      await reviewFile(comment, PDFActionSelectValue + 3, selectedFileString, selectedFileID)
+        .then((string) => {
+          pageChange({view: 'MainMenu'});
+          setAlertMessage(string);
+          setAlertStatus('success');
+          setAlert(true);
+          setSpinner(false);
+        })
+        .catch((error) => {
+          setAlertMessage(error);
           setAlertStatus('error');
           setAlert(true);
           setSpinner(false);
           return false;
-        }
-        
-        const comment = CommentTextAreaRef.current.value;
-        const base64 = await convertToBase64(selectedFile[0])
-          .catch((error) => {
-            setAlertMessage(error);
-            setAlertStatus('error');
-            setAlert(true);
-            setSpinner(false);
-            return false;
-          });
-        
-        await reviewFile(comment, PDFActionSelectValue + 3, base64 as string, selectedFileID)
-          .then((string) => {
-            pageChange({view: 'MainMenu'});
-            setAlertMessage(string);
-            setAlertStatus('success');
-            setAlert(true);
-            setSpinner(false);
-          })
-          .catch((error) => {
-            setAlertMessage(error);
-            setAlertStatus('error');
-            setAlert(true);
-            setSpinner(false);
-            return false;
-          }); 
-      }
-      else{
-        setAlertMessage('Please Select a File from your computer.');
-        setAlertStatus('error');
-        setAlert(true);
-        setSpinner(false);
-        return false;
-      }
+        });
     }
 
     return true;
@@ -255,55 +207,27 @@ const PDFviewPage: React.FC<{
     setViewModal(false);
 
     //Read File
-    if (PDFActionInputRef && PDFActionInputRef.current && CommentTextAreaRef && CommentTextAreaRef.current ){
-      const selectedFile = PDFActionInputRef.current.files;
+    if ( CommentTextAreaRef && CommentTextAreaRef.current ){
 
       const selectedFileID = fileID;
-      //Check File is not Empty
-      if (selectedFile && selectedFile.length > 0) {
-
-        if (!selectedFile[0].name.match(/.(pdf)$/i))
-        {
-          setAlertMessage('Please provide a PDF file to upload');
+        
+      const comment = CommentTextAreaRef.current.value;
+      
+      await recommendFile(comment, PDFActionSelectValue == 1, PDFiframeSrc as string, selectedFileID)
+        .then((string) => {
+          pageChange({view: 'MainMenu'});
+          setAlertMessage(string);
+          setAlertStatus('success');
+          setAlert(true);
+          setSpinner(false);
+        })
+        .catch((error) => {
+          setAlertMessage(error);
           setAlertStatus('error');
           setAlert(true);
           setSpinner(false);
           return false;
-        }
-        
-        const comment = CommentTextAreaRef.current.value;
-        const base64 = await convertToBase64(selectedFile[0])
-          .catch((error) => {
-            setAlertMessage(error);
-            setAlertStatus('error');
-            setAlert(true);
-            setSpinner(false);
-            return false;
-          });
-        
-        await recommendFile(comment, PDFActionSelectValue == 1, base64 as string, selectedFileID)
-          .then((string) => {
-            pageChange({view: 'MainMenu'});
-            setAlertMessage(string);
-            setAlertStatus('success');
-            setAlert(true);
-            setSpinner(false);
-          })
-          .catch((error) => {
-            setAlertMessage(error);
-            setAlertStatus('error');
-            setAlert(true);
-            setSpinner(false);
-            return false;
-          }); 
-      }
-      else{
-        setAlertMessage('Please Select a File from your computer.');
-        setAlertStatus('error');
-        setAlert(true);
-        setSpinner(false);
-        return false;
-      }
+        }); 
     }
 
     return true;
@@ -360,6 +284,14 @@ const PDFviewPage: React.FC<{
             width: 50,
             height: 50
           };
+          
+          const dateTextProps = {
+            x: 470,
+            y: 220,
+            size: 12,
+          };
+
+          pdfDoc.getPage(0).drawText(new Date().toLocaleDateString(), dateTextProps);
         }
       }
     }
@@ -395,17 +327,9 @@ const PDFviewPage: React.FC<{
 
   async function handlePDFActionSelect(event: SelectChangeEvent<unknown>)
   {
-    setViewModal(true);
     console.log(event);
 
-    if (event && event.target && event.target.value == 1)
-    {
-      console.log(event.target.value);
-      setPDFActionSelectValue(0);
-      setCurrentModalView({view: 'Update'});
-    }
-
-    else if (event && event.target && event.target.value == 2)
+    if (event && event.target && event.target.value == 2)
     {
       console.log(event.target.value);
       setPDFActionSelectValue(0);
@@ -447,9 +371,16 @@ const PDFviewPage: React.FC<{
       setPDFActionSelectValue(0);
       setCurrentModalView({view: 'TimestampHistory'});
     }
+
+    setViewModal(true);
   }
 
   useEffect(() => {
+    getUser()
+      .then((data) => {
+        setUserDODID((data as any).dod);
+      })
+      .catch((err) => console.log(err));
     getPDF()
       .catch((err) => console.log(err));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -495,24 +426,15 @@ const PDFviewPage: React.FC<{
       {// eslint-disable-next-line
         props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={6}>Remove Signature</MenuItem>}
       {// eslint-disable-next-line
-        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && <MenuItem value={4}>Give Recommendation</MenuItem>}
+        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 1 && (PDFData as any)?.recommender == userDODID && <MenuItem value={4}>Give Recommendation</MenuItem>}
       {// eslint-disable-next-line
-        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 2 && <MenuItem value={3}>Give Review</MenuItem>}
+        props.PDFviewMode.mode == 'Review' && (PDFData as any)?.filetype == 'rst_request' && (PDFData as any)?.status == 2 && (PDFData as any)?.reviewer == userDODID && <MenuItem value={3}>Give Review</MenuItem>}
 
     </Select>
 
     { currentModalView.view == 'InsertSignatureReminder' && <CustomModal open={viewModal} setOpen={setViewModal}>
       <div>
-        <p className='PDFViewMenu'>Signature inserted. Please save the PDF and update it.<br/></p>
-      </div>
-    </CustomModal>}
-
-    { currentModalView.view == 'Update' && <CustomModal open={viewModal} setOpen={setViewModal}>
-      <div>
-        <p className='PDFViewMenu'>Please select a file from your computer to replace the current file.<br/></p>
-        <Input inputRef = {PDFActionInputRef} type='file'/> 
-        <p className='PDFViewMenu'><br/>Press Submit Button to confirm.</p>
-        <Button className='PDFViewMenu' onClick={updatePDF}>Submit</Button>
+        <p className='PDFViewMenu'>Signature inserted. Please save the PDF for your records.<br/></p>
       </div>
     </CustomModal>}
 
@@ -554,8 +476,6 @@ const PDFviewPage: React.FC<{
           <MenuItem value={1}>Approved</MenuItem>
           <MenuItem value={2}>Rejected</MenuItem>
         </Select>
-        <p><br/>Please select a file from your computer to replace the current file.<br/></p>
-        <Input inputRef = {PDFActionInputRef} type='file'/> 
         <p><br/>Press Submit Button to confirm.</p>
         <Button onClick={submitReview}>Submit</Button>
       </div>
@@ -592,8 +512,6 @@ const PDFviewPage: React.FC<{
           <MenuItem value={1}>Recommend</MenuItem>
           <MenuItem value={2}>Do Not Recommend</MenuItem>
         </Select>
-        <p><br/>Please select a file from your computer to replace the current file.<br/></p>
-        <Input inputRef = {PDFActionInputRef} type='file'/> 
         <p><br/>Press Submit Button to confirm.</p>
         <Button onClick={submitRecommendation}>Submit</Button>
       </div>

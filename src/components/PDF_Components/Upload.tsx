@@ -113,7 +113,7 @@ const UploadPage: React.FC<{
           return false;
         }
 
-        const base64 = await convertToBase64(selectedFile[0])
+        let base64 = await convertToBase64(selectedFile[0])
           .then(async (fileString) => {
             console.log(fileString);
             if (formType.formType == 'rst_request')
@@ -132,6 +132,10 @@ const UploadPage: React.FC<{
             setSpinner(false);
             return false;
           });
+
+        const pdfDoc = await PDFDocument.load(base64 as string);
+        pdfDoc.getForm().flatten();
+        base64 = await pdfDoc.saveAsBase64({ dataUri: true });
 
         const parameters: [string, string, string, string, string | undefined] = [
           base64 as string,
