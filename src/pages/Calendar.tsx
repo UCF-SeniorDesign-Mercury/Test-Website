@@ -20,6 +20,7 @@ import { CustomEventModal } from '../components/Modal';
 import AlertBox from '../components/AlertBox';
 import { getMedicalData } from '../api/medical';
 import { getUsers } from '../api/users';
+import { pushGraphicsState } from 'pdf-lib';
 
 interface eventInformation{
   author: string;
@@ -28,7 +29,6 @@ interface eventInformation{
   endtime: string;
   event_id: string;
   organizer: string;
-  period: boolean;
   starttime: string;
   timeStamp: string;
   title: string;
@@ -55,7 +55,7 @@ const EventPage = function (this: any): JSX.Element {
 
   
   const [usersInfo, setUsersInfo] = useState<{name: string; dod: string}[]>([]);
-  const [usersInfoList, setusersInfoList] = useState<{name: string; dod: string}[]>([]);
+  const[userSubmitInfo, setuserSubmitInfo] = useState<string[]>([]);
   const [alert, setAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertStatus, setAlertStatus] = useState('success');
@@ -86,7 +86,6 @@ const EventPage = function (this: any): JSX.Element {
     await getMedicalData()
       .then((data) => {
         const numMonths=[9,12,15];
-        console.log(data);
         
         numMonths.forEach(element => {
           const dentCopy = new Date(new Date((data as any).dent_date as string).getTime());
@@ -99,7 +98,7 @@ const EventPage = function (this: any): JSX.Element {
             end: (dentCopy).toISOString(),
           });
           deezEvents = deezEvents.concat({
-            title: element +' Months since Last Physical Submission',
+            title: element +' Months Since Last PHA Sub.',
             start: (phaCopy).toISOString(),
             end: (phaCopy).toISOString(),
           });
@@ -152,14 +151,6 @@ const EventPage = function (this: any): JSX.Element {
       </>
     );
   }
-  function renderSidebarEvent(event: EventApi) {
-    return (
-      <li key={event.id}>
-        <b>{formatDate(event.start!, {year: 'numeric', month: 'short', day: 'numeric'})}</b>
-        <i>{event.title}</i>
-      </li>
-    );
-  }
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     // const title = prompt('Please enter a new title for your event');
     // const test1 = () => (
@@ -180,19 +171,6 @@ const EventPage = function (this: any): JSX.Element {
     //   });
     // }
   };
-
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
   const handleEventClick = (clickInfo: EventClickArg) => {
     if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
       deleteEvent(clickInfo.event.id);
@@ -271,12 +249,18 @@ const EventPage = function (this: any): JSX.Element {
               // const calendarApi = selectInfo.view.calendar;
               const title = target.title.value; // typechecks!
               const description = target.description.value; // typechecks!
-              const invitees_dod = target.invitees_dod.value.split(', ');
+              // const invitees_dod = target.invitees_dod.value.split(', ');
+              const invitees_dod:string[] = [];
+              console.log(userSubmitInfo);
+              userSubmitInfo.forEach(element => {
+                invitees_dod.push(element as string);
+              });
+              // const invitees_dod = userSubmitInfo.split(',');
               const starttime= new Date(target.starttime.value).toISOString();
-              const endtime= new Date(target.endtime.value).toISOString();
+              const endtime= new Date(target.endtime.value).toISOString(); 
               const organizer= target.organizer.value;
-              // const period= target.period.value;
-              const period= true;
+              // const period= getBoolean(target.period.value);
+              const period = true;
               const type= target.type.value;
               addEvent(description, endtime, organizer, starttime, title, invitees_dod,period,type);
               // etc...
@@ -304,12 +288,28 @@ const EventPage = function (this: any): JSX.Element {
                 <input type="text" name="description" placeholder="Description" />
               </label>
             </div>
-            <div>
-              <label className='modalText'>
-                Invitees: <br/>
-                <input type="text" name="invitees_dod" placeholder='DOD, DOD...'/>
-              </label>
-            </div>
+            {<div>
+              <p><br/>Please select inviteese to sign off.</p>
+              <Select
+                multiple={true}
+                value={userSubmitInfo}
+                onChange={(event) => {
+                  console.log(event.target.value);
+                  setuserSubmitInfo(event.target.value as any);
+                }}
+              >
+                <MenuItem disabled key={'none'} value={'none'}>None</MenuItem>
+                {
+                  usersInfo.map(option => {
+                    return (
+                      <MenuItem key={option.dod} value={option.dod}>
+                        {option.name}
+                      </MenuItem>
+                    );
+                  })
+                }
+              </Select>
+            </div>}
             <div>
               <label className='modalText'>
                 Start Time: <br/>
@@ -329,40 +329,11 @@ const EventPage = function (this: any): JSX.Element {
               </label>
             </div>
             <div>
-              <div className='modalText'>
-              Period:  <br/>
-              </div>
-              <input type="radio" name="period" value="true" />
-              <label>True</label> <br/>
-              <input type="radio" name="period" value="False" />
-              <label>False</label>
-            </div>
-            <div>
               <label className='modalText'>
                 Type: (Mandatory, Optional, or Personal)<br/>
                 <input type="text" name="type" placeholder="Type"/>
               </label>
             </div>
-            {<div>
-              <p><br/>Please select the officer to sign off.</p>
-              <Select
-                value={usersInfo}
-                onChange={(event) => {
-                  setUsersInfo(event.target.value as any);
-                }}
-              >
-                <MenuItem disabled key={'none'} value={'none'}>None</MenuItem>
-                {
-                  usersInfo.map(option => {
-                    return (
-                      <MenuItem key={option.dod} value={option.dod}>
-                        {option.name}
-                      </MenuItem>
-                    );
-                  })
-                }
-              </Select>
-            </div>}
             <div>
               <input type="submit" value="Submit" />
             </div>
@@ -387,6 +358,7 @@ const EventPage = function (this: any): JSX.Element {
             eventBackgroundColor='#FFC947'
             eventColor = '#FFC947'
             initialView='dayGridMonth'
+            eventBorderColor='#FFC947'
             editable={true}
             selectable={true}
             selectMirror={true}
