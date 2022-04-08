@@ -26,11 +26,11 @@ const HomePage = function (): JSX.Element {
         <h1 className="username-display">{context.var1}</h1>
 
         <Form className="home-form" onSubmit={SubmitHandler}>
-          <NavLink to="/pdf">
+          {/* <NavLink to="/pdf">
             <Button variant="primary" className="module-button" type="submit">
               Events
             </Button>
-          </NavLink>
+          </NavLink> */}
           {/* <Button variant="primary" className="module-button" type="submit">
             Chat
           </Button> */}
@@ -55,16 +55,16 @@ const HomePage = function (): JSX.Element {
           {/* <Button variant="primary" className="module-button" type="submit">
             Module
           </Button> */}
-          <NavLink to="/medicalPage">
+          {/* <NavLink to="/medicalPage">
             <Button variant="primary" className="module-button" type="submit">
               Medical Page
             </Button>
-          </NavLink>
-          <NavLink to="/pdf_test">
+          </NavLink> */}
+          {/* <NavLink to="/pdf_test">
             <Button variant="primary" className="module-button" type="submit">
               PDF_test&apos;s
             </Button>
-          </NavLink>
+          </NavLink> */}
           {/* <Button variant="primary" className="module-button" type="submit">
             Test
           </Button> */}
