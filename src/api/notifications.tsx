@@ -34,6 +34,7 @@ export const getNotifications = async () : Promise<any> => {
   });  
 };
 
+
 export const readNotifications = async (notification_id:string) : Promise<unknown> => {
   const header = await getHeaders();
 

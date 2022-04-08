@@ -2,18 +2,15 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail} from 'firebase/auth';
 '@firebase/auth-types';
 
-import { initializeApp } from 'firebase/app';
-
-// import { getStorage, ref,getBlob, listAll,getMetadata, getBytes, FirebaseStorage } from 'firebase/storage';
-import { getStorage, ref,getBlob,} from 'firebase/storage';
-
+import { initializeApp } from '@firebase/app';
+import { getStorage, ref,getBlob,} from '@firebase/storage';
+import { getFirestore } from '@firebase/firestore';
 import firebaseConfig from './firebaseConfig';
 // import { Email, Password } from '@mui/icons-material';
 
 // const axios = require('axios');
 
 // Initialize Firebase App
-
 const firebaseApp = initializeApp(firebaseConfig);
 export const auth = getAuth();
 

@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import Context from '../../context/MainContext';
 import Badge from '@mui/material/Badge';
-import { getNotifications, } from '../../api/notifications';
+import { getNotifications } from '../../api/notifications';
 
 interface NavLinksProps{
   closeMenu: () => void;
