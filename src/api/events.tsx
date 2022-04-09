@@ -14,20 +14,14 @@ import { url, getHeaders } from './api_settings';
 
 /*****************Events API CAlls*****************/
 //Confirm  event
-export const confirmEvent = async (): Promise<unknown> => {
-  const data = {
-
-  };
-  console.log(JSON.stringify(data));
-
+export const confirmEvent = async (event_id: string): Promise<unknown> => {
   const header = await getHeaders();
 
   return new Promise(function (resolve, reject) {
-    fetch(url + '/events/confirm_event/', {
+    fetch(url + '/events/confirm_event/' + event_id, {
       method: 'POST',
       mode: 'cors',
-      headers: header,
-      body: JSON.stringify(data)
+      headers: header
     })
       .then(async response => {
         console.log(response);
