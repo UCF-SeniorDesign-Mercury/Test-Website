@@ -33,6 +33,7 @@ const Notification = function (): JSX.Element {
     sender: '',
     tpye: '', 
     timestamp: '',
+    status:'',
   },]);
 
   const [eventId, setEventId] = useState('');
@@ -58,7 +59,7 @@ const Notification = function (): JSX.Element {
       editable: true,
     },
     {
-      field: 'read',
+      field: 'status',
       headerName: 'Status',
       width: 200,
     },
@@ -142,6 +143,7 @@ const Notification = function (): JSX.Element {
   }, [eventId]);
   
   notifications.forEach(function (item) { 
+    item.status = item.read ? 'No Action Required' : 'Action Required';
     const time = new Date(item.timestamp);
     item.timestamp = time.toString();
   }); 
