@@ -98,8 +98,8 @@ const Notification = function (): JSX.Element {
           );
 
         return(
-          <Box m={10}>
-            <Button onClick={read_notification} variant='contained' color='warning'>Read</Button>
+          <Box m={6}>
+            <Button onClick={read_notification} variant='contained' color='warning'>Acknowledge</Button>
           </Box>
         );
       },
