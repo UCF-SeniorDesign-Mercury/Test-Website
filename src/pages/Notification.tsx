@@ -7,6 +7,7 @@ import { confirmEvent } from '../api/events';
 import { Box } from '@mui/system';
 import { deleteNotifications, getNotifications } from '../api/notifications';
 import { NavLink } from 'react-router-dom';
+import { Typography } from '@mui/material';
 
 function CustomPagination() {
   const apiRef = useGridApiContext();
@@ -150,6 +151,11 @@ const Notification = function (): JSX.Element {
 
   return (
     <div style={{ height: 1080,width: '100%' }}>
+      <br/>
+      <Typography variant='h2' align='center' fontFamily={'Fantasy, Copperplate'}>
+        Notifications
+      </Typography>
+      <br/>
       <DataGrid 
         rowHeight={100}
         rows={notifications}
