@@ -10,14 +10,17 @@ import { auth } from '../firebase/firebase';
 import { stat } from 'fs';
 import { start } from 'repl';
 import { Description } from '@mui/icons-material';
-
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
-import { CustomModal } from '../components/Modal';
+import { CustomEventModal } from '../components/Modal';
 import AlertBox from '../components/AlertBox';
 import { getMedicalData } from '../api/medical';
+import { getUsers } from '../api/users';
+import { pushGraphicsState } from 'pdf-lib';
 
 interface eventInformation{
   author: string;
@@ -26,38 +29,33 @@ interface eventInformation{
   endtime: string;
   event_id: string;
   organizer: string;
-  period: boolean;
   starttime: string;
   timeStamp: string;
   title: string;
   type: string;
 }
 
+interface usersInformation{
+  name: string;
+  dod: string;
+}
+
 
 
 
 const EventPage = function (this: any): JSX.Element {
-  // const [eventInfo, seteventInfo] = useState<eventInformation>({
-  //   author: '',
-  //   confirmed_dod: [],
-  //   description: '',
-  //   endtime: '',
-  //   event_id: '',
-  //   organizer: '',
-  //   period: true,
-  //   starttime: '',
-  //   timeStamp: '',
-  //   title: '',
-  //   type: '',
-  // });
   const [eventArray, seteventArray] = useState<eventInformation[]>([]);
   const [displayEvent, setdisplayEvent] = useState<EventInput[]>([{
 
     title: '',
-    start:'',
-    end:''
+    start: '',
+    end:'',
+    id:''
   }]);
 
+  
+  const [usersInfo, setUsersInfo] = useState<{name: string; dod: string}[]>([]);
+  const[userSubmitInfo, setuserSubmitInfo] = useState<string[]>([]);
   const [alert, setAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertStatus, setAlertStatus] = useState('success');
@@ -66,64 +64,46 @@ const EventPage = function (this: any): JSX.Element {
   async function get_events(){
 
     let deezEvents:EventInput[]= []; 
+    // let eventDetails:EventInput[] = [];
 
     await getEvents()
       .then((data) => {
         seteventArray(data as eventInformation[]);
-        // settestEvent(data as EventInput[]);
-        // console.log(data);
-        // const userName = (data as any).display_name;
-        // console.log('name: ' + userName);
-        const eventData: eventInformation = {
-          author: (data as any).author,
-          confirmed_dod: (data as any).confirmed_dod,
-          description: (data as any).description,
-          endtime: (data as any).endtime,
-          event_id: (data as any).event_id,
-          organizer: (data as any).organizer,
-          period: true,
-          starttime: (data as any).starttime,
-          timeStamp: (data as any).timestamp,
-          title: (data as any).title,
-          type: (data as any).type,
-        };
 
         (data as any).forEach((element: any) => {
           deezEvents = deezEvents.concat({
             title: (element as any).title,
-            start: (element as any).starttime,
-            end: (element as any).endtime
+            start: (new Date((element as any).starttime as string)).toISOString(),
+            end: (new Date((element as any).endtime as string)).toISOString(),
+            id: (element as any).event_id
           });
         });
-        // seteventInfo(eventData);
-      })
-      // .then(() =>{
-      //   console.log(eventArray[0] + 'test');
-      //   console.log('test pt 2 :)'); 
-      // }) 
+      }) 
       .catch((error) => {
         console.log('didnt work! :)');
       });
 
     await getMedicalData()
       .then((data) => {
-        console.log(data);
-        deezEvents = deezEvents.concat({
-          title: 'Dental Due Date',
-          start: (new Date((data as any).dent_date as string)).toISOString(),
-          end: (new Date((data as any).dent_date as string)).toISOString(),
+        const numMonths=[9,12,15];
+        
+        numMonths.forEach(element => {
+          const dentCopy = new Date(new Date((data as any).dent_date as string).getTime());
+          dentCopy.setMonth(dentCopy.getMonth()+element);
+          const phaCopy = new Date(new Date((data as any).pha_date as string).getTime());
+          phaCopy.setMonth(phaCopy.getMonth()+element);
+          deezEvents = deezEvents.concat({
+            title: element +' Months since Last Dental Submission',
+            start: (dentCopy).toISOString(),
+            end: (dentCopy).toISOString(),
+          });
+          deezEvents = deezEvents.concat({
+            title: element +' Months Since Last PHA Sub.',
+            start: (phaCopy).toISOString(),
+            end: (phaCopy).toISOString(),
+          });
         });
-        deezEvents = deezEvents.concat({
-          title: 'Physical Due Date',
-          start: (new Date((data as any).pha_date as string)).toISOString(),
-          end: (new Date((data as any).pha_date as string)).toISOString(),
-        });
-        // seteventInfo(eventData);
       })
-      // .then(() =>{
-      //   console.log(eventArray[0] + 'test');
-      //   console.log('test pt 2 :)'); 
-      // }) 
       .catch((error) => {
         console.log('didnt work! :)');
       });
@@ -132,13 +112,34 @@ const EventPage = function (this: any): JSX.Element {
     setdisplayEvent(deezEvents);
   }
 
+  function get_users(){
+    getUsers()
+      .then((data) => {
+        const usersData:{name: string; dod: string}[] = [];
+        for (let i = 0; i < (data as unknown[]).length; i++){
+          usersData.push({name: (data as any)[i].name as string, dod: (data as any)[i].dod as string});
+        }
+        setUsersInfo(usersData as any);
+        
+      }) 
+      .catch((error) => {
+        console.log('didnt work! :)');
+      });
+  }
+
+  useEffect(()=>{
+    get_users();
+    console.log(usersInfo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
+
   useEffect(()=>{
     get_events();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
 
   useEffect(()=>{
-    console.log(displayEvent);
+    // console.log(displayEvent);
   },[displayEvent]);
 
   function renderEventContent(eventContent: EventContentArg) {
@@ -148,14 +149,6 @@ const EventPage = function (this: any): JSX.Element {
         <i>{eventContent.event.title}</i>&nbsp;
         {/* <i>{eventContent.event.extendedProps.description}</i> */}
       </>
-    );
-  }
-  function renderSidebarEvent(event: EventApi) {
-    return (
-      <li key={event.id}>
-        <b>{formatDate(event.start!, {year: 'numeric', month: 'short', day: 'numeric'})}</b>
-        <i>{event.title}</i>
-      </li>
     );
   }
   const handleDateSelect = (selectInfo: DateSelectArg) => {
@@ -178,24 +171,11 @@ const EventPage = function (this: any): JSX.Element {
     //   });
     // }
   };
-
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
   const handleEventClick = (clickInfo: EventClickArg) => {
-    // if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-    //   clickInfo.event.remove();
-    // }
-    // deleteEvent(clickInfo.event.remove());
+    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
+      deleteEvent(clickInfo.event.id);
+      clickInfo.event.remove();
+    }
     
     return(
       console.log(clickInfo.event.title)
@@ -220,7 +200,7 @@ const EventPage = function (this: any): JSX.Element {
   return (
     <header>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossOrigin="anonymous" />
-      <link rel="stylesheet" href="Profile.css" />
+      <link rel="stylesheet" href="Calendar.css" />
       <div className='demo-app'>
         <div className='demo-app-main'>
 
@@ -234,8 +214,23 @@ const EventPage = function (this: any): JSX.Element {
           Create New Event
         </Button>
       </div>
+
+      {/* { Object.keys(usersInfo).map((key) =>{
+        if((key as string) == 'name'){
+          return(
+            <h2 className='center userdata-color' key={key}>Name: {(userInfo as { [key: string]: any })[key]}</h2>  
+          );
+        }
+        else if((key as string) == 'dod'){
+          return(
+            <h2 className='center userdata-color' key={key}>DOD: {(userInfo as { [key: string]: any })[key]}</h2>  
+          );
+        }
+      }
+      )
+      } */}
       
-      { <CustomModal open={viewModal} setOpen={setViewModal}>
+      { <CustomEventModal open={viewModal} setOpen={setViewModal}>
         <Typography sx={{ p: 2 }}>
           <form
             // ref={formRef}
@@ -245,8 +240,8 @@ const EventPage = function (this: any): JSX.Element {
                 title: { value: string };
                 description: { value: string };
                 invitees_dod: { value:  string};
-                starttime: {value: string};
-                endtime: {value: string};
+                starttime: {value: Date};
+                endtime: {value: Date};
                 organizer: {value: string};
                 period:{value:boolean};
                 type:{value:string};
@@ -254,12 +249,18 @@ const EventPage = function (this: any): JSX.Element {
               // const calendarApi = selectInfo.view.calendar;
               const title = target.title.value; // typechecks!
               const description = target.description.value; // typechecks!
-              const invitees_dod = target.invitees_dod.value.split(', ');
-              const starttime= target.starttime.value;
-              const endtime= target.endtime.value;
+              // const invitees_dod = target.invitees_dod.value.split(', ');
+              const invitees_dod:string[] = [];
+              console.log(userSubmitInfo);
+              userSubmitInfo.forEach(element => {
+                invitees_dod.push(element as string);
+              });
+              // const invitees_dod = userSubmitInfo.split(',');
+              const starttime= new Date(target.starttime.value).toISOString();
+              const endtime= new Date(target.endtime.value).toISOString(); 
               const organizer= target.organizer.value;
-              // const period= target.period.value;
-              const period= true;
+              // const period= getBoolean(target.period.value);
+              const period = true;
               const type= target.type.value;
               addEvent(description, endtime, organizer, starttime, title, invitees_dod,period,type);
               // etc...
@@ -271,55 +272,66 @@ const EventPage = function (this: any): JSX.Element {
               //   start: starttime,
               //   end: endtime,
               // });
-              console.log(title + description + typeof (invitees_dod));
+              // const testTime = new Date(starttime);
+              console.log(starttime);
             }}
           >
             <div>
-              <label>
-                Title:
-                <input type="text" name="title" />
+              <label className='modalText'>
+                Title: <br/>
+                <input type="text" name="title" placeholder="Title" />
               </label>
             </div>
             <div>
-              <label>
-                Description:
-                <input type="text" name="description" />
+              <label className='modalText'>
+                Description: <br/>
+                <input type="text" name="description" placeholder="Description" />
               </label>
             </div>
+            {<div>
+              <p><br/>Please select inviteese to sign off.</p>
+              <Select
+                multiple={true}
+                value={userSubmitInfo}
+                onChange={(event) => {
+                  console.log(event.target.value);
+                  setuserSubmitInfo(event.target.value as any);
+                }}
+              >
+                <MenuItem disabled key={'none'} value={'none'}>None</MenuItem>
+                {
+                  usersInfo.map(option => {
+                    return (
+                      <MenuItem key={option.dod} value={option.dod}>
+                        {option.name}
+                      </MenuItem>
+                    );
+                  })
+                }
+              </Select>
+            </div>}
             <div>
-              <label>
-                Invitees DOD:
-                <input type="text" name="invitees_dod" placeholder='DOD, DOD, DOD...'/>
-              </label>
-            </div>
-            <div>
-              <label>
-                Start Time:
+              <label className='modalText'>
+                Start Time: <br/>
                 <input type="datetime-local" name="starttime" placeholder="yy-MM-dd SSS HH:mm:ss" />
               </label>
             </div>
             <div>
-              <label>
-                End Time:
+              <label className='modalText'> 
+                End Time: <br/>
                 <input type="datetime-local" name="endtime" placeholder="yy-MM-dd SSS HH:mm:ss" />
               </label>
             </div>
             <div>
-              <label>
-                Organizer:
-                <input type="text" name="organizer" />
+              <label className='modalText'>
+                Organizer: <br/>
+                <input type="text" name="organizer" placeholder="Organizer" />
               </label>
             </div>
             <div>
-              <label>
-                Period:
-                <input type="radio" name="period" value="true" />
-              </label>
-            </div>
-            <div>
-              <label>
-                Type:
-                <input type="text" name="type"/>
+              <label className='modalText'>
+                Type: (Mandatory, Optional, or Personal)<br/>
+                <input type="text" name="type" placeholder="Type"/>
               </label>
             </div>
             <div>
@@ -327,22 +339,11 @@ const EventPage = function (this: any): JSX.Element {
             </div>
           </form>
         </Typography>
-      </CustomModal>}
-
-      <div className="demo-app background_dark">
+      </CustomEventModal>}
+      <div className="demo-app">
         <div className='demo-app-main'>
           {/* {console.log(eventArray[0])}
           {console.log(eventArray[1])} */}
-          { eventArray.map((element) => Object.keys(element).map((key) =>{
-            // if((key as string) == 'starttime'){
-            //   return(
-            //     <h2 className='username-display' key={key}>id: {(element as { [key: string]: any })[key]}</h2>  
-            //   );
-            // }
-            // return(<h2 key={key}>{(element as { [key: string]: any })[key]}</h2>);
-          }
-          ))        
-          }
           {/* {console.log(displayEvent)} */}
 
           {<FullCalendar
@@ -353,7 +354,11 @@ const EventPage = function (this: any): JSX.Element {
               center: 'title',
               right: 'dayGridMonth,timeGridWeek,timeGridDay'
             }}
+            eventTextColor='black'
+            eventBackgroundColor='#FFC947'
+            eventColor = '#FFC947'
             initialView='dayGridMonth'
+            eventBorderColor='#FFC947'
             editable={true}
             selectable={true}
             selectMirror={true}
@@ -361,10 +366,35 @@ const EventPage = function (this: any): JSX.Element {
             select={handleDateSelect}  
             eventContent={renderEventContent}
             eventClick={handleEventClick}
+            //  you can update a remote database when these fire:
+            // eventAdd={function(){}}
+            // eventChange={function(){}}
+            // eventRemove={function(){}}
+            
           />}
         </div>
       </div>
     </header>
+  //   {formType.formType == '1380_form' && <div>
+  //   <p><br/>Please select the officer to sign off.</p>
+  //   <Select
+  //     value={reviewer}
+  //     onChange={(event) => {
+  //       setReviewer(event.target.value);
+  //     }}
+  //   >
+  //     <MenuItem disabled key={'none'} value={'none'}>None</MenuItem>
+  //     {
+  //       reviewerList.map(option => {
+  //         return (
+  //           <MenuItem key={option.dod} value={option.dod}>
+  //             {option.name}
+  //           </MenuItem>
+  //         );
+  //       })
+  //     }
+  //   </Select>
+  // </div>}
   );
 };
 

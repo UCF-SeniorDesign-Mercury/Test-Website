@@ -47,7 +47,7 @@ export const confirmEvent = async (event_id: string): Promise<unknown> => {
 };
 
 //create event
-export const createEvent = async (description: string, endtime: string, organizer: string, starttime: string, title: string, invitees_dod:string[], period:boolean, type:string): Promise<string> => {
+export const createEvent = async (description: string, endtime: string, organizer: string, starttime: string, title: string, invitees_dod:string[],period:boolean, type:string): Promise<string | Date> => {
   const data = {
     description: description,
     endtime: endtime,
@@ -59,6 +59,7 @@ export const createEvent = async (description: string, endtime: string, organize
     type:type
 
   };
+  console.log(data);
   console.log(JSON.stringify(data));
 
   const header = await getHeaders();

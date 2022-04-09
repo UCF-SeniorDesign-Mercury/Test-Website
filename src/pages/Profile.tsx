@@ -13,6 +13,8 @@ import { deleteUser,getSubordinates,getUser,getUsers,updateUser} from '../api/us
 
 import blankProfile from '../assets/blank-profile-picture.png';
 
+// import ImagePicker from 'react-image-picker';
+
 const iframeStyle = {
   width: '100%', 
   height: '2000px', 
@@ -28,6 +30,7 @@ interface userInformation{
   level: number | string;
   officer: boolean | string;
   phone: string;
+  profile_picture:string;
   rank: string;
   superior: number | string;
   // uid: string;
@@ -58,6 +61,7 @@ const ProfilePage = function (): JSX.Element {
     level: '',
     officer: true,
     phone: '',
+    profile_picture:'',
     rank: '',
     superior: '',
     // uid: '',
@@ -82,6 +86,7 @@ const ProfilePage = function (): JSX.Element {
           level: (data as any).level,
           officer:(data as any).officer,
           phone: (data as any).phone,
+          profile_picture:(data as any).profile_picture,
           rank: (data as any).rank,
           superior: (data as any).superior,
           // uid: (data as any).uid,
@@ -89,7 +94,7 @@ const ProfilePage = function (): JSX.Element {
           // signature: (data as any).signature,
         };
         setUserInfo(userData);
-        // console.log(userData.name + 'testtest');
+        console.log(userData);
       }) 
       .catch((error) => {
         console.log('didnt work! :)');
@@ -109,8 +114,19 @@ const ProfilePage = function (): JSX.Element {
         {/* <h1 className="username-display">{context.var1}</h1> */}
         {/* {'test' + get_user_test()} */}
         {/* <h1 className="username-display">{get_user_test}</h1> */}
+        <div>
+          <iframe src={userInfo.profile_picture}></iframe>
+        </div>
         <div className="profile-img">
-          <img src={blankProfile} alt="No IMG found"/>
+          {/* <img src={userInfo.profile_picture} alt="No IMG found"/> */}
+          <iframe src={userInfo.profile_picture}></iframe>
+          {/* <view>
+            <ImagePicker
+              source={{
+                uri: userInfo.profile_picture,
+              }}
+            />
+          </view> */}
           <div className="file btn btn-lg btn-primary center">
               Change Photo
             <input id="file" type="file" name="file"/>
@@ -128,6 +144,11 @@ const ProfilePage = function (): JSX.Element {
               <h2 className='center userdata-color' key={key}>Email: {(userInfo as { [key: string]: any })[key]}</h2>  
             );
           }
+          // else if((key as string) == 'profile_picture'){
+          //   return(
+          //     <h2 className='center userdata-color' key={key}>profile_picture: {(userInfo as { [key: string]: any })[key]}</h2>  
+          //   );
+          // }
           // else if((key as string) == 'branch'){
           //   return(
           //     <h2 className='username-display' key={key}>Branch: {(userInfo as { [key: string]: any })[key]}</h2>  
