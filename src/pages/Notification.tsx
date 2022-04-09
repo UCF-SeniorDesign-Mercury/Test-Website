@@ -1,9 +1,12 @@
-import { getNotifications } from '../api/notifications';
+import {  } from '../components/PDF_Components/PDFview';
 import React, { useEffect, useState } from 'react';
 import { DataGrid, GridColDef, gridPageCountSelector, gridPageSelector, useGridApiContext, useGridSelector } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
 import { confirmEvent } from '../api/events';
+import { Box } from '@mui/system';
+import { deleteNotifications, getNotifications } from '../api/notifications';
+import { NavLink } from 'react-router-dom';
 
 function CustomPagination() {
   const apiRef = useGridApiContext();
@@ -68,16 +71,56 @@ const Notification = function (): JSX.Element {
       field: 'action',
       headerName: 'Action',
       sortable: false,
+      width: 300,
       renderCell: (params) => {
-        const onClick = (e: any) => {
+        const confirm_event = async(e: any) => {
           e.stopPropagation(); // don't select this row after clicking
           
           if (params.row.notification_type === 'invite to an event')
           {
-            setEventId(params.row.notification_id);
+            const response = await confirmEvent(params.row.notification_id);
           }
         };
-        return <Button onClick={onClick}>Confirm</Button>;
+
+        const read_notification = async(e: any) => {
+          e.stopPropagation(); // don't select this row after clicking
+          const response = await deleteNotifications(params.row.notification_id);
+          
+        };
+
+        if (params.row.notification_type === 'invite to an event')
+          return (
+            <Box m={3}>
+              <Button onClick={confirm_event} variant='contained' color='success' >Confirm</Button> 
+              <Button onClick={read_notification} variant='contained' color='error'>Ignore</Button>
+            </Box>
+          );
+
+        return(
+          <Box m={10}>
+            <Button onClick={read_notification} variant='contained' color='warning'>Read</Button>
+          </Box>
+        );
+      },
+    },
+    {
+      field: 'details',
+      headerName: 'Details',
+      sortable: false,
+      width: 300,
+      renderCell: (params) => {
+        if (params.row.notification_type.includes('file'))
+          return(
+            <NavLink to='/pdf'>
+              <Button variant='contained' color='info'>more details</Button>
+            </NavLink>
+          );
+
+        return(
+          <NavLink to='/calendar'>
+            <Button variant='contained' color='info'>more details</Button>
+          </NavLink>
+        );
       },
     },
   ];
@@ -85,9 +128,6 @@ const Notification = function (): JSX.Element {
   useEffect( () => {
     async function fetchData() {
       const obj = await getNotifications();
-      console.log('before', obj);
-      
-      console.log('after', obj);
       setNotifications(obj);
     }
     fetchData();
@@ -101,7 +141,6 @@ const Notification = function (): JSX.Element {
     fetchData();    
   }, [eventId]);
   
-  console.log(typeof(notifications[0].timestamp));
   notifications.forEach(function (item) { 
     const time = new Date(item.timestamp);
     item.timestamp = time.toString();
