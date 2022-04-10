@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import { useContext } from 'react';
-
+import { useContext, useEffect, useState } from 'react';
 import Context from '../../context/MainContext';
+import Badge from '@mui/material/Badge';
+import { getNotifications } from '../../api/notifications';
 
 interface NavLinksProps{
   closeMenu: () => void;
@@ -10,6 +11,15 @@ interface NavLinksProps{
 const NavLinks = (props:NavLinksProps):JSX.Element => {
 
   const context = useContext(Context);
+  const [notificationCount,setNotificationCount] = useState(0);
+  useEffect( () => {
+    async function fetchData() {
+      const notifications = await getNotifications();
+      setNotificationCount(notifications.length);
+    }
+    fetchData();
+  },[]);
+
   return (
     <header className='navLinks'>
       <nav className="links">
@@ -51,6 +61,15 @@ const NavLinks = (props:NavLinksProps):JSX.Element => {
             // }
           }}> <NavLink to="/profile">Profile</NavLink></li>}
 
+          {context.var1 && <li className='regular' onClick={() => {
+            // if (context && context.logout) {
+            //   context.logout();
+            //   props.closeMenu();
+            // }
+          }}> <Badge badgeContent={notificationCount} color="error">
+              <NavLink to="/notification">Notification</NavLink>
+            </Badge> </li>}
+          
           {/* pdf test nav link end */}
           
           {context.var1 && <li className='regular' onClick={() => {
@@ -60,7 +79,7 @@ const NavLinks = (props:NavLinksProps):JSX.Element => {
             }
           }}> <NavLink to="/logout">Logout</NavLink></li>}  
 
-          {context.var1 && <li onClick={() => {
+          {/* {context.var1 && <li onClick={() => {
             if (context && context.logout) {
               context.logout();
               props.closeMenu();
@@ -79,7 +98,7 @@ const NavLinks = (props:NavLinksProps):JSX.Element => {
               context.logout();
               props.closeMenu();
             }
-          }}> <NavLink to="/logout">Module</NavLink></li>}                  
+          }}> <NavLink to="/logout">Module</NavLink></li>}   */}
         </ul>
       </nav>
     </header>

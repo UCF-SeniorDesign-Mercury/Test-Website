@@ -9,7 +9,7 @@ const Menu = ():JSX.Element => {
     <div className="Menu">
       <div className="regular-menu">
         <BiMenu className="menu-icon" 
-          size='70px' color='black'
+          size='auto' color='black'
           onClick={() => { setState(!state); }}
         />
         <NavLinks closeMenu={ () => {setState(!state);} }/>
