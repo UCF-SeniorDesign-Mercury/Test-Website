@@ -114,12 +114,13 @@ const ProfilePage = function (): JSX.Element {
         {/* <h1 className="username-display">{context.var1}</h1> */}
         {/* {'test' + get_user_test()} */}
         {/* <h1 className="username-display">{get_user_test}</h1> */}
-        <div>
+        {/* <div>
           <iframe src={userInfo.profile_picture}></iframe>
-        </div>
+        </div> */}
         <div className="profile-img">
-          {/* <img src={userInfo.profile_picture} alt="No IMG found"/> */}
-          <iframe src={userInfo.profile_picture}></iframe>
+          {/* <img src={blankProfile} alt="No IMG found"/> */}
+          <img src={userInfo.profile_picture} alt="No IMG found"/>
+          {/* <iframe className='profileImage' src={userInfo.profile_picture}></iframe> */}
           {/* <view>
             <ImagePicker
               source={{
