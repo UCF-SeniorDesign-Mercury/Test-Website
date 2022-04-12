@@ -81,7 +81,7 @@
     -webkit-transform-origin: 0 0;
     transform-origin: 0 0;
 }
-/* .profileImage{
+.profileImage{
     margin-top: 30;
     width: 130;
     height: 130;
@@ -90,7 +90,7 @@
     border-color: "black";
     border-width: 2;
     align-self: 'center';
-} */
+}
 .profile-img{
     text-align: center;
     width:50%;

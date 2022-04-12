@@ -260,7 +260,7 @@ const EventPage = function (this: any): JSX.Element {
               const endtime= new Date(target.endtime.value).toISOString(); 
               const organizer= target.organizer.value;
               // const period= getBoolean(target.period.value);
-              const period = true;
+              const period = false;
               const type= target.type.value;
               addEvent(description, endtime, organizer, starttime, title, invitees_dod,period,type);
               // etc...
@@ -289,7 +289,7 @@ const EventPage = function (this: any): JSX.Element {
               </label>
             </div>
             {<div>
-              <p><br/>Please select inviteese to sign off.</p>
+              <p><br/>Please select invitees:</p>
               <Select
                 multiple={true}
                 value={userSubmitInfo}
@@ -330,8 +330,12 @@ const EventPage = function (this: any): JSX.Element {
             </div>
             <div>
               <label className='modalText'>
-                Type: (Mandatory, Optional, or Personal)<br/>
-                <input type="text" name="type" placeholder="Type"/>
+                Type:<br/>
+                {/* <input type="text" name="type" placeholder="Type"/> */}
+                {/* <p>Please Select the Event Type:</p> */}
+                <input type="radio" id="type" value="mandatory" name="type"/>Mandatory  
+                <input type="radio" id="type" value="optional" name="type"/>Optional 
+                <input type="radio" id="type" value="personal" name="type"/>Personal 
               </label>
             </div>
             <div>
