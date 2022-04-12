@@ -8,6 +8,7 @@ import { Box } from '@mui/system';
 import { deleteNotifications, getNotifications } from '../api/notifications';
 import { NavLink } from 'react-router-dom';
 import { Typography } from '@mui/material';
+import AlertBox from '../components/AlertBox';
 
 function CustomPagination() {
   const apiRef = useGridApiContext();
@@ -24,20 +25,23 @@ function CustomPagination() {
   );
 }
 
-const Notification = function (): JSX.Element {
-  const [notifications,setNotifications] = useState([{
-    id: '',
-    notification_id: '',
-    notification_type: '',
-    read: true,
-    receiver: '',
-    sender: '',
-    tpye: '', 
-    timestamp: '',
-    status:'',
-  },]);
+interface notification {
+  id: string;
+  notification_id: string;
+  notification_type: string;
+  read: boolean;
+  receiver: string;
+  sender: string;
+  tpye: string;
+  timestamp: string;
+  status: string;
+}
 
-  const [eventId, setEventId] = useState('');
+const Notification = function (): JSX.Element {
+  const [notifications,setNotifications] = useState<notification[]>([]);
+  const [alert, setAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertStatus, setAlertStatus] = useState('success');
 
   const columns: GridColDef[] = [
     {
@@ -80,14 +84,54 @@ const Notification = function (): JSX.Element {
           
           if (params.row.notification_type === 'invite to an event')
           {
-            const response = await confirmEvent(params.row.notification_id);
+            const response: number = await confirmEvent(params.row.id);
+            
+            if (response === 200)
+            {
+              const response: number = await deleteNotifications(params.row.notification_id);
+              if (response === 200)
+              {
+                setAlertMessage('Event Confirmed!');
+                setAlertStatus('success');
+                setAlert(true);
+                params.row.delete();
+                setTimeout(()=>{setAlert(false);}, 5000);
+              }
+              else
+              {
+                setAlertMessage('Error! please try again later.');
+                setAlertStatus('error');
+                setAlert(true);
+                setTimeout(()=>{setAlert(false);}, 5000);
+              }
+            }
+            else
+            {
+              setAlertMessage('Error! please try again later.');
+              setAlertStatus('error');
+              setAlert(true);
+              setTimeout(()=>{setAlert(false);}, 5000);
+            }
           }
         };
 
         const read_notification = async(e: any) => {
           e.stopPropagation(); // don't select this row after clicking
-          const response = await deleteNotifications(params.row.notification_id);
-          
+          const response: number = await deleteNotifications(params.row.notification_id);
+          if (response === 200)
+          {
+            setAlertMessage('Acknowledged the Notification');
+            setAlertStatus('success');
+            setAlert(true);
+            setTimeout(()=>{setAlert(false);}, 5000);
+          }
+          else
+          {
+            setAlertMessage('Error! please try again later.');
+            setAlertStatus('error');
+            setAlert(true);
+            setTimeout(()=>{setAlert(false);}, 5000);
+          }
         };
 
         if (params.row.notification_type === 'invite to an event')
@@ -134,14 +178,6 @@ const Notification = function (): JSX.Element {
     }
     fetchData();
   },[]);
-
-  useEffect(() => {
-    async function fetchData() {
-      const response = await confirmEvent(eventId);
-      window.alert('Event confirmed');
-    }
-    fetchData();    
-  }, [eventId]);
   
   notifications.forEach(function (item) { 
     item.status = item.read ? 'No Action Required' : 'Action Required';
@@ -150,21 +186,25 @@ const Notification = function (): JSX.Element {
   }); 
 
   return (
-    <div style={{ height: 1080,width: '100%' }}>
-      <br/>
-      <Typography variant='h2' align='center' fontFamily={'Fantasy, Copperplate'}>
-        Notifications
-      </Typography>
-      <br/>
-      <DataGrid 
-        rowHeight={100}
-        rows={notifications}
-        columns={columns}
-        components={{
-          Pagination: CustomPagination,
-        }}
-      />
-    </div>
+    <Box >
+      {AlertBox(alert, setAlert, alertMessage, alertStatus)}
+      <Box style={{ height: 1080,width: '100%' }}>
+        <br/>
+        <Typography variant='h2' align='center' fontFamily={'Fantasy, Copperplate'}>
+          Notifications
+        </Typography>
+        <br/>
+        <DataGrid 
+          rowHeight={100}
+          rows={notifications}
+          columns={columns}
+          components={{
+            Pagination: CustomPagination,
+          }}
+        />
+      </Box>
+    </Box>
+    
   );
 };
 

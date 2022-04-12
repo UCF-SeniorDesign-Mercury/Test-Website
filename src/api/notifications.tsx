@@ -35,7 +35,7 @@ export const getNotifications = async () : Promise<any> => {
 };
 
 
-export const readNotifications = async (notification_id:string) : Promise<unknown> => {
+export const readNotifications = async (notification_id:string) : Promise<number> => {
   const header = await getHeaders();
 
   return new Promise(function(resolve,reject){
@@ -47,27 +47,17 @@ export const readNotifications = async (notification_id:string) : Promise<unknow
       .then(async response => {
         console.log(response);
         if (response.status == 200) {            
-          resolve('Successfully read notification');
+          resolve(response.status);
         }
         else {
-          if (response.status == 400)
-            reject('Status 400: Bad Request');
-          else if (response.status == 401)
-            reject('Status 401: Unauthorized - the provided token is not valid.');
-          else if (response.status == 404)
-            reject('Status 404: File not found.');
-          else if (response.status == 415)
-            reject('Status 415: Unsupported media type.');
-          else if (response.status == 500)
-            reject('Status 500: Internal API Error.');
-          reject('Error. Please try again later.');
+          reject(response.status);
         }
       })
       .catch(err => console.log(err));
   });  
 };
 
-export const deleteNotifications = async (notification_id:string) : Promise<unknown> => {
+export const deleteNotifications = async (notification_id:string) : Promise<number> => {
   const header = await getHeaders();
 
   return new Promise(function(resolve,reject){
@@ -79,20 +69,10 @@ export const deleteNotifications = async (notification_id:string) : Promise<unkn
       .then(async response => {
         console.log(response);
         if (response.status == 200) {            
-          resolve('Successfully delete notification');
+          resolve(response.status);
         }
         else {
-          if (response.status == 400)
-            reject('Status 400: Bad Request');
-          else if (response.status == 401)
-            reject('Status 401: Unauthorized - the provided token is not valid.');
-          else if (response.status == 404)
-            reject('Status 404: File not found.');
-          else if (response.status == 415)
-            reject('Status 415: Unsupported media type.');
-          else if (response.status == 500)
-            reject('Status 500: Internal API Error.');
-          reject('Error. Please try again later.');
+          reject(response.status);
         }
       })
       .catch(err => console.log(err));

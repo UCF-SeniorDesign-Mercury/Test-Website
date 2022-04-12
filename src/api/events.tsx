@@ -14,7 +14,7 @@ import { url, getHeaders } from './api_settings';
 
 /*****************Events API CAlls*****************/
 //Confirm  event
-export const confirmEvent = async (event_id: string): Promise<unknown> => {
+export const confirmEvent = async (event_id: string): Promise<number> => {
   const header = await getHeaders();
 
   return new Promise(function (resolve, reject) {
@@ -24,23 +24,7 @@ export const confirmEvent = async (event_id: string): Promise<unknown> => {
       headers: header
     })
       .then(async response => {
-        console.log(response);
-        if (response.status == 201) {
-          resolve('Event Confirmed');
-        }
-        else {
-          if (response.status == 400)
-            reject('Status 400: Bad Request');
-          else if (response.status == 401)
-            reject('Status 401: Unauthorized - the provided token is not valid.');
-          else if (response.status == 404)
-            reject('Status 404: File not found.');
-          else if (response.status == 415)
-            reject('Status 415: Unsupported media type.');
-          else if (response.status == 500)
-            reject('Status 500: Internal API Error.');
-          reject('Error. Please try again later.');
-        }
+        resolve(response.status);
       })
       .catch(err => console.log(err));
   });
