@@ -94,8 +94,10 @@ const Notification = function (): JSX.Element {
                 setAlertMessage('Event Confirmed!');
                 setAlertStatus('success');
                 setAlert(true);
-                params.row.delete();
                 setTimeout(()=>{setAlert(false);}, 5000);
+                setNotifications(notifications.filter((notification)=>{
+                  return notification.id != params.row.id;
+                }));
               }
               else
               {
@@ -124,6 +126,9 @@ const Notification = function (): JSX.Element {
             setAlertStatus('success');
             setAlert(true);
             setTimeout(()=>{setAlert(false);}, 5000);
+            setNotifications(notifications.filter((notification)=>{
+              return notification.id != params.row.id;
+            }));
           }
           else
           {
