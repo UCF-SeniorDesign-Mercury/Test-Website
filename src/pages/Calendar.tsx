@@ -93,12 +93,12 @@ const EventPage = function (this: any): JSX.Element {
           const phaCopy = new Date(new Date((data as any).pha_date as string).getTime());
           phaCopy.setMonth(phaCopy.getMonth()+element);
           deezEvents = deezEvents.concat({
-            title: element +' Months since Last Dental Submission',
+            title: 'Dental > ' + element +' Months',
             start: (dentCopy).toISOString(),
             end: (dentCopy).toISOString(),
           });
           deezEvents = deezEvents.concat({
-            title: element +' Months Since Last PHA Sub.',
+            title: 'PHA > ' + element +' Months',
             start: (phaCopy).toISOString(),
             end: (phaCopy).toISOString(),
           });
