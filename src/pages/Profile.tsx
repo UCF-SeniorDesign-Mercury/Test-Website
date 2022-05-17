@@ -1,6 +1,6 @@
 import mainContext from '../context/MainContext';
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import Button from '@mui/material/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Profile.css';
 import { NavLink } from 'react-router-dom';
@@ -117,6 +117,11 @@ const ProfilePage = function (): JSX.Element {
         {/* <div>
           <iframe src={userInfo.profile_picture}></iframe>
         </div> */}
+        <NavLink to="/home">
+          <Button type="submit">
+            Go Back to Home
+          </Button>
+        </NavLink>
         <div className="profile-img">
           {/* <img src={blankProfile} alt="No IMG found"/> */}
           <img src={userInfo.profile_picture} alt="No IMG found"/>

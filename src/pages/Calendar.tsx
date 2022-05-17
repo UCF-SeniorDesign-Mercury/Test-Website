@@ -21,6 +21,7 @@ import AlertBox from '../components/AlertBox';
 import { getMedicalData } from '../api/medical';
 import { getUsers } from '../api/users';
 import { pushGraphicsState } from 'pdf-lib';
+import { NavLink } from 'react-router-dom';
 
 interface eventInformation{
   author: string;
@@ -206,6 +207,11 @@ const EventPage = function (this: any): JSX.Element {
 
         </div>
       </div>
+      <NavLink to="/home">
+        <Button type="submit">
+          Go Back to Home
+        </Button>
+      </NavLink>
       {AlertBox(alert, setAlert, alertMessage, alertStatus)}
       <div className='buttonBackground'>
         <Button onClick={() => {

@@ -14,6 +14,7 @@ import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
 import PDFview from '../components/PDF_Components/PDFview';
 import { PDFviewMode } from '../components/PDF_Components/PDFview';
 import FormList from '../components/PDF_Components/FormList';
+import { NavLink } from 'react-router-dom';
 
 export interface PageView
 {
@@ -98,6 +99,11 @@ const PDFPage = function (): JSX.Element {
       {spinner && <FullPageLoader/>}
 
       {currentPageView.view == 'MainMenu' && <div className='MainMenu'>
+        <NavLink to="/home">
+          <Button type="submit">
+            Go Back to Home
+          </Button>
+        </NavLink>
         <Button variant='outlined' startIcon={<FileUpload />} onClick={() => pageChange({view: 'ReviewList'})}
           sx={{
             position: 'absolute',

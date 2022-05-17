@@ -194,6 +194,11 @@ const Notification = function (): JSX.Element {
     <Box >
       {AlertBox(alert, setAlert, alertMessage, alertStatus)}
       <Box style={{ height: 1080,width: '100%' }}>
+        <NavLink to="/home">
+          <Button type="submit">
+            Go Back to Home
+          </Button>
+        </NavLink>
         <br/>
         <Typography variant='h2' align='center' fontFamily={'Fantasy, Copperplate'}>
           Notifications
